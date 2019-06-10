@@ -1,2 +1,2 @@
 # dante
-Single stack report made simple
+Single stack reports made simple
