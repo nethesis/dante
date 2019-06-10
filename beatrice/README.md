@@ -1,4 +1,4 @@
-# beatrice
+# Beatrice
 
 ## Project setup
 ```
