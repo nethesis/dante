@@ -1,0 +1,40 @@
+#!/bin/bash
+
+#
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - info@nethesis.it
+#
+# This script is part of Dante.
+#
+# Dante is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# Dante is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Dante.  If not, see COPYING.
+#
+
+# Execute all Dante miners and save the output to the configured directory.
+
+CIACCO_OUTPUT_DIR=/var/lib/nethserver/dante
+CIACCO_MINERS_DIR=/usr/share/dante/miners
+
+if [ -f /etc/sysconfig/dante ]; then
+    . /etc/sysconfig/dante
+fi
+
+TODAY_DIR="$CIACCO_OUTPUT_DIR/""$(date +"%Y/%m/%d")/"
+mkdir -p $TODAY_DIR
+
+for f in $(find /usr/share/dante/miners -type f);
+do
+    if [ -x $f ]; then
+        $f > $TODAY_DIR/$(basename $f).json
+    fi
+done
