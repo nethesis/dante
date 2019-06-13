@@ -1,0 +1,34 @@
+#!/bin/bash
+
+TMP_FILE=$(mktemp)
+LOG="/var/log/maillog"
+DAY=$(date +"%b %d")
+
+PREVIOUS_LOG="$LOG-"$(date -d "-1 day" +"%Y%m%d")
+if [ -f "$PREVIOUS_LOG" ] || [ -f "$PREVIOUS_LOG.gz" ]; then
+    zgrep "$DAY" $PREVIOUS_LOG*  > $TMP_FILE
+fi
+
+grep "$DAY" /var/log/maillog >> $TMP_FILE
+
+sent=0
+received=0
+spam=0
+viruts=0
+
+sent=$(grep "postfix/smtp" $TMP_FILE | wc -l)
+received=$(grep "postfix/smtpd" $TMP_FILE | wc -l)
+spam=$(grep "Blocked SPAM" $TMP_FILE | wc -l)
+virus=$(grep "Blocked INFECTED" $TMP_FILE | wc -l)
+virus=$((virus+$(grep "clamav: virus found:" $TMP_FILE | wc -l)))
+received=$((received+$(grep "default: F (no action)" $TMP_FILE | wc -l)))
+spam=$((spam+$(grep -e "soft reject" -e "reject" -e "add header" $TMP_FILE | wc -l)))
+
+echo -n '{"series":['
+echo -n "{\"name\": \"sent\", \"data\": [$sent]},"
+echo -n "{\"name\": \"received\", \"data\": [$received]},"
+echo -n "{\"name\": \"spam\", \"data\": [$spam]},"
+echo -n "{\"name\": \"virus\", \"data\": [$virus]}"
+echo -n ']}'
+
+rm -f $TMP_FILE 2>/dev/null
