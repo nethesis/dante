@@ -6,8 +6,8 @@ Edit `config.json` file:
 
 ```json
 {
-  "beatrice_url": "<your_beatrice_ui_url>", // beatrice instance
-  "theme": "light" // yout theme: <light | dark>
+  "beatrice_url": "<your_beatrice_ui_url>",
+  "theme": "<light | dark>"
 }
 ```
 
