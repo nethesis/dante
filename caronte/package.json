@@ -1,0 +1,19 @@
+{
+  "name": "caronte",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "bin": {
+    "main": "main.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "pkg": "rm -rf ./build && pkg -t node6-linux-x64 --out-path build .",
+    "postpkg": "mkdir -p ./build/node_modules/puppeteer && cp -R ./node_modules/puppeteer/.local-chromium ./build/node_modules/puppeteer"
+  },
+  "author": "Edoardo Spadoni <edoardo.spadoni@nethesis.it>",
+  "license": "ISC",
+  "dependencies": {
+    "puppeteer": "^1.17.0"
+  }
+}
