@@ -1,0 +1,11 @@
+{
+  "home": {
+    "dashboard": "Dashboard",
+    "settings": "Settings"
+  },
+  "dashboard": {},
+  "settings": {
+    "dark_theme": "Dark theme",
+    "light_theme": "Light theme"
+  }
+}
