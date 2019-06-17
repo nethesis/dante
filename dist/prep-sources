@@ -1,0 +1,13 @@
+#!/bin/bash
+
+#
+# Build caronte binary
+#
+pushd ../caronte
+npm install
+npm run pkg
+cp build/caronte ../dist/
+popd
+
+# Remove debug symbols
+strip caronte
