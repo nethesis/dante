@@ -14,6 +14,7 @@
   "author": "Edoardo Spadoni <edoardo.spadoni@nethesis.it>",
   "license": "ISC",
   "dependencies": {
+    "pkg": "^4.4.0",
     "puppeteer": "^1.17.0"
   }
 }
