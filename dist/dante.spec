@@ -5,7 +5,7 @@ Summary:	Single stack reports made simple
 
 License:	GPLv3
 URL:	    https://github.com/nethesis/dante	
-Source0:	https://github.com/gsanchietti/dante/archive/ciacco.tar.gz
+Source0:	https://github.com/nethesis/dante/archive/master.tar.gz
 
 BuildArch:  noarch
 #BuildRequires:	
@@ -16,7 +16,7 @@ Single stack reports made simple
 
 
 %prep
-%setup -q -n dante-ciacco
+%setup -q -n dante-master
 
 
 %install
