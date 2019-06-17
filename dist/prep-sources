@@ -6,8 +6,8 @@
 pushd ../caronte
 npm install
 npm run pkg
-cp build/caronte ../dist/
-popd
-
 # Remove debug symbols
-strip caronte
+strip build/caronte
+tar cvzf caronte.tar.gz -C build .
+cp caronte.tar.gz ../dist/
+popd
