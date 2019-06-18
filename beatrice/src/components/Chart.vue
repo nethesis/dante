@@ -1,6 +1,13 @@
 <template>
   <div :id="chartId">
-    <apexchart :type="type" :width="width" :height="height" :options="options" :series="series"/>
+    <apexchart
+      :ref="chartId"
+      :type="type"
+      :width="width"
+      :height="height"
+      :options="options"
+      :series="series"
+    />
   </div>
 </template>
 
@@ -10,13 +17,19 @@ export default {
   props: {
     chartId: String,
     type: String,
+    series: Array,
     width: Number,
     height: Number,
-    series: Array,
-    theme: Boolean
+    theme: Boolean,
+    palette: String,
+    sparkline: Boolean,
+    title: String
   },
   watch: {
     theme: function() {
+      this.options = this.initOptions();
+    },
+    palette: function() {
       this.options = this.initOptions();
     }
   },
@@ -31,25 +44,29 @@ export default {
         chart: {
           toolbar: {
             show: true,
-            tools: {
-              download: true,
-              selection: false,
-              zoom: false,
-              zoomin: false,
-              zoomout: false,
-              pan: false,
-              reset: false
-            }
+            tools: this.sparkline
+              ? false
+              : {
+                  download: true,
+                  selection: false,
+                  zoom: false,
+                  zoomin: false,
+                  zoomout: false,
+                  pan: false,
+                  reset: false
+                }
           },
           id: this.id,
-          background: this.theme ? "#fffff" : "#1c1d1d"
+          background: this.theme ? "#fffff" : "#1d1e1e",
+          sparkline: {
+            enabled: this.sparkline
+          }
         },
-        //colors: ["#77B6EA", "#545454"],
         dataLabels: {
           enabled: false
         },
         title: {
-          text: "Average High & Low Temperature",
+          text: this.sparkline ? "" : this.title,
           floating: false,
           align: "left",
           style: {
@@ -58,7 +75,7 @@ export default {
           }
         },
         markers: {
-          size: 4
+          size: this.sparkline ? 0 : 4
         },
         xaxis: {
           title: {
@@ -72,14 +89,13 @@ export default {
         },
         legend: {
           position: "top",
-          horizontalAlign: "right",
           onItemClick: {
             toggleDataSeries: false
           }
         },
         theme: {
           mode: this.theme ? "light" : "dark",
-          palette: "palette1"
+          palette: this.palette || "palette1"
         }
       };
     }
