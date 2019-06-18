@@ -28,6 +28,6 @@ title=$id
 type=$(basename $0 | cut -d'-' -f2)
 tags='["host", "hostname", "domain"]'
 snap='true'
-data=$(hostname -f)
+value=$(hostname -f)
 
-echo -n "{\"data\":\"$data\",\"type\":\"$type\",\"title\":\"$title\",\"tags\":$tags,\"position\":$pos,\"minerId\":\"$id\",\"snapshot\":$snap}"
+echo -n "{\"value\":\"$value\",\"type\":\"$type\",\"title\":\"$title\",\"tags\":$tags,\"position\":$pos,\"minerId\":\"$id\",\"snapshot\":$snap}"

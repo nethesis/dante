@@ -28,7 +28,7 @@ This is the structure of the output JSON of a miner that feeds a label widget:
 - `type`: "label"
 - `minerId`: miner identifier
 - `title`: a i18n string representing a description of the information associated to the label
-- `data`: a value in string format
+- `value`: a value in string format
 - `tags`: list of keywords related to the information displayed by the widget
 - `position`: integer number that defines the position of the widget on the dashboard. Small numbers are displayed top-left.
 - `snapshot`:  can be `true` or `false`. If set to `true`, values will not be aggregated over a span of time. It's fixed to `true` for the `label` type
@@ -40,7 +40,7 @@ This is the structure of the output JSON of a miner that feeds a label widget:
     "type": "label",
     "title": "hostname-label",
     "minerId": "miner-total-emails-received",
-    "data": "mail.nethserver.org",
+    "value": "mail.nethserver.org",
     "tags": [ "hostname" ],
     "position": 10,
     "snapshot": true

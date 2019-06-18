@@ -28,6 +28,6 @@ title=$id
 type=$(basename $0 | cut -d'-' -f2)
 tags='["disk", "usage", "root", "/"]'
 snap='true'
-data=$(df --output=used / | tail -n 1 | cut -d' ' -f1)
+value=$(df --output=used / | tail -n 1 | cut -d' ' -f1)
 
-echo -n "{\"data\":\"$data\",\"type\":\"$type\",\"title\":\"$title\",\"tags\":$tags,\"position\":$pos,\"minerId\":\"$id\",\"snapshot\":$snap}"
+echo -n "{\"value\":$value,\"type\":\"$type\",\"title\":\"$title\",\"tags\":$tags,\"position\":$pos,\"minerId\":\"$id\",\"snapshot\":$snap}"

@@ -22,11 +22,11 @@
 
 # Return the NethServer or system-release
 
-data=$(cat /etc/nethserver-release)
+value=$(cat /etc/nethserver-release)
 
 # fallback to system-release
 if [ -z "$ns_release" ]; then
-    data=$(cat /etc/system-release)
+    value=$(cat /etc/system-release)
 fi
 
 pos=03
@@ -36,4 +36,4 @@ type=$(basename $0 | cut -d'-' -f2)
 tags='["release", "product", "version"]'
 snap='true'
 
-echo -n "{\"data\":\"$data\",\"type\":\"$type\",\"title\":\"$title\",\"tags\":$tags,\"position\":$pos,\"minerId\":\"$id\",\"snapshot\":$snap}"
+echo -n "{\"value\":\"$value\",\"type\":\"$type\",\"title\":\"$title\",\"tags\":$tags,\"position\":$pos,\"minerId\":\"$id\",\"snapshot\":$snap}"
