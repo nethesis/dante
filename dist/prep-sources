@@ -11,3 +11,11 @@ strip build/caronte
 tar cvzf caronte.tar.gz -C build .
 cp caronte.tar.gz ../dist/
 popd
+
+pushd ../beatrice
+rm -rf dist/
+npm install
+npm run build
+tar cvzf beatrice.tar.gz -C dist .
+cp beatrice.tar.gz ../dist/
+popd
