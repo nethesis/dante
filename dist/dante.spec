@@ -31,6 +31,7 @@ mkdir -p %{buildroot}/usr/share/dante/caronte
 mkdir -p %{buildroot}/usr/bin
 mkdir -p %{buildroot}/etc/sysconfig/
 cp ciacco/ciacco %{buildroot}/%{_bindir}
+mv ciacco/miners %{buildroot}/usr/share/dante/
 tar xvzf %{SOURCE1}  -C %{buildroot}/usr/share/dante/caronte
 mv %{SOURCE2}  %{buildroot}/etc/sysconfig/dante
 
@@ -41,6 +42,7 @@ mv %{SOURCE2}  %{buildroot}/etc/sysconfig/dante
 %config /etc/sysconfig/dante
 %dir /usr/share/dante/
 %{_bindir}/ciacco
+/usr/share/dante/miners/
 
 %files caronte
 /usr/share/dante/caronte
