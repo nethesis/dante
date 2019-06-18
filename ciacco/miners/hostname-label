@@ -22,7 +22,7 @@
 
 # Return the hostname
 
-pos=02
+pos=10
 id=$(basename $0)
 title=$id
 type=$(basename $0 | cut -d'-' -f2)

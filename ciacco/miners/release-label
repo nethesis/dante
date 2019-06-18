@@ -29,7 +29,7 @@ if [ -z "$ns_release" ]; then
     value=$(cat /etc/system-release)
 fi
 
-pos=03
+pos=30
 id=$(basename $0)
 title=$id
 type=$(basename $0 | cut -d'-' -f2)

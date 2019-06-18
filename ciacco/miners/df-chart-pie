@@ -26,7 +26,7 @@ data=$(df --output=used,avail / | tail -n 1)
 used=$(echo $data | cut -d' ' -f 1)
 avail=$(echo $data | cut -d' ' -f 2)
 
-pos=10
+pos=40
 id=$(basename $0)
 title=$id
 type=$(basename $0 | cut -d'-' -f2)

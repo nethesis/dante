@@ -22,7 +22,7 @@
 
 # Root paritition usage
 
-pos=10
+pos=50
 id=$(basename $0)
 title=$id
 type=$(basename $0 | cut -d'-' -f2)

@@ -26,7 +26,7 @@ vendor=$(cat /sys/devices/virtual/dmi/id/sys_vendor)
 product=$(cat /sys/devices/virtual/dmi/id/product_name)
 value="$vendor $product"
 
-pos=04
+pos=20
 id=$(basename $0)
 title=$id
 type=$(basename $0 | cut -d'-' -f2)
