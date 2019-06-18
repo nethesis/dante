@@ -1,0 +1,39 @@
+#!/bin/bash
+
+#
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - info@nethesis.it
+#
+# This script is part of Dante.
+#
+# Dante is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# Dante is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Dante.  If not, see COPYING.
+#
+
+# Return the NethServer or system-release
+
+data=$(cat /etc/nethserver-release)
+
+# fallback to system-release
+if [ -z "$ns_release" ]; then
+    data=$(cat /etc/system-release)
+fi
+
+pos=03
+id=$(basename $0)
+title=$id
+type=$(basename $0 | cut -d'-' -f2)
+tags='["release", "product", "version"]'
+snap='true'
+
+echo -n "{\"data\":\"$data\",\"type\":\"$type\",\"title\":\"$title\",\"tags\":$tags,\"position\":$pos,\"minerId\":\"$id\",\"snapshot\":$snap}"
