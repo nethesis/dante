@@ -1,19 +1,8 @@
 # Caronte
 
-## Configuration
-
-Edit `config.json` file:
-
-```json
-{
-  "beatrice_url": "<your_beatrice_ui_url>",
-  "theme": "<light | dark>"
-}
-```
-
 ## Development & Run
 
-Run `node main.js` produces `caronte-DATE-IN-ISO.png`
+Run `node main.js "http://beatrice_url/#/?theme=dark&palette=palette1"` produces `caronte-DATE-IN-ISO.png`
 
 ## Build
 
