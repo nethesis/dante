@@ -1,4 +1,7 @@
+# avoid error during caronte packaging
 %define debug_package %{nil}
+# do not strip caronte binary
+%define __strip /bin/true
 
 Name:		dante
 Version:	0.0.0
