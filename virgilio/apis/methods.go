@@ -15,6 +15,11 @@ import (
 	"github.com/nethesis/dante/virgilio/widgets"
 )
 
+type miner struct {
+	Name string `json:"name"`
+	Type string `json:"type"`
+}
+
 // Validate query parameters
 func validate(widgetName string, startDateString string, endDateString string) (string, time.Time, int) {
 	deltaDays := 0
@@ -231,4 +236,68 @@ func ReadWidget(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"widget": widget,
 	})
+}
+
+// ListMiners list all Ciacco miners
+func ListMiners(c *gin.Context) {
+	var miners []miner
+
+	files, err := ioutil.ReadDir(configuration.Config.Ciacco.MinersDirectory)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Miner directory not found " + configuration.Config.Ciacco.MinersDirectory})
+		return
+	}
+
+	for _, f := range files {
+		var m miner
+		if !f.IsDir() {
+			parts := strings.Split(f.Name(), "-")
+			m.Name = parts[0]
+			m.Type = parts[1]
+			miners = append(miners, m)
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"miners": miners,
+	})
+
+}
+
+func readDefaultLayout() widgets.Layout {
+	return widgets.Layout{}
+}
+
+func readLayout() widgets.Layout {
+	_, err := os.Stat(configuration.Config.Virgilio.LayoutFile)
+	if os.IsNotExist(err) {
+		return readDefaultLayout()
+	}
+
+	return widgets.ParseLayout(configuration.Config.Virgilio.LayoutFile)
+}
+
+// GetLayout returns the saved layout from VIRGILIO_STORE_DIR,
+// if no existing layout can be found, return the default one
+func GetLayout(c *gin.Context) {
+	layout := readLayout()
+
+	c.JSON(http.StatusOK, gin.H{
+		"layout": layout.Widgets,
+	})
+}
+
+// SetLayoyt saves the layout inside VIRGILIO_STORE_DIR
+func SetLayout(c *gin.Context) {
+	var layout widgets.Layout
+
+	if err := c.ShouldBindJSON(&layout); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.Status(http.StatusOK)
+	file, _ := json.Marshal(layout)
+
+	_ = ioutil.WriteFile(configuration.Config.Virgilio.LayoutFile, file, 0644)
 }

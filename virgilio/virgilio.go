@@ -21,6 +21,9 @@ func main() {
 	router.Use(cors.New(corsConf))
 
 	router.GET("/widget/:widgetName", apis.ReadWidget)
+	router.GET("/miners", apis.ListMiners)
+	router.GET("/layout", apis.GetLayout)
+	router.POST("/layout", apis.SetLayout)
 
 	// listen on default free port
 	router.Run(":8081") // listen and serve

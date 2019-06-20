@@ -1,5 +1,27 @@
 package widgets
 
+type Layout struct {
+	Widgets []Widget `json:"layout"`
+}
+
+type Serie struct {
+	Name string `json:"name"`
+	Data []int  `json:"data"`
+}
+
+type Widget struct {
+	X    int    `json:"x"`
+	Y    int    `json:"y"`
+	I    int    `json:"i"`
+	Id   string `json:"id"`
+	Type string `json:"type"`
+	Data struct {
+		Title  string  `json:"title"`
+		Type   string  `json:"type"`
+		Series []Serie `json:"series"`
+	} `json:"data"`
+}
+
 type Label struct {
 	Type     string   `json:"type"`
 	Title    string   `json:"title"`

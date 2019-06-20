@@ -1,7 +1,10 @@
 package widgets
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"os"
 	"path"
 	"strconv"
 	"time"
@@ -24,4 +27,53 @@ func GetFileLists(widgetName string, startDate time.Time, deltaDays int) []strin
 		filePaths[i] = fullPath
 	}
 	return filePaths
+}
+
+// ParseWidget return a widget generic data from a file
+// Return nil if the file can't be parsed
+func ParseWidget(filePath string) map[string]interface{} {
+	var widgetData map[string]interface{}
+
+	widgetFile, err := os.Open(filePath)
+	defer widgetFile.Close()
+	if err != nil {
+		return nil
+	}
+	bytes, err := ioutil.ReadAll(widgetFile)
+	if err != nil {
+		return nil
+	}
+
+	json.Unmarshal(bytes, &widgetData)
+	if err != nil {
+		return nil
+	}
+
+	return widgetData
+}
+
+// ParseLayout return a layout from a file
+// Return nil if the file can't be parsed
+func ParseLayout(filePath string) Layout {
+	var layout Layout
+
+	file, err := os.Open(filePath)
+	defer file.Close()
+	if err != nil {
+		return Layout{}
+	}
+	bytes, err := ioutil.ReadAll(file)
+	if err != nil {
+		return Layout{}
+	}
+
+	json.Unmarshal(bytes, &layout)
+	if err != nil {
+		return Layout{}
+	}
+
+	fmt.Print("all ok ->")
+	fmt.Println(layout)
+
+	return layout
 }
