@@ -167,7 +167,7 @@ This is the the structure of output JSON of a miner that feeds a table widget:
     "tags": [ "host", "traffic", "total", "received", "sent" ],
     "unit": "bytes",
     "columnHeader": [ "Total", "Sent", "Received" ],
-    "rowHeader": [ "TCP", "UDP" ],
+    "rowHeader": "true | false // if true first item of columnHeader is blank: [ '', 'Sent', 'Received' ]",
     "rows":  [ 
         [ 720, 400, 320 ],
         [ 550, 300, 250 ]
