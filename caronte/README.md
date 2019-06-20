@@ -2,7 +2,7 @@
 
 ## Development & Run
 
-Run `node main.js "http://beatrice_url/#/?theme=dark&palette=palette1"` produces `caronte-DATE-IN-ISO.png`
+Run `node main.js "http://<beatrice_url>/#/?theme=dark&palette=palette1"` produces `caronte-DATE-IN-ISO.png`
 
 ## Build
 

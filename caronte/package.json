@@ -8,13 +8,18 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "pkg": "rm -rf ./build && pkg -t node6-linux-x64 --out-path build .",
+    "pkg": "rm -rf ./build && pkg -t node10-linux-x64 --out-path build .",
     "postpkg": "mkdir -p ./build/node_modules/puppeteer && cp -R ./node_modules/puppeteer/.local-chromium ./build/node_modules/puppeteer"
   },
   "author": "Edoardo Spadoni <edoardo.spadoni@nethesis.it>",
   "license": "ISC",
   "dependencies": {
+    "i18n": "^0.8.3",
+    "mjml": "^4.4.0-beta.2",
+    "moment": "^2.24.0",
+    "nodemailer": "^6.2.1",
     "pkg": "^4.4.0",
-    "puppeteer": "^1.17.0"
+    "puppeteer": "^1.17.0",
+    "url-parse": "^1.4.7"
   }
 }

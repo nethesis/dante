@@ -1,31 +1,37 @@
-const puppeteer = require("puppeteer");
+#!/usr/bin/env node
 
-let _browser;
-let _page;
+const Screenshot = require("./Screenshot");
+const Template = require("./Template");
+const Mail = require("./Mail");
 
-let args = process.argv.slice(2);
+(async () => {
+  // read args
+  var args = process.argv.slice(2);
 
-puppeteer
-  .launch({
-    args: ["--no-sandbox"],
-    defaultViewport: {
-      width: 1024,
-      height: 768
-    },
-    executablePath: process.pkg
-      ? puppeteer.executablePath().replace(__dirname, ".")
-      : null
-  })
-  .then(browser => (_browser = browser))
-  .then(browser => (_page = browser.newPage()))
-  .then(page => page.goto(args[0])) // args[0] contains beatrice url
-  .then(() => _page)
-  .then(page => page.waitFor(2000)) // wait for charts animations
-  .then(() => _page)
-  .then(page =>
-    page.screenshot({
-      path: "caronte-" + new Date().toISOString() + ".png",
-      fullPage: true
-    })
-  )
-  .then(() => _browser.close());
+  // check args
+  if (!args[0] || args[0].length == 0) {
+    console.error("Beatrice 'URL' is required.");
+    process.exit(1);
+  }
+
+  if (!args[1] || args[1].length == 0) {
+    console.error("Sender address[es]' are required.");
+    process.exit(1);
+  }
+
+  // get args
+  var url = args[0];
+  var addresses = args[1];
+
+  // process images and send mail
+  const screenshot = new Screenshot();
+  var image = await screenshot.shot(url);
+
+  const template = new Template();
+  var html = await template.create(image, url);
+
+  const mail = new Mail();
+  var status = await mail.send(html, addresses);
+
+  process.exit(0);
+})();
