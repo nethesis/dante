@@ -22,12 +22,10 @@
 
 # Return the hostname
 
-pos=10
 id=$(basename $0)
 title=$id
 type=$(basename $0 | cut -d'-' -f2)
-tags='["host", "hostname", "domain"]'
 snap='true'
 value=$(hostname -f)
 
-echo -n "{\"value\":\"$value\",\"type\":\"$type\",\"title\":\"$title\",\"tags\":$tags,\"position\":$pos,\"minerId\":\"$id\",\"snapshot\":$snap}"
+echo -n "{\"value\":\"$value\",\"type\":\"$type\",\"title\":\"$title\",\"minerId\":\"$id\",\"snapshot\":$snap}"

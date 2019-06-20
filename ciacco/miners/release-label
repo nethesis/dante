@@ -29,11 +29,9 @@ if [ -z "$ns_release" ]; then
     value=$(cat /etc/system-release)
 fi
 
-pos=30
 id=$(basename $0)
 title=$id
 type=$(basename $0 | cut -d'-' -f2)
-tags='["release", "product", "version"]'
 snap='true'
 
-echo -n "{\"value\":\"$value\",\"type\":\"$type\",\"title\":\"$title\",\"tags\":$tags,\"position\":$pos,\"minerId\":\"$id\",\"snapshot\":$snap}"
+echo -n "{\"value\":\"$value\",\"type\":\"$type\",\"title\":\"$title\",\"minerId\":\"$id\",\"snapshot\":$snap}"

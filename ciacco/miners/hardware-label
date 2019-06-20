@@ -26,11 +26,9 @@ vendor=$(cat /sys/devices/virtual/dmi/id/sys_vendor)
 product=$(cat /sys/devices/virtual/dmi/id/product_name)
 value="$vendor $product"
 
-pos=20
 id=$(basename $0)
 title=$id
 type=$(basename $0 | cut -d'-' -f2)
-tags='["type", "product", "hardware"]'
 snap='true'
 
-echo -n "{\"value\":\"$value\",\"type\":\"$type\",\"title\":\"$title\",\"tags\":$tags,\"position\":$pos,\"minerId\":\"$id\",\"snapshot\":$snap}"
+echo -n "{\"value\":\"$value\",\"type\":\"$type\",\"title\":\"$title\",\"minerId\":\"$id\",\"snapshot\":$snap}"

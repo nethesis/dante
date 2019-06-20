@@ -29,8 +29,6 @@ This is the structure of the output JSON of a miner that feeds a label widget:
 - `minerId`: miner identifier
 - `title`: a i18n string representing a description of the information associated to the label
 - `value`: a value in string format
-- `tags`: list of keywords related to the information displayed by the widget
-- `position`: integer number that defines the position of the widget on the dashboard. Small numbers are displayed top-left.
 - `snapshot`:  can be `true` or `false`. If set to `true`, values will not be aggregated over a span of time. It's fixed to `true` for the `label` type
 
 #### Example
@@ -41,8 +39,6 @@ This is the structure of the output JSON of a miner that feeds a label widget:
     "title": "hostname-label",
     "minerId": "miner-total-emails-received",
     "value": "mail.nethserver.org",
-    "tags": [ "hostname" ],
-    "position": 10,
     "snapshot": true
 }
 ```
@@ -55,8 +51,6 @@ This is the structure of the output JSON of a miner that feeds a counter widget:
 - `minerId`: miner identifier
 - `title`: a i18n string representing a description of the information associated to the counter
 - `value`: numerical value of the counter
-- `tags`: list of keywords related to the information displayed by the widget
-- `position`: integer number that defines the position of the widget on the dashboard. Small numbers are displayed top-left.
 - `snapshot`: can be `true` or `false`. If set to `true`, values will not be aggregated over a span of time
 
 #### Example
@@ -67,8 +61,6 @@ This is the structure of the output JSON of a miner that feeds a counter widget:
     "title": "received_mails",
     "minerId": "miner-total-emails-received",
     "value":  42,
-    "tags": [ "email", "e-mail", "received", "total", "mail" ],
-    "position": 10,
     "snapshot": true
 }
 ```
@@ -81,8 +73,6 @@ This is the structure of the output JSON of a miner that feeds a chart widget:
 - `chartType`: "pie" or "bar" or "line" or "area" or "column"
 - `title`: the title of the chart
 - `minerId`: miner identifier
-- `position`: integer number that defines the position of the widget on the dashboard. Small numbers are displayed top-left.
-- `tags`: list of keywords related to the information displayed by the widget
 - `unit`: unit of measurement. Currently only "bytes" is supported
 - `categories`: array of categories (for pie, bar and columns charts) or values on the x-axis (for line and area charts)
 - `series`: array of values/objects associated to the categories
@@ -100,8 +90,6 @@ This is the structure of the output JSON of a miner that feeds a chart widget:
     "chartType": "pie",
     "title": "traffic_by_protocol",
     "minerId": "miner-traffic-by-protocol", 
-    "position": 20,
-    "tags": [ "traffic", "protocol", "tcp", "udp", "icmp", "network" ],
     "categories": [ "TCP", "UDP", "ICMP", "Other" ],
     "series": [
         {
@@ -122,8 +110,6 @@ This is the structure of the output JSON of a miner that feeds a chart widget:
     "chartType": "bar",
     "title": "Calls sent and received by hour",
     "minerId": "miner-calls-sent-and-received-by-hour", 
-    "position": 30,
-    "tags": [ "calls", "call", "sent", "received", "hour", "phone" ],
     "categories": [ "9:00-10:00", "10:00-11:00", "11:00-12:00", "12:00-13:00" ],
     "series": [
         {
@@ -148,8 +134,6 @@ This is the the structure of output JSON of a miner that feeds a table widget:
 - `type`: "table"
 - `title`: the title of the table
 - `minerId`: miner identifier
-- `position`: integer number that defines the position of the widget on the dashboard. Small numbers are displayed top-left.
-- `tags`: list of keywords related to the information displayed by the widget
 - `unit`: unit of measurement. Currently only "bytes" is supported
 - `columnsHeader`: column headers
 - `rowHeader`: row headers
@@ -163,8 +147,6 @@ This is the the structure of output JSON of a miner that feeds a table widget:
     "type": "table",
     "title": "host-traffic",
     "minerId": "miner-host-traffic",
-    "position": 40,
-    "tags": [ "host", "traffic", "total", "received", "sent" ],
     "unit": "bytes",
     "columnHeader": [ "Total", "Sent", "Received" ],
     "rowHeader": "true | false // if true first item of columnHeader is blank: [ '', 'Sent', 'Received' ]",

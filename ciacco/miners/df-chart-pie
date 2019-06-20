@@ -26,18 +26,16 @@ data=$(df --output=used,avail / | tail -n 1)
 used=$(echo $data | cut -d' ' -f 1)
 avail=$(echo $data | cut -d' ' -f 2)
 
-pos=40
 id=$(basename $0)
 title=$id
 type=$(basename $0 | cut -d'-' -f2)
 chartType=$(basename $0 | cut -d'-' -f3)
-tags='["root", "disk", "usage"]'
 unit="bytes"
 snap='true'
 categories='["used", "available"]'
 series="[{\"name\":\"root_parition\",\"i18n\":\"true\",\"data\":[$used, $avail]}]"
 
-echo -n "{\"type\":\"$type\",\"chartType\":\"$chartType\",\"title\":\"$title\",\"tags\":$tags,\"position\":$pos,\"minerId\":\"$id\",\"snapshot\":$snap,\"unit\":\"$unit\","
+echo -n "{\"type\":\"$type\",\"chartType\":\"$chartType\",\"title\":\"$title\",\"minerId\":\"$id\",\"snapshot\":$snap,\"unit\":\"$unit\","
 echo -n "\"series\":$series",
 echo -n "\"categories\":$categories"
 echo -n "}"
