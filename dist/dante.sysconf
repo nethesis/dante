@@ -1,6 +1,6 @@
 # Directory containing the miners script
-MINERS_DIR=/usr/share/dante/miners
+CIACCO_MINERS_DIR=/usr/share/dante/miners
 
 # Directory where miner output is saved
-OUTPUT_DIR=/var/lib/nethserver/dante
+CIACCO_OUTPUT_DIR=/var/lib/nethserver/dante
 
