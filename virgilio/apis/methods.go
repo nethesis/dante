@@ -264,23 +264,22 @@ func ListMiners(c *gin.Context) {
 
 }
 
-func readDefaultLayout() widgets.Layout {
-	return widgets.Layout{}
-}
-
-func readLayout() widgets.Layout {
-	_, err := os.Stat(configuration.Config.Virgilio.LayoutFile)
-	if os.IsNotExist(err) {
-		return readDefaultLayout()
+// DeleteLayout delete saved layout
+func DeleteLayout(c *gin.Context) {
+	var err = os.Remove(configuration.Config.Virgilio.LayoutFile)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+	} else {
+		c.Status(http.StatusOK)
 	}
-
-	return widgets.ParseLayout(configuration.Config.Virgilio.LayoutFile)
 }
 
 // GetLayout returns the saved layout from VIRGILIO_STORE_DIR,
 // if no existing layout can be found, return the default one
 func GetLayout(c *gin.Context) {
-	layout := readLayout()
+	layout := widgets.ReadLayout()
 
 	c.JSON(http.StatusOK, gin.H{
 		"layout": layout.Widgets,

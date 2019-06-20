@@ -24,6 +24,7 @@ func main() {
 	router.GET("/miners", apis.ListMiners)
 	router.GET("/layout", apis.GetLayout)
 	router.POST("/layout", apis.SetLayout)
+	router.DELETE("/layout", apis.DeleteLayout)
 
 	// listen on default free port
 	router.Run(":8081") // listen and serve

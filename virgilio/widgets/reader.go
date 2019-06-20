@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -72,8 +74,67 @@ func ParseLayout(filePath string) Layout {
 		return Layout{}
 	}
 
-	fmt.Print("all ok ->")
-	fmt.Println(layout)
-
 	return layout
+}
+
+func ReadDefaultLayout() Layout {
+	var widgets []Widget
+
+	// find newest output directory named as day of the month
+	libRegEx, e := regexp.Compile("^\\d\\d$")
+	if e != nil {
+		return Layout{}
+	}
+
+	modTime := time.Unix(0, 0)
+	var newest string
+	e = filepath.Walk(configuration.Config.Ciacco.OutputDirectory, func(path string, info os.FileInfo, err error) error {
+		if err == nil && libRegEx.MatchString(info.Name()) {
+			if info.Mode().IsDir() {
+				if info.ModTime().After(modTime) {
+					newest = path
+				}
+			}
+		}
+
+		return nil
+	})
+	if e != nil {
+		return Layout{}
+	}
+
+	// read all widgets and generates the default layout
+	i := 0
+	files, err := ioutil.ReadDir(newest)
+	if err != nil {
+		return Layout{}
+	}
+	for _, f := range files {
+		var w Widget
+		if !f.IsDir() {
+			obj := ParseWidget(path.Join(newest, f.Name()))
+			w.Type = obj["type"].(string)
+			w.Id = obj["minerId"].(string)
+			w.I = i
+			w.Y = i
+			if i%2 == 0 {
+				w.X = 0
+			} else {
+				w.X = 6
+			}
+			widgets = append(widgets, w)
+			i++
+		}
+	}
+
+	return Layout{widgets}
+}
+
+func ReadLayout() Layout {
+	_, err := os.Stat(configuration.Config.Virgilio.LayoutFile)
+	if os.IsNotExist(err) {
+		return ReadDefaultLayout()
+	}
+
+	return ParseLayout(configuration.Config.Virgilio.LayoutFile)
 }

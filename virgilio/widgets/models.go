@@ -15,11 +15,6 @@ type Widget struct {
 	I    int    `json:"i"`
 	Id   string `json:"id"`
 	Type string `json:"type"`
-	Data struct {
-		Title  string  `json:"title"`
-		Type   string  `json:"type"`
-		Series []Serie `json:"series"`
-	} `json:"data"`
 }
 
 type Label struct {
