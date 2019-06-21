@@ -1,7 +1,9 @@
 #!/bin/bash
 
+set -e
+
 #
-# Build caronte binary
+# Build caronte NodeJS binary
 #
 pushd ../caronte
 npm install
@@ -10,6 +12,9 @@ tar cvzf caronte.tar.gz -C build .
 cp caronte.tar.gz ../dist/
 popd
 
+#
+# Build beatrice UI
+#
 pushd ../beatrice
 rm -rf dist/
 npm install
@@ -19,9 +24,10 @@ cp beatrice.tar.gz ../dist/
 popd
 
 #
-# Build virgilio binary
+# Build virgilio GO binary
 #
 pushd ../virgilio
+unset GOPATH
 GO111MODULE=on
 go build
 cp virgilio ../dist

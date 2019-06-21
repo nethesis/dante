@@ -1,8 +1,6 @@
 ---
 sudo: required
-language: node_js
-node_js:
-  - "8"
+language: go
 git:
   depth: false
 
@@ -29,14 +27,16 @@ env:
         -e ENDPOINTS_PACK
         "
 before_install:
-    - sudo apt-get install -y npm python-setuptools
+    - sudo apt-get install curl python-software-properties npm python-setuptools -y
+    - curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+    -  sudo apt-get install nodejs
     - sudo npm config set ca ""
     - sudo npm conf set strict-ssl false
     - sudo easy_install pip
     - sudo pip install transifex-client
 
 install:
-    - cd dist && ./prep-sources
+    - cd dist && ./prep-sources >/dev/null
 
 script: >
     docker run -ti --name makerpms ${EVARS}
