@@ -6,7 +6,6 @@
     "last_day": "Last day",
     "last_week": "Last week",
     "last_month": "Last month",
-    "last_halfyear": "Last 6 months",
     "colors": "Colors",
     "palette": "Palette",
     "light_theme": "Light theme",
@@ -15,12 +14,10 @@
   "dashboard": {
     "cancel": "Cancel",
     "add": "Add",
-    "trend": "Trend",
     "insert_new_title": "Insert new title",
     "add_widget": "Add widget",
     "edit_widgets": "Edit widgets",
     "edit_done": "Edit done",
-    "reset_default": "Default layout",
     "empty_title": "Empty Title",
     "empty_chart_title": "Empty chart title",
     "empty_counter_title": "Empty counter title",
@@ -45,11 +42,8 @@
     "report_title": "Here's your Report!",
     "machine": "Machine",
     "view_more": "View more",
+    "yesterday": "Yesterday",
     "last_week": "Last week",
-    "last_month": "Last month",
-    "last_halfyear": "Last 6 months",
-    "weekly": "Weekly",
-    "monthly": "Monthly",
-    "halfyearly": "Half-yearly"
+    "last_month": "Last month"
   }
 }
