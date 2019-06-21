@@ -192,7 +192,7 @@
           <div class="ui indeterminate text loader">{{$t('dashboard.retrieving_data')}}</div>
         </div>
         <div
-          v-if="item.type == 'label'"
+          v-if="item.type == 'label' && item.data.value"
           class="ui one statistics full-box"
           :class="[$parent.lightTheme ? '' : 'inverted', 'mini']"
         >
@@ -406,7 +406,7 @@ export default {
       view: {
         isLoading: true
       },
-      apiHost: ""
+      apiHost: "http://192.168.5.216:8081"
     };
   },
   methods: {
@@ -602,7 +602,7 @@ export default {
       this.$http
         .get(
           this.apiHost +
-            "/widget" +
+            "/widget/" +
             widget +
             "?startDate=" +
             startDate.format("YYYY-MM-DD") +

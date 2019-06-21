@@ -1,0 +1,43 @@
+{
+  "home": {
+    "title": "Report",
+    "dashboard": "Dashboard",
+    "settings": "Settings",
+    "last_day": "Last day",
+    "last_week": "Last week",
+    "last_month": "Last month",
+    "colors": "Colors",
+    "palette": "Palette",
+    "light_theme": "Light theme",
+    "dark_theme": "Dark theme"
+  },
+  "dashboard": {
+    "cancel": "Cancel",
+    "add": "Add",
+    "insert_new_title": "Insert new title",
+    "add_widget": "Add widget",
+    "edit_widgets": "Edit widgets",
+    "edit_done": "Edit done",
+    "empty_title": "Empty Title",
+    "empty_chart_title": "Empty chart title",
+    "empty_counter_title": "Empty counter title",
+    "empty_table_title": "Empty table title",
+    "chart": "Chart",
+    "counter": "Counter",
+    "table": "Table",
+    "title": "Title",
+    "choose_chart": "Choose chart",
+    "choose_counter": "Choose counter",
+    "choose_table": "Choose table",
+    "no_widgets": "No widgets found. Click on the button below to add a new one.",
+    "retrieving_data": "Retrieving data..."
+  },
+  "caronte": {
+    "report_title": "Here's your Report!",
+    "machine": "Machine",
+    "view_more": "View more",
+    "yesterday": "Yesterday",
+    "last_week": "Last week",
+    "last_month": "Last month"
+  }
+}
