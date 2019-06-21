@@ -31,13 +31,13 @@ const Mail = require("./Mail");
 
   // process images and send mail
   const screenshot = new Screenshot();
-  var image = await screenshot.shot(url);
+  var assets = await screenshot.shot(url);
 
   const template = new Template();
-  var html = await template.create(image, url, parsedQuery);
+  var html = await template.create(assets.image, url, parsedQuery);
 
   const mail = new Mail();
-  var status = await mail.send(html, addresses, url, parsedQuery);
+  var status = await mail.send(html, addresses, url, parsedQuery, assets.pdf);
 
   process.exit(0);
 })();

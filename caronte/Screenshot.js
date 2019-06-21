@@ -57,11 +57,24 @@ class Screenshot {
     await this.page.waitFor(2000);
 
     // take screenshot
-    return await this.screenshotDOMElement({
+    var image = await this.screenshotDOMElement({
       selector: ".ui.segment",
       padding: -1,
       height: 768
     });
+
+    // take pdf
+    await this.page.emulateMedia("screen");
+    var pdf = await this.page.pdf({
+      format: "Tabloid",
+      printBackground: true
+    });
+
+    // return image and pdf
+    return {
+      image: image,
+      pdf: pdf
+    };
   }
 }
 module.exports = Screenshot;
