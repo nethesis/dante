@@ -43,6 +43,16 @@ type Chart struct {
 	Snapshot   bool     `json:"snapshot"`
 }
 
+type PieChart struct {
+	Type       string    `json:"type"`
+	ChartType  string    `json:"chartType"`
+	Title      string    `json:"title"`
+	MinerId    string    `json:"minerId"`
+	Labels     []string  `json:"labels"`
+	Series     []float64 `json:"series"`
+	Snapshot   bool      `json:"snapshot"`
+}
+
 type Table struct {
 	Type         string      `json:"type"`
 	Title        string      `json:"title"`

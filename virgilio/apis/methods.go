@@ -13,6 +13,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/nethesis/dante/virgilio/configuration"
 	"github.com/nethesis/dante/virgilio/widgets"
+	"github.com/nethesis/dante/virgilio/utils"
 )
 
 type miner struct {
@@ -227,7 +228,14 @@ func ReadWidget(c *gin.Context) {
 		widget = counterData
 	case "chart":
 		chartData.Series = seriesOutputChart
-		widget = chartData
+
+		// if it's a pie chart, change structure of output json
+		if chartData.ChartType == "pie" {
+			pieChart := utils.MapPieChart(chartData)
+			widget = pieChart
+		} else {
+			widget = chartData
+		}
 	case "table":
 		tableData.Rows = rowsOutputTable
 		widget = tableData
