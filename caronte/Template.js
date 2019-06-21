@@ -1,19 +1,14 @@
+const os = require("os");
 const i18n = require("i18n");
 const moment = require("moment");
 const mjml2html = require("mjml");
-const urlparse = require("url-parse");
-const querystring = require("querystring");
 
 class Template {
   constructor() {
     this.htmlOutput = null;
   }
 
-  async create(image, url) {
-    // parse url
-    var queryStringParsed = new urlparse(url.replace("/#/?", "?")).query;
-    var parsedQuery = querystring.parse(queryStringParsed);
-
+  async create(image, url, parsedQuery) {
     // extract query
     var theme = parsedQuery["?theme"];
     var last = parsedQuery.last;
@@ -28,6 +23,13 @@ class Template {
       objectNotation: true
     });
     moment.locale(lang);
+
+    // create machine string
+    var machineString =
+      i18n.__("caronte.machine") +
+      ": <code><b>" +
+      os.hostname() +
+      "</b></code>";
 
     // create translation string
     var htmlString = "";
@@ -77,6 +79,7 @@ class Template {
 
       <mj-head>
         <mj-attributes>
+            <mj-all font-family="Arial" />
             <mj-class name="mjclass" color="` +
         (theme == "dark" ? "#1d1e1e" : "#ffffff") +
         `"/>
@@ -105,6 +108,11 @@ class Template {
             <mj-text mj-class="mjclass" align="center" font-size="16px">` +
         htmlString +
         `</mj-text>
+            <mj-text mj-class="mjclass" align="center" font-size="16px">
+                ` +
+        machineString +
+        `
+            </mj-text>
             <mj-spacer height="10px" />
             <mj-divider padding="0px 0px" border-width="1px" border-style="solid" border-color="` +
         (theme == "light" ? "#c0c1c3" : "#2e2e2e") +

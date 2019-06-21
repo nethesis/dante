@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+const urlparse = require("url-parse");
+const querystring = require("querystring");
 
 const Screenshot = require("./Screenshot");
 const Template = require("./Template");
@@ -23,15 +25,19 @@ const Mail = require("./Mail");
   var url = args[0];
   var addresses = args[1];
 
+  // parse url
+  var queryStringParsed = new urlparse(url.replace("/#/?", "?")).query;
+  var parsedQuery = querystring.parse(queryStringParsed);
+
   // process images and send mail
   const screenshot = new Screenshot();
   var image = await screenshot.shot(url);
 
   const template = new Template();
-  var html = await template.create(image, url);
+  var html = await template.create(image, url, parsedQuery);
 
   const mail = new Mail();
-  var status = await mail.send(html, addresses);
+  var status = await mail.send(html, addresses, url, parsedQuery);
 
   process.exit(0);
 })();
