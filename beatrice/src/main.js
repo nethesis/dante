@@ -19,9 +19,10 @@ Vue.component("apexchart", VueApexCharts);
 
 Vue.config.productionTip = false;
 
-const lang = (navigator.language || navigator.userLanguage)
-  .replace("-", "_")
-  .split("_")[0];
+var url = new URL(window.location.href.replace("/#/?", "?"));
+var params = new URLSearchParams(url.search);
+
+const lang = params.get("lang") || "en";
 const i18n = new VueI18n({
   locale: lang
 });
@@ -32,7 +33,7 @@ var app = new Vue({
   render: h => h(App)
 });
 
-app.$http.get("./i18n/language.json").then(
+app.$http.get("./i18n/" + lang + ".json").then(
   success => {
     i18n.setLocaleMessage(lang, success.body);
     app.$mount("#app");

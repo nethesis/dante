@@ -23,13 +23,20 @@ export default {
     theme: Boolean,
     palette: String,
     sparkline: Boolean,
-    title: String
+    title: String,
+    labels: Array
   },
   watch: {
-    theme: function() {
+    theme: function(theme) {
       this.options = this.initOptions();
     },
     palette: function() {
+      this.options = this.initOptions();
+    },
+    title: function() {
+      this.options = this.initOptions();
+    },
+    sparkline: function() {
       this.options = this.initOptions();
     }
   },
@@ -65,6 +72,7 @@ export default {
         dataLabels: {
           enabled: false
         },
+        labels: this.labels ? this.labels : [],
         title: {
           text: this.sparkline ? "" : this.title,
           floating: false,
@@ -91,7 +99,8 @@ export default {
           position: "top",
           onItemClick: {
             toggleDataSeries: false
-          }
+          },
+          width: 250
         },
         theme: {
           mode: this.theme ? "light" : "dark",
