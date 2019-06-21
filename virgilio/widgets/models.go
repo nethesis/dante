@@ -17,11 +17,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Dante.  If not, see COPYING.
  */
- 
- package widgets
+
+package widgets
 
 type Layout struct {
 	Widgets []Widget `json:"layout"`
+	Default bool     `json:"default"`
 }
 
 type Serie struct {
@@ -30,11 +31,15 @@ type Serie struct {
 }
 
 type Widget struct {
-	X    int    `json:"x"`
-	Y    int    `json:"y"`
-	I    int    `json:"i"`
-	Id   string `json:"id"`
-	Type string `json:"type"`
+	X      int     `json:"x"`
+	Y      int     `json:"y"`
+	I      int     `json:"i"`
+	Id     string  `json:"id"`
+	Type   string  `json:"type"`
+	Width  float64 `json:"width"`
+	Height float64 `json:"height"`
+	W      int     `json:"w"`
+	H      int     `json:"h"`
 }
 
 type Label struct {
@@ -64,13 +69,13 @@ type Chart struct {
 }
 
 type PieChart struct {
-	Type       string    `json:"type"`
-	ChartType  string    `json:"chartType"`
-	Title      string    `json:"title"`
-	MinerId    string    `json:"minerId"`
-	Labels     []string  `json:"labels"`
-	Series     []float64 `json:"series"`
-	Snapshot   bool      `json:"snapshot"`
+	Type      string    `json:"type"`
+	ChartType string    `json:"chartType"`
+	Title     string    `json:"title"`
+	MinerId   string    `json:"minerId"`
+	Labels    []string  `json:"labels"`
+	Series    []float64 `json:"series"`
+	Snapshot  bool      `json:"snapshot"`
 }
 
 type Table struct {

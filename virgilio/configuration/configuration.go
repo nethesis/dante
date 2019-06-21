@@ -37,6 +37,9 @@ type Configuration struct {
 		CorsAllowOrigins []string
 		MaxDays          int
 	}
+	Beatrice struct {
+		BaseDirectory string
+	}
 }
 
 var Config = Configuration{}
@@ -57,4 +60,6 @@ func Init() {
 	}
 	Config.Virgilio.LayoutFile = path.Join(Config.Virgilio.StoreDirectory, "layout.json")
 	Config.Virgilio.MaxDays = 366
+
+	Config.Beatrice.BaseDirectory = os.Getenv("BEATRICE_BASE_DIR")
 }

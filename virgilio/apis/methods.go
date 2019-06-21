@@ -22,6 +22,7 @@ package apis
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -32,13 +33,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/mitchellh/mapstructure"
 	"github.com/nethesis/dante/virgilio/configuration"
-	"github.com/nethesis/dante/virgilio/widgets"
 	"github.com/nethesis/dante/virgilio/utils"
+	"github.com/nethesis/dante/virgilio/widgets"
 )
 
 type miner struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
+	FullName string `json:"fullName"`
+	Name     string `json:"name"`
+	Type     string `json:"type"`
 }
 
 // Validate query parameters
@@ -268,28 +270,35 @@ func ReadWidget(c *gin.Context) {
 
 // ListMiners list all Ciacco miners
 func ListMiners(c *gin.Context) {
+	miners, errString := GetMiners()
+	if errString != "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": errString})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"miners": miners,
+	})
+}
+
+func GetMiners() ([]miner, string) {
 	var miners []miner
 
 	files, err := ioutil.ReadDir(configuration.Config.Ciacco.MinersDirectory)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Miner directory not found " + configuration.Config.Ciacco.MinersDirectory})
-		return
+		return nil, "Miners directory not found " + configuration.Config.Ciacco.MinersDirectory
 	}
 
 	for _, f := range files {
 		var m miner
 		if !f.IsDir() {
 			parts := strings.Split(f.Name(), "-")
+			m.FullName = f.Name()
 			m.Name = parts[0]
 			m.Type = parts[1]
 			miners = append(miners, m)
 		}
 	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"miners": miners,
-	})
-
+	return miners, ""
 }
 
 // DeleteLayout delete saved layout
@@ -310,7 +319,8 @@ func GetLayout(c *gin.Context) {
 	layout := widgets.ReadLayout()
 
 	c.JSON(http.StatusOK, gin.H{
-		"layout": layout.Widgets,
+		"layout":  layout.Widgets,
+		"default": layout.Default,
 	})
 }
 
@@ -327,4 +337,38 @@ func SetLayout(c *gin.Context) {
 	file, _ := json.Marshal(layout)
 
 	_ = ioutil.WriteFile(configuration.Config.Virgilio.LayoutFile, file, 0644)
+}
+
+// GetLang returns the i18n strings used by Beatrice, including those used by the widgets
+func GetLang(c *gin.Context) {
+	langCode := c.Param("langCode")
+	basePath := configuration.Config.Beatrice.BaseDirectory + "/i18n/"
+	i18nFile := basePath + langCode + ".json"
+	i18nMap, err := utils.ReadJson(i18nFile)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	miners, errString := GetMiners()
+	if errString != "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": errString})
+		return
+	}
+
+	for _, miner := range miners {
+		minerName := miner.FullName
+		minerI18nFile := basePath + minerName + "-" + langCode + ".json"
+		minerI18nMap, err := utils.ReadJson(minerI18nFile)
+		if err != nil {
+			// non-fatal error
+			fmt.Fprintln(os.Stderr, err)
+			continue
+		}
+		i18nMap[minerName] = minerI18nMap
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"lang": i18nMap,
+	})
 }

@@ -147,7 +147,7 @@ func ReadDefaultLayout() Layout {
 		}
 	}
 
-	return Layout{widgets}
+	return Layout{widgets, true}
 }
 
 func ReadLayout() Layout {
@@ -156,5 +156,8 @@ func ReadLayout() Layout {
 		return ReadDefaultLayout()
 	}
 
-	return ParseLayout(configuration.Config.Virgilio.LayoutFile)
+	layout := ParseLayout(configuration.Config.Virgilio.LayoutFile)
+	layout.Default = false
+	
+	return layout
 }

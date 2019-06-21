@@ -20,7 +20,13 @@
 
 package utils
 
-import "github.com/nethesis/dante/virgilio/widgets"
+import (
+	"encoding/json"
+	"io/ioutil"
+	"os"
+
+	"github.com/nethesis/dante/virgilio/widgets"
+)
 
 func ContainsString(stringSlice []string, searchString string) bool {
 	for _, value := range stringSlice {
@@ -47,4 +53,23 @@ func MapChartToPieChart(chart widgets.Chart) widgets.PieChart {
 	}
 	pieChart.Series = pieChartSeries
 	return pieChart
+}
+
+func ReadJson(filePath string) (map[string]interface{}, error) {
+	var mapData map[string]interface{}
+
+	jsonFile, err := os.Open(filePath)
+	defer jsonFile.Close()
+	if err != nil {
+		return nil, err
+	}
+	bytes, err := ioutil.ReadAll(jsonFile)
+	if err != nil {
+		return nil, err
+	}
+	json.Unmarshal(bytes, &mapData)
+	if err != nil {
+		return nil, err
+	}
+	return mapData, nil
 }
