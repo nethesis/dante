@@ -4,3 +4,14 @@ CIACCO_MINERS_DIR=/usr/share/dante/miners
 # Directory where miner output is saved
 CIACCO_OUTPUT_DIR=/var/lib/nethserver/dante
 
+# Directory where server files are saves
+VIRGILIO_STORE_DIR="/usr/share/dante/virgilio"
+
+# CORS configuration
+VIRGILIO_ALLOW_ORIGIN="*"
+
+# Set production environment
+GIN_MODE=release
+
+# Listening port
+PORT=9292

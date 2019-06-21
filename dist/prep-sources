@@ -17,3 +17,12 @@ npm run build
 tar cvzf beatrice.tar.gz -C dist .
 cp beatrice.tar.gz ../dist/
 popd
+
+#
+# Build virgilio binary
+#
+pushd ../virgilio
+GO111MODULE=on
+go build
+cp virgilio ../dist
+popd
