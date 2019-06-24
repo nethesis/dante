@@ -207,11 +207,11 @@ The server will aggregate data from all days and calculate the "top X items" or 
     "unit": "number",
     "data":  [
         {
-            "hits": 865,
+            "count": 865,
             "name": "88.60.zz.xx"
         },
         {
-            "hits": 272,
+            "count": 272,
             "name": "49.248.yyy.xxx"
         },
     ],

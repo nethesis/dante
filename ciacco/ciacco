@@ -35,6 +35,9 @@ mkdir -p $TODAY_DIR
 for f in $(find /usr/share/dante/miners -type f);
 do
     if [ -x $f ]; then
-        $f > $TODAY_DIR/$(basename $f).json
+        out=$($f)
+        if [ $? -eq 0 ]; then
+            $f > $TODAY_DIR/$(basename $f).json
+        fi
     fi
 done
