@@ -12,24 +12,64 @@ The configuration file is `/etc/sysconfig/dante`.
 - `CIACCO_MINER_DIRECTORY`: `/usr/share/dante/miners`
 - `CIACCO_OUTPUT_DIRECTORY` `/var/lib/nethserver/dante`
 
-## Output file
+## Miners
+
+A miner is a script which collects statistics from the system for the current day.
+
+On success, each miner must always generates output in JSON format and should exit 0.
+On error the miner must exit with non-zero code and can be generate custom output.
+
+The name of the script must respect some naming conventions. The name is composed by 3 parts: `minerId-type-subtype`.
+Both `minerId` and `type` are mandatory, while `subtype` is optional.
+
+Valid naming examples:
+
+- df-chart-pie
+- hostname-label
+
+
+## Miners output file
 
 Ciacco defines the structure of the output file of a miner.
 The file produced by a miner can represent different kinds of graphical widgets:
 
+- a label
 - a card that displays a title and a single numerical value (counter)
 - a chart
 - a table
+- a ranking list
 
-### Label
+Each miner has a specific set of fields, but there are some common ones which are mandatory:
 
-This is the structure of the output JSON of a miner that feeds a label widget:
-
-- `type`: "label"
 - `minerId`: miner identifier
 - `title`: a i18n string representing a description of the information associated to the label
+- `type`: it describes the widget type. Valid values are:
+   - `label`
+   - `counter`
+   - `chart`
+   - `table`
+   - `list`
+
+Extra commond fields:
+
+- `unit`: the data type (not valid for `label` type), valid types are:
+  - `number`
+  - `seconds`
+  - `bytes`
+  - `time`
+- `aggregationType`: how data will aggreagate by server for the selected span of time:
+   - `sum`: values will be summed
+   - `average`: average calculation
+   - `snapshot`: values will not be aggregated
+
+
+### label
+
+Display a simple label, labels have no trends and can't be aggregated.
+
+Extra fields:
+
 - `value`: a value in string format
-- `snapshot`:  can be `true` or `false`. If set to `true`, values will not be aggregated over a span of time. It's fixed to `true` for the `label` type
 
 #### Example
 
@@ -38,20 +78,20 @@ This is the structure of the output JSON of a miner that feeds a label widget:
     "type": "label",
     "title": "hostname-label",
     "minerId": "miner-total-emails-received",
-    "value": "mail.nethserver.org",
-    "snapshot": true
+    "value": "mail.nethserver.org"
 }
 ```
 
-### Counter
+### counter
 
-This is the structure of the output JSON of a miner that feeds a counter widget:
+Display a counter with a trend and a line chart.
 
-- `type`: "counter"
-- `minerId`: miner identifier
-- `title`: a i18n string representing a description of the information associated to the counter
+Extra fields:
+
 - `value`: numerical value of the counter
-- `snapshot`: can be `true` or `false`. If set to `true`, values will not be aggregated over a span of time
+- `trendType`: display the counter variation
+  - `percentage`
+  - `number`
 
 #### Example
 
@@ -61,25 +101,22 @@ This is the structure of the output JSON of a miner that feeds a counter widget:
     "title": "received_mails",
     "minerId": "miner-total-emails-received",
     "value":  42,
-    "snapshot": true
+    "unit": "number",
+    "aggregationType": "snapshot",
+    "trendType": "percentage"
 }
 ```
 
-### Chart
+### chart
 
-This is the structure of the output JSON of a miner that feeds a chart widget:
+Display a chart without a trend. Extra fields:
 
-- `type`: "chart"
 - `chartType`: "pie" or "bar" or "line" or "area" or "column"
-- `title`: the title of the chart
-- `minerId`: miner identifier
-- `unit`: unit of measurement. Currently only "bytes" is supported
 - `categories`: array of categories (for pie, bar and columns charts) or values on the x-axis (for line and area charts)
 - `series`: array of values/objects associated to the categories
     - `i18n`: boolean value that specifies if category and series labels should be translated or not (e.g. numbers, IP addresses, ...)
     - `name`: name of the series, it will be translated if `i18n` is set to true
     - `data`: array of values
-- `snapshot`: can be `true` or `false`. If set to `true`, values will not be aggregated over a span of time
 
 
 #### Example 1: single series
@@ -98,7 +135,7 @@ This is the structure of the output JSON of a miner that feeds a chart widget:
             "data": [ 34, 42, 45, 38 ]
         }
     ],
-    "snapshot": false
+    "aggregationType": "sum"
 }
 ```
 
@@ -123,22 +160,19 @@ This is the structure of the output JSON of a miner that feeds a chart widget:
             "data": [ 24, 33, 35, 28 ]
         }
     ],
-    "snapshot": false
+    "aggregationType": "average"
 }
 ```
 
-### Table
+### table
 
-This is the the structure of output JSON of a miner that feeds a table widget:
+Display a simple table.
 
-- `type`: "table"
-- `title`: the title of the table
-- `minerId`: miner identifier
-- `unit`: unit of measurement. Currently only "bytes" is supported
+Extra fields:
+
 - `columnsHeader`: column headers
 - `rowHeader`: row headers
 - `rows`: array of array values for the table
-- `snapshot`: can be `true` or `false`. If set to `true`, values will not be aggregated over a span of time
 
 #### Example
 
@@ -154,6 +188,33 @@ This is the the structure of output JSON of a miner that feeds a table widget:
         [ 720, 400, 320 ],
         [ 550, 300, 250 ]
     ],
-    "snapshot": true
+    "aggregationType": "snapshot"
 }
 ```
+
+### list
+
+Display an ordered list of items.
+The server will aggregate data from all days and calculate the "top X items" or "bottom X items".
+
+#### Example
+
+```json
+{
+    "type": "list",
+    "title": "blockedcategories",
+    "minerId": "blockedcategories",
+    "unit": "number",
+    "data":  [
+        {
+            "hits": 865,
+            "name": "88.60.zz.xx"
+        },
+        {
+            "hits": 272,
+            "name": "49.248.yyy.xxx"
+        },
+    ],
+}
+```
+
