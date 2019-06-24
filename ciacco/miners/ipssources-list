@@ -1,0 +1,68 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - info@nethesis.it
+#
+# This script is part of Dante.
+#
+# Dante is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# Dante is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Dante.  If not, see COPYING.
+#
+
+# Bar chart for sources with most match
+
+use JSON;
+
+my @data;
+my $hash;
+my $i = 0;
+my $limit = 5;
+my $anonymize = shift || undef;
+
+my $out = `curl --connect-timeout 2  -G http://localhost:5636/api/1/alerts -d time_range=864000s -s 2>/dev/null`;
+
+if ($? > 0) {
+    exit 1;
+}
+
+my $eve = decode_json($out);
+if($eve->{'alerts'}) {
+    foreach (@{$eve->{'alerts'}}) {
+        $hash->{$_->{'event'}{'_source'}{'src_ip'}} += int($_->{'count'});
+    }
+}
+
+# sort hash accordingly to value
+foreach my $key (sort { $hash->{$b} <=> $hash->{$a} } keys %$hash) {
+    last if ($i >= $limit);
+    if ($anonymize eq "true") {
+        push(@data, {"name" => "source$i", "count" => $hash->{$key}});
+    } else {
+        push(@data, {"name" => $key, "count" => $hash->{$key}});
+    }
+    $i++;
+}
+
+my $name = "ipssources";
+my $ret = {
+    minerId => $name,
+    title => $name,
+    type => 'list',
+    aggregationType => "sum",
+    unit => 'number',
+    data => \@data
+};
+
+
+print encode_json($ret);
