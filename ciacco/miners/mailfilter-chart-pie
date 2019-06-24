@@ -1,0 +1,66 @@
+#!/bin/bash
+
+#
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - info@nethesis.it
+#
+# This script is part of Dante.
+#
+# Dante is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# Dante is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Dante.  If not, see COPYING.
+#
+
+# Calculate a pie chart of filtered mail
+
+TMP_FILE=$(mktemp)
+LOG="/var/log/maillog"
+DAY=$(date +"%b %d")
+
+# Exit if rspamd is not installed or log is empty
+if [ ! -f $LOG ] || [ ! -f /etc/e-smith/db/configuration/defaults/rspamd/type ]; then 
+    exit 1
+fi
+
+# Search for rotate logs
+PREVIOUS_LOG="$LOG-"$(date -d "-1 day" +"%Y%m%d")
+if [ -f "$PREVIOUS_LOG" ] || [ -f "$PREVIOUS_LOG.gz" ]; then
+    zgrep "$DAY" $PREVIOUS_LOG*  > $TMP_FILE
+fi
+
+# Move today lines to temporary file 
+grep "$DAY" /var/log/maillog >> $TMP_FILE
+
+spam=0
+virus=0
+
+spam=$(grep "Blocked SPAM" $TMP_FILE | wc -l)
+virus=$(grep "Blocked INFECTED" $TMP_FILE | wc -l)
+virus=$((virus+$(grep "clamav: virus found:" $TMP_FILE | wc -l)))
+spam=$((spam+$(grep -e "soft reject" -e "reject" -e "add header" $TMP_FILE | wc -l)))
+
+# Cleanup temporary file
+rm -f $TMP_FILE 2>/dev/null
+
+id=$(basename $0)
+title=$id
+type=$(basename $0 | cut -d'-' -f2)
+chartType=$(basename $0 | cut -d'-' -f3)
+unit="number"
+aggregation='snapshot'
+categories='["virus", "spam"]'
+series="[{\"name\":\"mails\",\"i18n\":\"true\",\"data\":[$virus, $spam]}]"
+
+echo -n "{\"type\":\"$type\",\"chartType\":\"$chartType\",\"title\":\"$title\",\"minerId\":\"$id\",\"aggregationType\":\"$aggregation\",\"unit\":\"$unit\","
+echo -n "\"series\":$series",
+echo -n "\"categories\":$categories"
+echo -n "}"
