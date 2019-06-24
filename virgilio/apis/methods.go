@@ -111,9 +111,77 @@ func validate(widgetName string, startDateString string, endDateString string) (
 	return "", startDate, deltaDays
 }
 
+// AggregateCounter decodes a Counter from a map and aggregates its value
+func AggregateCounter(widgetData map[string]interface{}, counterData widgets.Counter, valueOutputCounter float64) (widgets.Counter, float64) {
+	mapstructure.Decode(widgetData, &counterData)
+	valueOutputCounter += counterData.Value
+	return counterData, valueOutputCounter
+}
+
+// AggregateChart decodes a Chart from a map and aggregates its series
+func AggregateChart(widgetData map[string]interface{}, chartData widgets.Chart, seriesOutputChart []widgets.Series, initialize bool) (widgets.Chart, []widgets.Series) {
+	mapstructure.Decode(widgetData, &chartData)
+	series := chartData.Series
+	numSeries := len(series)
+	numCategories := len(chartData.Categories)
+
+	if initialize {
+		seriesOutputChart = make([]widgets.Series, numSeries)
+
+		for i := range seriesOutputChart {
+			seriesOutputChart[i].Data = make([]float64, numCategories)
+		}
+	}
+
+	for i := 0; i < numSeries; i++ {
+		for j := 0; j < numCategories; j++ {
+			seriesOutputChart[i].Data[j] += series[i].Data[j]
+		}
+	}
+	return chartData, seriesOutputChart
+}
+
+// AggregateTable decodes a Table from a map and aggregates its data cells
+func AggregateTable(widgetData map[string]interface{}, tableData widgets.Table, rowsOutputTable [][]float64, initialize bool) (widgets.Table, [][]float64) {
+	mapstructure.Decode(widgetData, &tableData)
+	rows := tableData.Rows
+	numRows := len(rows)
+	numColumns := len(rows[0])
+
+	if initialize {
+		rowsOutputTable = make([][]float64, numRows)
+
+		for i := range rowsOutputTable {
+			rowsOutputTable[i] = make([]float64, numColumns)
+		}
+	}
+
+	for i := 0; i < numRows; i++ {
+		for j := 0; j < numColumns; j++ {
+			rowsOutputTable[i][j] += rows[i][j]
+		}
+	}
+	return tableData, rowsOutputTable
+}
+
 // ReadWidget parses query and validate it
 // Finally, return the widget result
 func ReadWidget(c *gin.Context) {
+	var widgetData map[string]interface{}
+	var lastValidWidgetData map[string]interface{}
+	var openError bool
+	var err error
+	var labelData widgets.Label
+	var counterData widgets.Counter
+	var valueOutputCounter float64
+	var chartData widgets.Chart
+	var seriesOutputChart []widgets.Series
+	var tableData widgets.Table
+	var rowsOutputTable [][]float64
+	firstFileRead := false
+	var index int
+	aggregate := true
+
 	widgetName := c.Param("widgetName")
 	startDateString := c.Query("startDate")
 	endDateString := c.Query("endDate")
@@ -123,121 +191,82 @@ func ReadWidget(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": message})
 		return
 	}
-
 	filePaths := widgets.GetFileLists(widgetName, startDate, deltaDays)
 
-	var widgetData map[string]interface{}
-
-	var labelData widgets.Label
-
-	var counterData widgets.Counter
-	var valueOutputCounter float64
-
-	var chartData widgets.Chart
-	var numSeries int
-	var numCategories int
-	var seriesOutputChart []widgets.Series
-
-	var tableData widgets.Table
-	var numRows int
-	var numColumns int
-	var rowsOutputTable [][]float64
-	breakLoop := false
-	firstIteration := true
-
-	// widget files are read starting from the most recent
-	for index := len(filePaths) - 1; index >= 0; index-- {
-		if breakLoop {
-			break
-		}
+	// read most recent widget file
+	for index = len(filePaths) - 1; index >= 0 && !firstFileRead; index-- {
 		filePath := filePaths[index]
-		widgetFile, err := os.Open(filePath)
-		defer widgetFile.Close()
+		widgetData, openError, err = utils.ReadJsonIgnoreOpenError(filePath)
 		if err != nil {
-			// missing files are skipped
-			continue
+			if openError {
+				widgetData = lastValidWidgetData
+				// skip to next most recent widget file
+				continue
+			} else {
+				c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+				return
+			}
 		}
-		bytes, err := ioutil.ReadAll(widgetFile)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"message": "Error reading file", "error": err.Error()})
-			return
-		}
+		lastValidWidgetData = widgetData
+		firstFileRead = true
 
-		json.Unmarshal(bytes, &widgetData)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"message": "Unmarshaling error", "error": err.Error()})
-			return
+		if widgetData["snapshot"] == true {
+			aggregate = false
 		}
 
 		switch widgetType := widgetData["type"]; widgetType {
 		case "label":
 			mapstructure.Decode(widgetData, &labelData)
-			// label widget are never aggregated, exiting loop
-			breakLoop = true
+			// label widget are never aggregated
+			aggregate = false
 		case "counter":
-			mapstructure.Decode(widgetData, &counterData)
-			valueOutputCounter += counterData.Value
-
-			// if snapshot = true, don't aggregate
-			if counterData.Snapshot {
-				breakLoop = true
-			}
+			counterData, valueOutputCounter = AggregateCounter(widgetData, counterData, valueOutputCounter)
 		case "chart":
-			mapstructure.Decode(widgetData, &chartData)
-			series := chartData.Series
-
-			if firstIteration {
-				firstIteration = false
-				numSeries = len(series)
-				numCategories = len(chartData.Categories)
-				seriesOutputChart = make([]widgets.Series, numSeries)
-
-				for i := range seriesOutputChart {
-					seriesOutputChart[i].Data = make([]float64, numCategories)
-				}
-			}
-
-			for i := 0; i < numSeries; i++ {
-				for j := 0; j < numCategories; j++ {
-					seriesOutputChart[i].Data[j] += series[i].Data[j]
-				}
-			}
-
-			// if snapshot = true, don't aggregate
-			if chartData.Snapshot {
-				breakLoop = true
-			}
+			chartData, seriesOutputChart = AggregateChart(widgetData, chartData, seriesOutputChart, true)
 		case "table":
-			mapstructure.Decode(widgetData, &tableData)
-			rows := tableData.Rows
-
-			if firstIteration {
-				firstIteration = false
-				numRows = len(rows)
-				numColumns = len(rows[0])
-				rowsOutputTable = make([][]float64, numRows)
-
-				for i := range rowsOutputTable {
-					rowsOutputTable[i] = make([]float64, numColumns)
-				}
-			}
-
-			for i := 0; i < numRows; i++ {
-				for j := 0; j < numColumns; j++ {
-					rowsOutputTable[i][j] += rows[i][j]
-				}
-			}
-
-			// if snapshot = true, don't aggregate
-			if tableData.Snapshot {
-				breakLoop = true
-			}
+			tableData, rowsOutputTable = AggregateTable(widgetData, tableData, rowsOutputTable, true)
 		case nil:
 			c.JSON(http.StatusInternalServerError, gin.H{"message": "Cannot retrieve widget type for " + filePath})
 			return
 		default:
 			c.JSON(http.StatusNotImplemented, gin.H{"message": "Widget type not implemented: " + widgetType.(string)})
 			return
+		}
+	}
+
+	if aggregate {
+		// aggregate widget data
+		for ; index >= 0; index-- {
+			filePath := filePaths[index]
+			widgetData, openError, err = utils.ReadJsonIgnoreOpenError(filePath)
+			if err != nil {
+				if openError {
+					widgetData = lastValidWidgetData
+					// skip to next most recent widget file
+					continue
+				} else {
+					c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+					return
+				}
+			}
+			lastValidWidgetData = widgetData
+
+			switch widgetType := widgetData["type"]; widgetType {
+			// case "label":
+			// can't aggregate label widget
+			case "counter":
+				counterData, valueOutputCounter = AggregateCounter(widgetData, counterData, valueOutputCounter)
+			case "chart":
+				chartData, seriesOutputChart = AggregateChart(widgetData, chartData, seriesOutputChart, false)
+			case "table":
+				tableData, rowsOutputTable = AggregateTable(widgetData, tableData, rowsOutputTable, false)
+			case nil:
+				c.JSON(http.StatusInternalServerError, gin.H{"message": "Cannot retrieve widget type for " + filePath})
+				return
+			default:
+				c.JSON(http.StatusNotImplemented, gin.H{"message": "Widget type not implemented: " + widgetType.(string)})
+				return
+			}
 		}
 	}
 	var widget interface{}

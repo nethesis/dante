@@ -73,3 +73,22 @@ func ReadJson(filePath string) (map[string]interface{}, error) {
 	}
 	return mapData, nil
 }
+
+func ReadJsonIgnoreOpenError(filePath string) (map[string]interface{}, bool, error) {
+	var mapData map[string]interface{}
+
+	jsonFile, err := os.Open(filePath)
+	defer jsonFile.Close()
+	if err != nil {
+		return nil, true, err
+	}
+	bytes, err := ioutil.ReadAll(jsonFile)
+	if err != nil {
+		return nil, false, err
+	}
+	json.Unmarshal(bytes, &mapData)
+	if err != nil {
+		return nil, false, err
+	}
+	return mapData, false, nil
+}
