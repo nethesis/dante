@@ -32,6 +32,5 @@ fi
 id=$(basename $0)
 title=$id
 type=$(basename $0 | cut -d'-' -f2)
-snap='true'
 
-echo -n "{\"value\":\"$value\",\"type\":\"$type\",\"title\":\"$title\",\"minerId\":\"$id\",\"snapshot\":$snap}"
+echo -n "{\"value\":\"$value\",\"type\":\"$type\",\"title\":\"$title\",\"minerId\":\"$id\"}"
