@@ -24,6 +24,7 @@
 
 CIACCO_OUTPUT_DIR=/var/lib/nethserver/dante
 CIACCO_MINERS_DIR=/usr/share/dante/miners
+CIACCO_ANONYMIZE=false
 
 if [ -f /etc/sysconfig/dante ]; then
     . /etc/sysconfig/dante
@@ -35,7 +36,11 @@ mkdir -p $TODAY_DIR
 for f in $(find /usr/share/dante/miners -type f);
 do
     if [ -x $f ]; then
-        out=$($f)
+        if [ "$CIACCO_ANONYMIZE" == "true" ]; then
+            out=$($f "anonimize")
+        else
+            out=$($f)
+        fi
         if [ $? -eq 0 ]; then
             $f > $TODAY_DIR/$(basename $f).json
         fi
