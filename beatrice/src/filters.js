@@ -4,6 +4,7 @@ var moment = require("moment");
 
 var Filters = {
   formatter(value, unit) {
+    value = isNaN(value) ? value : parseInt(value);
     switch (unit) {
       case "bytes":
         return Filters.byteFormat(value);
