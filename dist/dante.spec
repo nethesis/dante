@@ -4,7 +4,7 @@
 %define __strip /bin/true
 
 Name:		dante
-Version:	0.0.1
+Version:	0.0.2
 Release:	0%{?dist}
 Summary:	Single stack reports made simple
 
@@ -17,6 +17,7 @@ Source2:    dante.sysconf
 Source3:    beatrice.tar.gz
 Source4:    virgilio
 Source5:    virgilio.service
+Source6:    dante.cron
 
 BuildRequires: systemd
 
@@ -48,6 +49,7 @@ mkdir -p %{buildroot}/usr/share/dante/beatrice
 mkdir -p %{buildroot}/usr/share/dante/virgilio
 mkdir -p %{buildroot}/usr/bin
 mkdir -p %{buildroot}/etc/sysconfig/
+mkdir -p %{buildroot}/etc/cron.d/
 mkdir -p %{buildroot}/%{_unitdir}
 cp ciacco/ciacco %{buildroot}/%{_bindir}
 cp %{SOURCE4} %{buildroot}/%{_bindir}
@@ -56,12 +58,14 @@ tar xvzf %{SOURCE1} -C %{buildroot}/usr/share/dante/caronte
 mv %{SOURCE2}  %{buildroot}/etc/sysconfig/dante
 tar xvzf %{SOURCE3} -C %{buildroot}/usr/share/dante/beatrice
 cp %{SOURCE5} %{buildroot}/%{_unitdir}
+cp %{SOURCE6} %{buildroot}/etc/cron.d/dante
 
 
 %files
 %doc README.md
 %license LICENSE
 %config /etc/sysconfig/dante
+%config /etc/cron.d/dante
 %dir /usr/share/dante/
 %dir %attr(0755, nobody, nobody) /usr/share/dante/virgilio
 %{_unitdir}/virgilio.service
