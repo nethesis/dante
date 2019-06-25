@@ -29,7 +29,7 @@ var Filters = {
 
     switch (true) {
       case size === null || size === "" || isNaN(size):
-        result = "-";
+        result = size;
         break;
 
       case size >= 0 && size < 1024:

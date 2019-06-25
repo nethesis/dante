@@ -74,6 +74,11 @@ export default {
             enabled: this.sparkline
           }
         },
+        plotOptions: {
+          bar: {
+            horizontal: true
+          }
+        },
         dataLabels: {
           enabled: false
         },
@@ -93,14 +98,19 @@ export default {
         xaxis: {
           categories: this.categories
             ? this.categories.map(function(c) {
-                return Filters.formatter(c, "date");
+                return Filters.formatter(c, "");
               })
-            : []
+            : [],
+          labels: {
+            formatter: function(value, timestamp, index) {
+              return Filters.formatter(value, context.unit || "");
+            }
+          }
         },
         yaxis: {
           labels: {
             formatter: function(value, timestamp, index) {
-              return Filters.formatter(value, context.unit);
+              return Filters.formatter(value, context.unit || "");
             }
           }
         },
