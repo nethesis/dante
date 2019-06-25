@@ -114,9 +114,9 @@ Display a chart without a trend. Extra fields:
 - `chartType`: "pie" or "bar" or "line" or "area" or "column"
 - `categories`: array of categories (for pie, bar and columns charts) or values on the x-axis (for line and area charts)
 - `series`: array of values/objects associated to the categories
-    - `i18n`: boolean value that specifies if category and series labels should be translated or not (e.g. numbers, IP addresses, ...)
-    - `name`: name of the series, it will be translated if `i18n` is set to true
+    - `name`: name of the serie
     - `data`: array of values
+    - `unit`: see above
 
 
 #### Example 1: single series
@@ -131,7 +131,6 @@ Display a chart without a trend. Extra fields:
     "series": [
         {
             "name": "traffic",
-            "i18n": true,
             "data": [ 34, 42, 45, 38 ]
         }
     ],
@@ -151,12 +150,10 @@ Display a chart without a trend. Extra fields:
     "series": [
         {
             "name": "Calls sent",
-            "i18n": true,
             "data": [ 34, 42, 45, 38 ]
         },
         {
             "name": "Calls received",
-            "i18n": true,
             "data": [ 24, 33, 35, 28 ]
         }
     ],

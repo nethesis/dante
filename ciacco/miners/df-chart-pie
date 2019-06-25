@@ -33,7 +33,7 @@ chartType=$(basename $0 | cut -d'-' -f3)
 unit="bytes"
 aggregation='snapshot'
 categories='["used", "available"]'
-series="[{\"name\":\"root_parition\",\"i18n\":\"true\",\"data\":[$used, $avail]}]"
+series="[{\"name\":\"root_parition\",\"data\":[$used, $avail]}]"
 
 echo -n "{\"type\":\"$type\",\"chartType\":\"$chartType\",\"title\":\"$title\",\"minerId\":\"$id\",\"aggregationType\":\"$aggregation\",\"unit\":\"$unit\","
 echo -n "\"series\":$series",

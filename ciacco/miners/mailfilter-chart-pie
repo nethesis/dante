@@ -58,7 +58,7 @@ chartType=$(basename $0 | cut -d'-' -f3)
 unit="number"
 aggregation='snapshot'
 categories='["virus", "spam"]'
-series="[{\"name\":\"mails\",\"i18n\":\"true\",\"data\":[$virus, $spam]}]"
+series="[{\"name\":\"mails\",\"data\":[$virus, $spam]}]"
 
 echo -n "{\"type\":\"$type\",\"chartType\":\"$chartType\",\"title\":\"$title\",\"minerId\":\"$id\",\"aggregationType\":\"$aggregation\",\"unit\":\"$unit\","
 echo -n "\"series\":$series",
