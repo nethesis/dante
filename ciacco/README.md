@@ -74,9 +74,9 @@ Extra fields:
 
 ```json
 {
-    "type": "label",
-    "minerId": "miner-total-emails-received",
-    "value": "mail.nethserver.org"
+  "value": "QEMU Standard PC (i440FX + PIIX, 1996)",
+  "type": "label",
+  "minerId": "hardware-label"
 }
 ```
 
@@ -95,12 +95,12 @@ Extra fields:
 
 ```json
 {
-    "type": "counter",
-    "minerId": "miner-total-emails-received",
-    "value":  42,
-    "unit": "number",
-    "aggregationType": "snapshot",
-    "trendType": "percentage"
+  "value": 43,
+  "type": "counter",
+  "minerId": "mailsent-counter",
+  "aggregationType": "sum",
+  "unit": "number",
+  "trendType": "percentage"
 }
 ```
 
@@ -116,43 +116,66 @@ Display a chart without a trend. Extra fields:
     - `unit`: see above
 
 
-#### Example 1: single series
+#### Example 1: series
 
 ```json
 {
-    "type": "chart",
-    "chartType": "pie",
-    "minerId": "miner-traffic-by-protocol", 
-    "categories": [ "TCP", "UDP", "ICMP", "Other" ],
-    "series": [
-        {
-            "name": "traffic",
-            "data": [ 34, 42, 45, 38 ]
-        }
-    ],
-    "aggregationType": "sum"
+  "aggregationType": "snapshot",
+  "categories": [
+    "192.168.1.252",
+    "192.168.1.253",
+    ...
+  ],
+  "type": "chart",
+  "title": "hosttraffic-chart-column",
+  "minerId": "hosttraffic-chart-column",
+  "series": [
+    {
+      "unit": "bytes",
+      "name": "sent",
+      "data": [
+        132710324944,
+        12560210471,
+        ...
+      ]
+    },
+    {
+      "unit": "bytes",
+      "name": "received",
+      "data": [
+        104958008699,
+        7118435580,
+        ...
+      ]
+    }
+  ],
+  "chartType": "column"
 }
+
 ```
 
-#### Example 2: multiple series
+### Example 2: pie
 
 ```json
 {
-    "type": "chart",
-    "chartType": "bar",
-    "minerId": "miner-calls-sent-and-received-by-hour", 
-    "categories": [ "9:00-10:00", "10:00-11:00", "11:00-12:00", "12:00-13:00" ],
-    "series": [
-        {
-            "name": "Calls sent",
-            "data": [ 34, 42, 45, 38 ]
-        },
-        {
-            "name": "Calls received",
-            "data": [ 24, 33, 35, 28 ]
-        }
-    ],
-    "aggregationType": "average"
+  "type": "chart",
+  "chartType": "pie",
+  "minerId": "mailfilter-chart-pie",
+  "aggregationType": "snapshot",
+  "unit": "number",
+  "series": [
+    {
+      "name": "mails",
+      "data": [
+        2,
+        143
+      ]
+    }
+  ],
+  "categories": [
+    "virus",
+    "spam"
+  ]
 }
 ```
 
@@ -170,17 +193,33 @@ Extra fields:
 
 ```json
 {
-    "type": "table",
-    "minerId": "miner-host-traffic",
-    "unit": "bytes",
-    "columnHeader": [ "Total", "Sent", "Received" ],
-    "rowHeader": "true | false // if true first item of columnHeader is blank: [ '', 'Sent', 'Received' ]",
-    "rows":  [ 
-        [ 720, 400, 320 ],
-        [ 550, 300, 250 ]
+  "rows": [
+    [
+      132710712601,
+      104958634973
     ],
-    "aggregationType": "snapshot"
+    [
+      12560714747,
+      7118848245
+    ],
+    ...
+  ],
+  "rowHeader": [
+    "host0",
+    "host1",
+    ...
+  ],
+  "minerId": "hosttraffic-table",
+  "aggregationType": "snapshot",
+  "unit": "bytes",
+  "title": "hosttraffic-table",
+  "type": "table",
+  "columnHeader": [
+    "sent",
+    "received"
+  ]
 }
+
 ```
 
 ### list
@@ -188,23 +227,31 @@ Extra fields:
 Display an ordered list of items.
 The server will aggregate data from all days and calculate the "top X items" or "bottom X items".
 
+Extra fields:
+
+- `data`: a list of objects with a label and a counter
+
 #### Example
 
 ```json
 {
-    "type": "list",
-    "minerId": "blockedcategories",
-    "unit": "number",
-    "data":  [
-        {
-            "count": 865,
-            "name": "88.60.zz.xx"
-        },
-        {
-            "count": 272,
-            "name": "49.248.yyy.xxx"
-        },
-    ],
+  "aggregationType": "sum",
+  "unit": "bytes",
+  "data": [
+    {
+      "count": 1121576493,
+      "name": "host1.nethesis.it"
+    },
+    {
+      "count": 487075598,
+      "name": "host2.nethesis.it"
+    },
+    ...
+  ],
+  "type": "list",
+  "title": "squidsources-list",
+  "minderId": "squidsources-list"
 }
+
 ```
 
