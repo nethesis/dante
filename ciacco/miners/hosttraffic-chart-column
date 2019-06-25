@@ -1,0 +1,79 @@
+#!/usr/bin/perl
+#
+# Copyright (C) 2014  Nethesis srl
+
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#
+# @author Giovanni Bezicheri <giovanni.bezicheri@nethesis.it>
+# @author Edoardo Spadoni <edoardo.spadoni@nethesis.it>
+
+#
+# hosttraffic-table - a miner to collect data about host traffic
+#
+use strict;
+use warnings;
+use JSON;
+
+my $api = 'http://127.0.0.1:3000/lua/hosts_traffic.lua';
+my $limit = 10;
+my $content = {};
+my @categories;
+my @sent;
+my @received;
+my $i = 0;
+my $anonymize = shift || '';
+
+system("/usr/bin/curl -s '$api' | grep '^{' > /tmp/result_ntopng");
+
+my $json;
+{
+  open my $fh, "<", "/tmp/result_ntopng";
+  $json = <$fh>;
+  close $fh;
+  system("/bin/rm -f /tmp/result_ntopng");
+}
+
+if ($json) {
+   $content = decode_json($json);
+} else {
+    exit 1;
+}
+
+if (!$content) {
+    exit 1;
+}
+
+foreach my $key (sort { int($a) <=> int($b) } keys %{$content->{'rank'}}) {
+    my $ip = $content->{'rank'}{$key};
+    last if ($i >= $limit);
+    if ($anonymize eq 'true') {
+        push(@categories, "host$i");
+    } else {
+        push(@categories, $ip);
+    }
+    push(@sent,  $content->{'hosts'}{$ip}{'total'}{'sent'});
+    push(@received,  $content->{'hosts'}{$ip}{'total'}{'received'});
+    $i++;
+}
+
+print encode_json({
+        minerId => "hosttraffic-chart-column",
+        title => "hosttraffic-chart-column",
+        type => "chart",
+        chartType => "column",
+        aggregationType => "snapshot",
+        categories => \@categories,
+        series => [ { name => "sent", data => \@sent, unit => "bytes" }, { name => "received", data => \@received, unit => "bytes" }]
+    });
