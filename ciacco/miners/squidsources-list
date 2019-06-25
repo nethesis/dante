@@ -68,7 +68,7 @@ if (-f $total_file) {
 }
 
 print encode_json({
-        minderId => "squidsources-list",
+        minerId => "squidsources-list",
         type => "list",
         data => \@data,
         unit => "bytes",
