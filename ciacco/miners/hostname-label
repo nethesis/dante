@@ -23,8 +23,7 @@
 # Return the hostname
 
 id=$(basename $0)
-title=$id
 type=$(basename $0 | cut -d'-' -f2)
 value=$(hostname -f)
 
-echo -n "{\"value\":\"$value\",\"type\":\"$type\",\"title\":\"$title\",\"minerId\":\"$id\"}"
+echo -n "{\"value\":\"$value\",\"type\":\"$type\",\"minerId\":\"$id\"}"

@@ -43,14 +43,13 @@ value=0
 value=$(grep "postfix/smtp" $TMP_FILE | wc -l)
 
 id=$(basename $0)
-title=$id
 type=$(basename $0 | cut -d'-' -f2)
 chartType=$(basename $0 | cut -d'-' -f3)
 unit="number"
 aggregation="sum"
 trend="percentage"
 
-echo -n "{\"value\":$value,\"type\":\"$type\",\"title\":\"$title\",\"minerId\":\"$id\",\"aggregationType\":\"$aggregation\",\"unit\":\"$unit\",\"trendType\":\"$trend\"}"
+echo -n "{\"value\":$value,\"type\":\"$type\",\"minerId\":\"$id\",\"aggregationType\":\"$aggregation\",\"unit\":\"$unit\",\"trendType\":\"$trend\"}"
 
 rm -f $TMP_FILE 2>/dev/null
 

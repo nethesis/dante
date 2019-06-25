@@ -55,7 +55,6 @@ if (-f $total_file) {
 print encode_json({
         minerId => "squidtraffic-counter",
         type => "counter",
-        title => "squidtraffic-counter",
         trendType => "percentage",
         unit => "bytes",
         aggregationType => "sum",

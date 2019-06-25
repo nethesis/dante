@@ -27,7 +27,6 @@ used=$(echo $data | cut -d' ' -f 1)
 avail=$(echo $data | cut -d' ' -f 2)
 
 id=$(basename $0)
-title=$id
 type=$(basename $0 | cut -d'-' -f2)
 chartType=$(basename $0 | cut -d'-' -f3)
 unit="bytes"
@@ -35,7 +34,7 @@ aggregation='snapshot'
 categories='["used", "available"]'
 series="[{\"name\":\"root_parition\",\"data\":[$used, $avail]}]"
 
-echo -n "{\"type\":\"$type\",\"chartType\":\"$chartType\",\"title\":\"$title\",\"minerId\":\"$id\",\"aggregationType\":\"$aggregation\",\"unit\":\"$unit\","
+echo -n "{\"type\":\"$type\",\"chartType\":\"$chartType\",\"minerId\":\"$id\",\"aggregationType\":\"$aggregation\",\"unit\":\"$unit\","
 echo -n "\"series\":$series",
 echo -n "\"categories\":$categories"
 echo -n "}"

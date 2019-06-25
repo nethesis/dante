@@ -70,7 +70,6 @@ foreach my $key (sort { int($a) <=> int($b) } keys %{$content->{'rank'}}) {
 
 print encode_json({
         minerId => "hosttraffic-chart-column",
-        title => "hosttraffic-chart-column",
         type => "chart",
         chartType => "column",
         aggregationType => "snapshot",

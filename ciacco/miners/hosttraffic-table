@@ -68,7 +68,6 @@ foreach my $key (sort { int($a) <=> int($b) } keys %{$content->{'rank'}}) {
 
 print encode_json({
         minerId => "hosttraffic-table",
-        title => "hosttraffic-table",
         type => "table",
         unit => "bytes",
         aggregationType => "snapshot",

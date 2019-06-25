@@ -42,7 +42,6 @@ The file produced by a miner can represent different kinds of graphical widgets:
 Each miner has a specific set of fields, but there are some common ones which are mandatory:
 
 - `minerId`: miner identifier
-- `title`: a i18n string representing a description of the information associated to the label
 - `type`: it describes the widget type. Valid values are:
    - `label`
    - `counter`
@@ -76,7 +75,6 @@ Extra fields:
 ```json
 {
     "type": "label",
-    "title": "hostname-label",
     "minerId": "miner-total-emails-received",
     "value": "mail.nethserver.org"
 }
@@ -98,7 +96,6 @@ Extra fields:
 ```json
 {
     "type": "counter",
-    "title": "received_mails",
     "minerId": "miner-total-emails-received",
     "value":  42,
     "unit": "number",
@@ -125,7 +122,6 @@ Display a chart without a trend. Extra fields:
 {
     "type": "chart",
     "chartType": "pie",
-    "title": "traffic_by_protocol",
     "minerId": "miner-traffic-by-protocol", 
     "categories": [ "TCP", "UDP", "ICMP", "Other" ],
     "series": [
@@ -144,7 +140,6 @@ Display a chart without a trend. Extra fields:
 {
     "type": "chart",
     "chartType": "bar",
-    "title": "Calls sent and received by hour",
     "minerId": "miner-calls-sent-and-received-by-hour", 
     "categories": [ "9:00-10:00", "10:00-11:00", "11:00-12:00", "12:00-13:00" ],
     "series": [
@@ -176,7 +171,6 @@ Extra fields:
 ```json
 {
     "type": "table",
-    "title": "host-traffic",
     "minerId": "miner-host-traffic",
     "unit": "bytes",
     "columnHeader": [ "Total", "Sent", "Received" ],
@@ -199,7 +193,6 @@ The server will aggregate data from all days and calculate the "top X items" or 
 ```json
 {
     "type": "list",
-    "title": "blockedcategories",
     "minerId": "blockedcategories",
     "unit": "number",
     "data":  [

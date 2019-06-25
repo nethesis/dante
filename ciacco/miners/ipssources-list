@@ -57,7 +57,6 @@ foreach my $key (sort { $hash->{$b} <=> $hash->{$a} } keys %$hash) {
 my $name = "ipssources";
 my $ret = {
     minerId => $name,
-    title => $name,
     type => 'list',
     aggregationType => "sum",
     unit => 'number',

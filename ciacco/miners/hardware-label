@@ -27,7 +27,6 @@ product=$(cat /sys/devices/virtual/dmi/id/product_name)
 value="$vendor $product"
 
 id=$(basename $0)
-title=$id
 type=$(basename $0 | cut -d'-' -f2)
 
-echo -n "{\"value\":\"$value\",\"type\":\"$type\",\"title\":\"$title\",\"minerId\":\"$id\"}"
+echo -n "{\"value\":\"$value\",\"type\":\"$type\",\"minerId\":\"$id\"}"

@@ -24,11 +24,10 @@
 
 pos=50
 id=$(basename $0)
-title=$id
 type=$(basename $0 | cut -d'-' -f2)
 value=$(df --output=used / | tail -n 1 | cut -d' ' -f1)
 trend="percentage"
 aggregation='snapshot'
 unit="bytes"
 
-echo -n "{\"value\":$value,\"type\":\"$type\",\"title\":\"$title\",\"minerId\":\"$id\",\"aggregationType\":\"$aggregation\",\"trendType\":\"$trend\",\"unit\":\"$unit\"}"
+echo -n "{\"value\":$value,\"type\":\"$type\",\"minerId\":\"$id\",\"aggregationType\":\"$aggregation\",\"trendType\":\"$trend\",\"unit\":\"$unit\"}"
