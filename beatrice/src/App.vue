@@ -5,11 +5,6 @@
       <div class="item">
         <div class="ui buttons" :class="lightTheme ? '' : 'inverted'">
           <button
-            @click="setFilterDate('day')"
-            class="ui button"
-            :class="[lightTheme ? '' : 'inverted', filterDate == 'day' ? 'active' : '']"
-          >{{$t('home.last_day')}}</button>
-          <button
             @click="setFilterDate('week')"
             class="ui button"
             :class="[lightTheme ? '' : 'inverted', filterDate == 'week' ? 'active' : '']"
@@ -19,6 +14,11 @@
             class="ui button"
             :class="[lightTheme ? '' : 'inverted', filterDate == 'month' ? 'active' : '']"
           >{{$t('home.last_month')}}</button>
+          <button
+            @click="setFilterDate('halfyear')"
+            class="ui button"
+            :class="[lightTheme ? '' : 'inverted', filterDate == 'halfyear' ? 'active' : '']"
+          >{{$t('home.last_halfyear')}}</button>
         </div>
       </div>
       <div class="item">
@@ -111,7 +111,7 @@ export default {
         ? this.$route.query.theme == "light"
         : "light",
       colorPalette: this.$route.query.palette || "palette1",
-      filterDate: this.$route.query.last || "day",
+      filterDate: this.$route.query.last || "week",
       language: this.$route.query.lang || "en",
       searchString: ""
     };

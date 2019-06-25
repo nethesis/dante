@@ -1,5 +1,7 @@
 import Vue from "vue";
 
+import "./filters";
+
 import VueResource from "vue-resource";
 Vue.use(VueResource);
 
@@ -9,13 +11,13 @@ Vue.use(VueI18n);
 import App from "./App.vue";
 import router from "./router";
 
+import VueApexCharts from "vue-apexcharts";
+Vue.component("apexchart", VueApexCharts);
+
 window.$ = window.jQuery = require("jquery");
 
 require("semantic-ui-css/semantic.min.css");
 require("semantic-ui-css/semantic.min.js");
-
-import VueApexCharts from "vue-apexcharts";
-Vue.component("apexchart", VueApexCharts);
 
 Vue.config.productionTip = false;
 
@@ -30,12 +32,13 @@ const i18n = new VueI18n({
 var app = new Vue({
   i18n,
   router,
+  apiHost: "your_virgilio_ip",
   render: h => h(App)
 });
 
-app.$http.get("./i18n/" + lang + ".json").then(
+app.$http.get(app.$options.apiHost + "/lang/" + lang).then(
   success => {
-    i18n.setLocaleMessage(lang, success.body);
+    i18n.setLocaleMessage(lang, success.body.lang);
     app.$mount("#app");
   },
   error => {

@@ -4,7 +4,7 @@
       :ref="chartId"
       :type="type"
       :width="width"
-      :height="height"
+      :height="height-30"
       :options="options"
       :series="series"
     />
@@ -12,19 +12,23 @@
 </template>
 
 <script>
+import Filters from "../filters";
+
 export default {
   name: "Chart",
   props: {
     chartId: String,
     type: String,
     series: Array,
+    categories: Array,
     width: Number,
     height: Number,
     theme: Boolean,
     palette: String,
     sparkline: Boolean,
     title: String,
-    labels: Array
+    labels: Array,
+    unit: String
   },
   watch: {
     theme: function(theme) {
@@ -47,6 +51,7 @@ export default {
   },
   methods: {
     initOptions() {
+      var context = this;
       return {
         chart: {
           toolbar: {
@@ -86,25 +91,31 @@ export default {
           size: this.sparkline ? 0 : 4
         },
         xaxis: {
-          title: {
-            text: "Month"
-          }
+          categories: this.categories
+            ? this.categories.map(function(c) {
+                return Filters.formatter(c, "date");
+              })
+            : []
         },
         yaxis: {
-          title: {
-            text: "Temperature"
+          labels: {
+            formatter: function(value, timestamp, index) {
+              return Filters.formatter(value, context.unit);
+            }
           }
         },
         legend: {
           position: "top",
           onItemClick: {
             toggleDataSeries: false
-          },
-          width: 250
+          }
         },
         theme: {
           mode: this.theme ? "light" : "dark",
           palette: this.palette || "palette1"
+        },
+        tooltip: {
+          fillSeriesColor: true
         }
       };
     }
@@ -112,5 +123,16 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
+.apexcharts-menu.open {
+  width: 130px !important;
+}
+
+.dark .apexcharts-menu > .apexcharts-menu-item:hover {
+  background: #88898a;
+}
+
+.apexcharts-tooltip {
+  box-shadow: 0px 0px 3px 0px #e0e1e2 !important;
+}
 </style>

@@ -24,11 +24,19 @@
       v-show="!view.isLoading && gridLayout.length > 0"
       @click="openAddElement()"
       class="ui compact labeled icon button right floated blue"
-      :disabled="mode == 'edit'"
       :class="$parent.lightTheme ? '' : 'inverted'"
     >
       <i class="add icon"></i>
       {{$t('dashboard.add_widget')}}
+    </button>
+    <button
+      v-show="!view.isLoading && gridLayout.length > 0 && mode == 'edit'"
+      @click="resetLayout()"
+      class="ui compact labeled icon button right floated red"
+      :class="$parent.lightTheme ? '' : 'inverted'"
+    >
+      <i class="redo icon"></i>
+      {{$t('dashboard.reset_default')}}
     </button>
 
     <div
@@ -52,6 +60,7 @@
     </div>
 
     <grid-layout
+      v-if="!view.isLoading"
       :layout.sync="gridLayout"
       :col-num="12"
       :row-height="20"
@@ -88,13 +97,16 @@
 
         <!-- CHART -->
         <div
-          v-if="item.type == 'chart' && item.data.series.length == 0"
+          v-if="item.type == 'chart' && item.data && item.data.series && item.data.series.length == 0"
           class="ui active dimmer"
           :class="$parent.lightTheme ? 'inverted' : ''"
         >
           <div class="ui indeterminate text loader">{{$t('dashboard.retrieving_data')}}</div>
         </div>
-        <div class="ui statistics" v-if="item.type == 'chart' && item.data.series.length > 0">
+        <div
+          class="ui statistics"
+          v-if="item.type == 'chart'  && item.data && item.data.series && item.data.series.length > 0"
+        >
           <div class="statistic">
             <div class="text value">
               <Chart
@@ -106,6 +118,7 @@
                 :theme="$parent.lightTheme"
                 :palette="$parent.colorPalette"
                 :title="item.data.title"
+                :unit="item.data.unit"
                 :labels="item.data.labels"
                 :class="mode == 'edit' ? 'adjust-content' : ''"
               />
@@ -116,27 +129,29 @@
 
         <!-- COUNTER -->
         <div
-          v-if="item.type == 'counter' && (!item.data.value || item.data.series.length == 0)"
+          v-if="item.type == 'counter' && item.data && (!item.data.value || item.data.series.length == 0)"
           class="ui active dimmer"
           :class="$parent.lightTheme ? 'inverted' : ''"
         >
           <div class="ui indeterminate text loader">{{$t('dashboard.retrieving_data')}}</div>
         </div>
         <div
-          v-if="item.type == 'counter' && (item.data.value || item.data.series.length > 0)"
-          class="ui statistics"
+          v-if="item.type == 'counter' && item.data && (item.data.value || item.data.series.length > 0)"
+          class="ui three statistics"
           :class="[$parent.lightTheme ? '' : 'inverted', mapTitleSize(item.width)]"
         >
           <div class="statistic">
             <div class="label adjust-label-counter">{{item.data.title || '-'}}</div>
-            <div class="value">{{item.data.value || 0}}</div>
+            <div class="value">{{item.data.value || 0 | formatter(item.data.unit)}}</div>
           </div>
           <div class="statistic">
-            <div class="text value">
+            <div class="label adjust-label-counter"></div>
+            <div class="value">
               <Chart
                 :chartId="item.id"
-                type="line"
+                type="area"
                 :series="item.data.series"
+                :categories="item.data.categories"
                 :width="item.width"
                 :height="item.height"
                 :theme="$parent.lightTheme"
@@ -144,29 +159,41 @@
                 :title="item.data.title"
                 :labels="item.data.labels"
                 :sparkline="true"
+                :unit="item.data.unit"
               />
             </div>
+          </div>
+          <div class="statistic">
+            <div class="label adjust-label-counter">
+              {{$t('dashboard.trend')}}
+              <br>
+              <span class="ui header grey">({{$t('home.last_'+$parent.filterDate)}})</span>
+            </div>
+            <div
+              class="ui value header"
+              :class="item.data.trend < 0 ? 'red' : 'green'"
+            >{{item.data.trend > 0 ? '+' : ''}}{{item.data.trend | formatter(item.data.trendType)}}</div>
           </div>
         </div>
         <!-- END COUNTER -->
 
         <!-- TABLE -->
         <div
-          v-if="item.type == 'table' && item.data.rows.length == 0"
+          v-if="item.type == 'table' && item.data && item.data.rows && item.data.rows.length == 0"
           class="ui active dimmer"
           :class="$parent.lightTheme ? 'inverted' : ''"
         >
           <div class="ui indeterminate text loader">{{$t('dashboard.retrieving_data')}}</div>
         </div>
         <span
-          v-if="item.type == 'table'"
+          v-if="item.type == 'table' && item.data && item.data.rows && item.data.rows.length > 0"
           class="ui header"
           :class="$parent.lightTheme ? '' : 'inverted'"
         >
-          <h5 class="adjust-title-table">{{item.title.toUpperCase()}}</h5>
+          <h5 class="adjust-title-table">{{item.data.title.toUpperCase()}}</h5>
         </span>
         <table
-          v-if="item.type == 'table'"
+          v-if="item.type == 'table' && item.data && item.data.rows && item.data.rows.length > 0"
           class="ui striped selectable table"
           :class="[$parent.lightTheme ? '' : 'inverted', item.data.rowHeader ? 'definition' : '']"
         >
@@ -185,14 +212,14 @@
 
         <!-- LABEL -->
         <div
-          v-if="item.type == 'label' && !item.data.value"
+          v-if="item.type == 'label' && item.data && !item.data.value"
           class="ui active dimmer"
           :class="$parent.lightTheme ? 'inverted' : ''"
         >
           <div class="ui indeterminate text loader">{{$t('dashboard.retrieving_data')}}</div>
         </div>
         <div
-          v-if="item.type == 'label' && item.data.value"
+          v-if="item.type == 'label' && item.data && item.data.value"
           class="ui one statistics full-box"
           :class="[$parent.lightTheme ? '' : 'inverted', 'mini']"
         >
@@ -202,6 +229,31 @@
           </div>
         </div>
         <!-- END LABEL -->
+
+        <!-- TOP -->
+        <div
+          v-if="item.type == 'top' && item.data && !item.data.list"
+          class="ui active dimmer"
+          :class="$parent.lightTheme ? 'inverted' : ''"
+        >
+          <div class="ui indeterminate text loader">{{$t('dashboard.retrieving_data')}}</div>
+        </div>
+        <h5
+          v-if="item.type == 'top' && item.data && item.data.list"
+          class="adjust-title-table"
+        >{{item.data.title.toUpperCase()}}</h5>
+        <div
+          v-if="item.type == 'top' && item.data && item.data.list"
+          class="ui middle aligned divided list large ordered selection adjust-list"
+          :class="$parent.lightTheme ? '' : 'inverted'"
+        >
+          <div class="item">
+            <div class="content">
+              <div class="header">Snickerdoodle</div>An excellent companion
+            </div>
+          </div>
+        </div>
+        <!-- END TOP -->
 
         <!-- TITLE -->
         <span
@@ -225,9 +277,9 @@
               :placeholder="$t('dashboard.insert_new_title')"
             >
             <i
-              @click="item.newTitle && item.newTitle.length > 0 ?  editTitle(item, false) : null"
-              class="check icon green adjust-icon"
-              :class="[item.newTitle && item.newTitle.length > 0 ? '' : 'disabled']"
+              @click="item.newTitle && item.newTitle.length > 0 ? editTitle(item, false) : null"
+              class="icon adjust-icon"
+              :class="[item.newTitle && item.newTitle.length > 0 ? '' : 'disabled', item.newTitle.length > 0 ? 'green check' : 'grey ban']"
             ></i>
           </div>
         </span>
@@ -235,15 +287,15 @@
       </grid-item>
     </grid-layout>
 
-    <div class="ui tiny modal">
+    <div class="ui small modal">
       <div class="header">{{$t('dashboard.add_widget')}}</div>
       <div class="content">
-        <div class="ui four column grid link cards">
+        <div class="ui five column grid link cards">
           <div class="column">
             <div
               class="ui fluid card"
               :class="[newObject.selected == 'chart' ? 'add-widget-selected' : '']"
-              @click="newObject.selected = 'chart'"
+              @click="setNewElement('chart')"
             >
               <div class="center aligned image adjust-image-icon">
                 <i class="chart area icon huge"></i>
@@ -257,7 +309,7 @@
             <div
               class="ui fluid card"
               :class="[newObject.selected == 'counter' ? 'add-widget-selected' : '']"
-              @click="newObject.selected = 'counter'"
+              @click="setNewElement('counter')"
             >
               <div class="center aligned image adjust-image-icon">
                 <i class="percent icon huge"></i>
@@ -271,7 +323,7 @@
             <div
               class="ui fluid card"
               :class="[newObject.selected == 'table' ? 'add-widget-selected' : '']"
-              @click="newObject.selected = 'table'"
+              @click="setNewElement('table')"
             >
               <div class="center aligned image adjust-image-icon">
                 <i class="table icon huge"></i>
@@ -284,8 +336,39 @@
           <div class="column">
             <div
               class="ui fluid card"
+              :class="[newObject.selected == 'top' ? 'add-widget-selected' : '']"
+              @click="setNewElement('top')"
+            >
+              <div class="center aligned image adjust-image-icon">
+                <i class="trophy icon huge"></i>
+              </div>
+              <div class="center aligned content">
+                <a class="header">{{$t('dashboard.top')}}</a>
+              </div>
+            </div>
+          </div>
+          <div class="column">
+            <div
+              class="ui fluid card"
+              :class="[newObject.selected == 'label' ? 'add-widget-selected' : '']"
+              @click="setNewElement('label')"
+            >
+              <div class="center aligned image adjust-image-icon">
+                <i class="font icon huge"></i>
+              </div>
+              <div class="center aligned content">
+                <a class="header">{{$t('dashboard.label')}}</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="ui divider"></div>
+        <div class="ui one column grid link cards adjust-card">
+          <div class="column">
+            <div
+              class="ui fluid card"
               :class="[newObject.selected == 'title' ? 'add-widget-selected' : '']"
-              @click="newObject.selected = 'title'"
+              @click="setNewElement('title')"
             >
               <div class="center aligned image adjust-image-icon">
                 <i class="heading icon huge"></i>
@@ -296,16 +379,18 @@
             </div>
           </div>
           <div
-            v-if="newObject.selected == 'chart' || newObject.selected == 'counter' || newObject.selected == 'table'"
+            v-if="newObject.selected == 'chart' || newObject.selected == 'counter' || newObject.selected == 'table' || newObject.selected == 'top' || newObject.selected == 'label'"
             class="ui form big grid row centered vertical segment"
           >
             <div class="inline fields">
               <label>{{$t('dashboard.choose_' + newObject.selected)}}</label>
               <div class="field">
-                <select class="ui inline dropdown">
-                  <option value>Gender</option>
-                  <option value="1">Male</option>
-                  <option value="0">Female</option>
+                <select v-model="newObject.widget" class="ui inline dropdown">
+                  <option
+                    v-for="(c,ck) in freeWidgets[newObject.selected]"
+                    :key="ck"
+                    :value="c"
+                  >{{c.fullName}}</option>
                 </select>
               </div>
             </div>
@@ -318,7 +403,7 @@
           {{$t('dashboard.cancel')}}
         </button>
         <button
-          :disabled="newObject.selected.length == 0"
+          :disabled="newObject.selected.length == 0 || !newObject.widget"
           @click="addElement()"
           class="ui green ok button"
         >
@@ -348,9 +433,11 @@ export default {
       this.gridLayout.map(function(g) {
         if (
           search.length > 0 &&
-          (g.type == "chart" || g.type == "counter" || g.type == "table") &&
+          (g.type == "chart" ||
+            g.type == "counter" ||
+            g.type == "label" ||
+            g.type == "table") &&
           JSON.stringify(g)
-            .toString()
             .toLowerCase()
             .includes(search.toLowerCase())
         ) {
@@ -368,6 +455,7 @@ export default {
   mounted() {
     var context = this;
     this.getLayout();
+    this.getWidgets();
   },
   data() {
     var offset = 30;
@@ -375,16 +463,20 @@ export default {
       chart: {
         w: 6,
         h: 14,
-        width: window.innerWidth / 2 - (offset + 7.5 * 6),
+        width: window.innerWidth / 2 - (offset + 3.5 * 6),
         height: window.innerHeight / 3
       },
       counter: {
         w: 6,
         h: 4,
-        width: window.innerWidth / 2 - ((window.innerWidth / 2) * 45) / 100,
+        width: window.innerWidth / 6,
         height: window.innerHeight / 12
       },
       table: {
+        w: 6,
+        h: 6
+      },
+      top: {
         w: 6,
         h: 6
       },
@@ -397,22 +489,25 @@ export default {
         h: 2
       }
     };
+
     return {
       offset: offset,
       mode: "view",
       widgetDefaults: widgetDefaults,
       gridLayout: [],
+      freeWidgets: [],
       newObject: this.initNewObject(),
       view: {
         isLoading: true
       },
-      apiHost: "http://192.168.5.216:8081"
+      apiHost: this.$root.$options.apiHost
     };
   },
   methods: {
     initNewObject() {
       return {
-        selected: ""
+        selected: "",
+        widget: null
       };
     },
     mapTitleSize(width) {
@@ -422,15 +517,19 @@ export default {
         case width >= 40 && width < 110:
           return "mini";
         case width >= 110 && width < 180:
-          return "tiny";
+          return "mini";
         case width >= 180 && width < 250:
-          return "small";
+          return "mini";
         case width >= 250:
-          return "small";
+          return "mini";
       }
     },
     toggleMode(mode) {
       this.mode = this.mode == "edit" ? "view" : "edit";
+
+      if (this.mode == "view") {
+        this.setLayout(this.gridLayout);
+      }
     },
     editTitle(item, edit) {
       if (edit) {
@@ -444,7 +543,7 @@ export default {
       }
     },
     closeModal() {
-      $(".tiny.modal").modal("hide");
+      $(".small.modal").modal("hide");
     },
 
     layoutUpdated: function(newLayout) {
@@ -462,8 +561,7 @@ export default {
           break;
         case "counter":
           defaultW =
-            window.innerWidth / (12 / newW) -
-            ((window.innerWidth / (12 / newW)) * 45) / 100;
+            window.innerWidth / (12 / newW) / 3 - (newW == 12 ? 10 : 0);
           defaultH = window.innerHeight / 3.5 / (12 / newH);
       }
 
@@ -473,7 +571,12 @@ export default {
 
     openAddElement() {
       this.newObject = this.initNewObject();
-      $(".tiny.modal").modal("show");
+      $(".small.modal").modal("show");
+    },
+    setNewElement(element) {
+      this.newObject.selected = element;
+      this.newObject.widget = element == "title" ? { fullName: "title" } : null;
+      this.$forceUpdate();
     },
     addElement() {
       var lastY = 0;
@@ -489,41 +592,33 @@ export default {
       var obj = this.widgetDefaults[type];
       obj.x = 0;
       obj.y = lastY + 1;
-      obj.i = lastI + 1;
-      obj.id = type + (lastI + 1);
+      obj.i = this.gridLayout.length == 0 ? 0 : lastI + 1;
       obj.type = type;
+      obj.id = this.newObject.widget.fullName;
 
-      // select widget type
-      switch (type) {
-        case "chart":
-          obj.title = this.$i18n.t("dashboard.empty_chart_title");
-          obj.data = {
-            series: [],
-            type: "line"
-          };
-          break;
-        case "counter":
-          obj.title = this.$i18n.t("dashboard.empty_counter_title");
-          obj.data = {
-            series: [],
-            value: 0
-          };
-          break;
-        case "table":
-          obj.title = this.$i18n.t("dashboard.empty_table_title");
-          obj.data = {
-            columnHeader: [],
-            rowHeader: false,
-            rows: []
-          };
-          break;
-        case "title":
-          obj.title = this.$i18n.t("dashboard.empty_title");
-          obj.newTitle = "";
-          break;
-      }
+      obj.w = this.widgetDefaults[obj.type].w;
+      obj.h = this.widgetDefaults[obj.type].h;
+      obj.width = this.widgetDefaults[obj.type].width;
+      obj.height = this.widgetDefaults[obj.type].height;
+      obj.data = {
+        series: []
+      };
+      obj.newTitle = "";
+      obj.title = this.$i18n.t("dashboard.empty_" + obj.type + "_title");
+
+      // add element to grid
       this.gridLayout.push(JSON.parse(JSON.stringify(obj)));
-      $(".tiny.modal").modal("hide");
+
+      // get widget info
+      if (type != "title") {
+        this.getWidgetData(obj.id, obj.i);
+      }
+
+      // save layout
+      this.setLayout(this.gridLayout);
+
+      // close modal
+      $(".small.modal").modal("hide");
     },
     removeElement(item) {
       this.gridLayout.splice(this.gridLayout.indexOf(item), 1);
@@ -532,8 +627,26 @@ export default {
       });
 
       this.mode = this.gridLayout.length == 0 ? "view" : "edit";
+      this.setLayout(this.gridLayout);
     },
+    getWidgets() {
+      this.$http.get(this.apiHost + "/miners").then(
+        success => {
+          for (var w in success.body.miners) {
+            var widget = success.body.miners[w];
 
+            if (this.freeWidgets[widget.type]) {
+              this.freeWidgets[widget.type].push(widget);
+            } else {
+              this.freeWidgets[widget.type] = [widget];
+            }
+          }
+        },
+        error => {
+          console.error(error);
+        }
+      );
+    },
     getLayout() {
       this.view.isLoading = true;
       this.$http.get(this.apiHost + "/layout").then(
@@ -559,8 +672,12 @@ export default {
             layout.data = {
               series: []
             };
+            layout.newTitle = "";
+            layout.title = layout.text;
 
-            this.getWidgetData(layout.id, l);
+            if (layout.type != "title") {
+              this.getWidgetData(layout.id, l);
+            }
           }
 
           this.gridLayout = layouts;
@@ -578,24 +695,22 @@ export default {
       var endDate = moment();
 
       switch (this.$parent.filterDate) {
-        case "day":
-          startDate = moment()
-            .subtract(1, "days")
-            .startOf("day");
-          break;
-
         case "week":
           startDate = moment()
             .subtract(7, "days")
             .startOf("day");
-
           break;
 
         case "month":
           startDate = moment()
             .subtract(1, "months")
             .startOf("day");
+          break;
 
+        case "halfyear":
+          startDate = moment()
+            .subtract(6, "months")
+            .startOf("day");
           break;
       }
 
@@ -614,11 +729,28 @@ export default {
             // get body data
             var widget = success.body.widget;
 
-            this.gridLayout[index].data.title = widget.title || "-";
-            this.gridLayout[index].data.type = widget.chartType || "line";
-            this.gridLayout[index].data.labels = widget.labels || [];
-            this.gridLayout[index].data.value = widget.value || 0;
-            this.gridLayout[index].data.series = widget.series || [];
+            if (widget) {
+              this.gridLayout[index].data.title =
+                this.$i18n.t(widget.minerId + ".title") || "-";
+              this.gridLayout[index].data.type = widget.chartType || "line";
+              this.gridLayout[index].data.labels = widget.labels || [];
+              this.gridLayout[index].data.value = widget.value || 0;
+              this.gridLayout[index].data.series =
+                widget.series || widget.trendSeries || [];
+              this.gridLayout[index].data.categories =
+                widget.categories || widget.trendCategories || [];
+              this.gridLayout[index].data.rows = widget.rows || [];
+              this.gridLayout[index].data.rowHeader = widget.rowHeader || false;
+              this.gridLayout[index].data.columnHeader =
+                widget.columnHeader || [];
+              this.gridLayout[index].data.trend = widget.trend;
+              this.gridLayout[index].data.trendType = widget.trendType;
+              this.gridLayout[index].data.unit = widget.unit;
+              this.gridLayout[index].data.aggregationType =
+                widget.aggregationType;
+            }
+
+            this.$forceUpdate();
           },
           error => {
             console.error(error);
@@ -636,12 +768,24 @@ export default {
           w: w.w,
           h: w.h,
           width: w.width,
-          height: w.height
+          height: w.height,
+          text: w.title || ""
         };
       });
       this.$http.post(this.apiHost + "/layout", { layout: newLayout }).then(
         success => {
           console.info("saved");
+        },
+        error => {
+          console.error(error);
+        }
+      );
+    },
+    resetLayout() {
+      this.$http.delete(this.apiHost + "/layout").then(
+        success => {
+          console.info("reset");
+          this.getLayout();
         },
         error => {
           console.error(error);
@@ -655,15 +799,11 @@ export default {
 <style>
 .on-edit {
   border-radius: 0.28571429rem;
-  border: 2px dashed #e0e1e2;
-  margin-top: -2px;
-  margin-left: -2px;
+  outline: 2px dashed #e0e1e2;
 }
 .on-edit-dark {
   border-radius: 0.28571429rem;
-  border: 2px dashed #828282;
-  margin-top: -2px;
-  margin-left: -2px;
+  outline: 2px dashed #828282;
 }
 .vue-grid-item.vue-grid-placeholder {
   background: #e0e1e2;
@@ -722,12 +862,16 @@ export default {
   padding-left: 10px !important;
   padding-top: 2px;
 }
+.adjust-list {
+  margin-top: 5px !important;
+}
+.adjust-card {
+  margin-top: -12px !important;
+}
 
 .highlight {
   border-radius: 0.28571429rem;
-  border: 2px solid #54c8ff;
-  margin-top: -2px;
-  margin-left: -2px;
+  outline: 2px solid #54c8ff;
 }
 .lowlight {
   opacity: 0.25 !important;
@@ -757,17 +901,18 @@ export default {
 }
 
 .ui.statistics {
-  display: table !important;
-  table-layout: fixed;
+  align-items: center !important;
   margin-top: 0px !important;
   margin-left: 0px !important;
   margin-right: 0px !important;
   margin-bottom: 0px !important;
-  width: 100%;
 }
-.ui.statistics > .statistic {
-  display: table-cell !important;
-  vertical-align: middle;
+.ui.ui.statistics > .statistic {
+  margin-top: 0px !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+  margin-bottom: 0px !important;
+  max-width: 33.333333%;
 }
 .vue-resizable-handle {
   z-index: 2;
