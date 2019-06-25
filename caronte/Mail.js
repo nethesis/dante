@@ -1,4 +1,5 @@
 const os = require("os");
+const i18n = require("i18n");
 const moment = require("moment");
 const nodemailer = require("nodemailer");
 
@@ -8,6 +9,7 @@ class Mail {
   async send(html, addresses, url, parsedQuery, pdf) {
     // extract query
     var last = parsedQuery.last;
+    var lang = parsedQuery.lang;
 
     // initialize transporter
     var transporter = nodemailer.createTransport({
@@ -17,14 +19,18 @@ class Mail {
       ignoreTLS: true
     });
 
+    // configure lang
+    i18n.configure({
+      locales: [lang],
+      directory: process.pkg
+        ? "/usr/share/dante/beatrice/i18n/"
+        : __dirname + "/../beatrice/public/i18n/",
+      objectNotation: true
+    });
+    moment.locale(lang);
+
     var dateRange = "";
     switch (last) {
-      case "day":
-        dateRange = moment()
-          .subtract(1, "days")
-          .format("LL");
-        break;
-
       case "week":
         dateRange =
           moment()
@@ -46,6 +52,16 @@ class Mail {
             .subtract(1, "days")
             .format("DD MMM YYYY");
         break;
+
+      case "halfyear":
+        moment()
+          .subtract(6, "months")
+          .format("DD MMM YYYY") +
+          " - " +
+          moment()
+            .subtract(1, "days")
+            .format("DD MMM YYYY");
+        break;
     }
 
     // setup e-mail data with unicode symbols
@@ -54,16 +70,14 @@ class Mail {
       to: addresses,
       subject:
         "📈 " +
-        last.charAt(0).toUpperCase() +
-        last.slice(1) +
-        "ly Report (" +
+        i18n.__("caronte." + last + "ly") +
+        " (" +
         os.hostname() +
         ") | " +
         dateRange,
       text:
-        last.charAt(0).toUpperCase() +
-        last.slice(1) +
-        "ly Report (" +
+        i18n.__("caronte." + last + "ly") +
+        " (" +
         os.hostname() +
         ") link: " +
         url,

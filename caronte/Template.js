@@ -34,16 +34,6 @@ class Template {
     // create translation string
     var htmlString = "";
     switch (last) {
-      case "day":
-        htmlString +=
-          i18n.__("caronte.yesterday") +
-          ": <b>" +
-          moment()
-            .subtract(1, "days")
-            .format("LL") +
-          "</b>";
-        break;
-
       case "week":
         htmlString +=
           i18n.__("caronte.last_week") +
@@ -64,6 +54,20 @@ class Template {
           ": <b>" +
           moment()
             .subtract(1, "months")
+            .format("DD MMM YYYY") +
+          "</b> - <b>" +
+          moment()
+            .subtract(1, "days")
+            .format("DD MMM YYYY") +
+          "</b>";
+        break;
+
+      case "halfyear":
+        htmlString +=
+          i18n.__("caronte.last_halfyear") +
+          ": <b>" +
+          moment()
+            .subtract(6, "months")
             .format("DD MMM YYYY") +
           "</b> - <b>" +
           moment()
