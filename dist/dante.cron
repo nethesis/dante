@@ -2,4 +2,4 @@
 0 5 * * *   root /usr/bin/ciacco
 
 # Send notification mail once a week, after miner execution
-0 5 * * 1   root cd /usr/share/dante/caronte && ./caronte 'http://localhost:8080/#/?theme=dark&palette=palette3&last=week&lang=en' root@localhost 
+0 5 * * 1   root cd /usr/share/dante/caronte && ./caronte 'http://localhost:9292/#/?theme=dark&palette=palette3&last=week&lang=en' root@localhost 
