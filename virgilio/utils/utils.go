@@ -57,35 +57,42 @@ func MapTableToTableUI(table widgets.Table) widgets.TableUI {
 
 	tableUi.Rows = make([][]string, len(table.Rows))
 
-	for i := range tableUi.Rows {
-		tableUi.Rows[i] = make([]string, len(table.Rows[0]))
-	}
-
 	if len(table.RowHeader) > 0 {
-		// put an empty string at the beginning of the column header (top-left cell)
+		tableUi.RowHeader = true
+		if len(table.ColumnHeader) > 0 {
+			// put an empty string at the beginning of the column header (top-left cell)
+			tableUi.ColumnHeader = make([]string, len(table.ColumnHeader)+1)
+			copy(tableUi.ColumnHeader, table.ColumnHeader)
+			copy(tableUi.ColumnHeader[1:], tableUi.ColumnHeader[:])
+			tableUi.ColumnHeader[0] = ""
+		} else {
+			tableUi.ColumnHeader = make([]string, 0)
+		}
 
-		tableUi.ColumnHeader = table.ColumnHeader
-		// copy(tableUi.ColumnHeader, table.ColumnHeader) // todo del
-		tableUi.ColumnHeader = append(tableUi.ColumnHeader, "") // make room for empty string at the beginning
-		copy(tableUi.ColumnHeader[1:], tableUi.ColumnHeader[:])
-		tableUi.ColumnHeader[0] = ""
+		// initialize tableUi.Rows
+		for i := range tableUi.Rows {
+			tableUi.Rows[i] = make([]string, len(table.Rows[0])+1)
+		}
 
 		// put every row header at the beginning of every row
 		for i := 0; i < len(table.RowHeader); i++ {
-			fmt.Println("len(tableUi.Rows)", len(tableUi.Rows))
-			fmt.Println("len(tableUi.Rows[i])", len(tableUi.Rows[i]), "len(tableUi.Rows[i][0])", tableUi.Rows[i][0], "table.RowHeader[i]", table.RowHeader[i]) // todo del
 			tableUi.Rows[i][0] = table.RowHeader[i]
 
-			for j := 0; j < len(table.ColumnHeader); j++ {
-				tableUi.Rows[i+1][j] = fmt.Sprintf("%g", table.Rows[i][j])
+			for j := 0; j < len(table.Rows[0]); j++ {
+				tableUi.Rows[i][j+1] = fmt.Sprintf("%g", table.Rows[i][j])
 			}
 		}
 	} else {
 		// no row headers
 		tableUi.ColumnHeader = table.ColumnHeader
 
-		for i := 0; i < len(table.RowHeader); i++ {
-			for j := 0; j < len(table.ColumnHeader); j++ {
+		// initialize tableUi.Rows
+		for i := range tableUi.Rows {
+			tableUi.Rows[i] = make([]string, len(table.Rows[0]))
+		}
+
+		for i := 0; i < len(table.Rows); i++ {
+			for j := 0; j < len(table.Rows[0]); j++ {
 				tableUi.Rows[i][j] = fmt.Sprintf("%g", table.Rows[i][j])
 			}
 		}
