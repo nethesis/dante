@@ -6,7 +6,7 @@ var Filters = {
   formatter(value, unit) {
     value = isNaN(value) ? value : parseFloat(value);
 
-    if (value) {
+    if (value || value == 0) {
       switch (unit) {
         case "bytes":
           return Filters.byteFormat(value);

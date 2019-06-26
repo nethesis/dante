@@ -1,4 +1,4 @@
-<!-- 
+<!--
 Copyright (C) 2019 Nethesis S.r.l.
 http://www.nethesis.it - info@nethesis.it
  This file is part of Dante project.
@@ -148,14 +148,14 @@ http://www.nethesis.it - info@nethesis.it
 
         <!-- COUNTER -->
         <div
-          v-if="item.type == 'counter' && item.data && (!item.data.value || item.data.series.length == 0)"
+          v-if="item.type == 'counter' && item.data && (item.data.series.length == 0)"
           class="ui active dimmer"
           :class="$parent.lightTheme ? 'inverted' : ''"
         >
           <div class="ui indeterminate text loader">{{$t('dashboard.retrieving_data')}}</div>
         </div>
         <div
-          v-if="item.type == 'counter' && item.data && (item.data.value || item.data.series.length > 0)"
+          v-if="item.type == 'counter' && item.data && (item.data.series.length > 0)"
           class="ui three statistics"
           :class="[$parent.lightTheme ? '' : 'inverted', 'mini']"
         >
@@ -190,7 +190,7 @@ http://www.nethesis.it - info@nethesis.it
             </div>
             <div
               class="ui value header"
-              :class="item.data.trend < 0 ? 'red' : 'green'"
+              :class="item.data.trend <= 0 ? 'red' : 'green'"
             >{{item.data.trend > 0 ? '+' : ''}}{{item.data.trend | formatter(item.data.trendType)}}</div>
           </div>
         </div>
@@ -274,7 +274,7 @@ http://www.nethesis.it - info@nethesis.it
         >
           <div v-for="(l,lk) in item.data.list" :key="lk" class="item">
             <div class="content">
-              <div class="header">{{l.name}}</div>
+              <div class="ui header" :class="setListTitle(lk)">{{l.name}}</div>
               {{l.count | formatter(item.data.unit)}}
             </div>
           </div>
@@ -399,7 +399,7 @@ http://www.nethesis.it - info@nethesis.it
                     v-for="(c,ck) in freeWidgets[newObject.selected]"
                     :key="ck"
                     :value="c"
-                  >{{c.name}}</option>
+                  >{{$t(c.name+'.title')}}</option>
                 </select>
               </div>
             </div>
@@ -552,6 +552,21 @@ export default {
         item.title = item.newTitle;
         item.isEdit = false;
         this.$forceUpdate();
+      }
+    },
+
+    setListTitle(index) {
+      switch (index) {
+        case 0:
+          return "huge";
+        case 1:
+          return "large";
+        case 2:
+          return "medium";
+        case 3:
+          return "small";
+        default:
+          return "tiny";
       }
     },
     closeModal() {
@@ -762,7 +777,7 @@ export default {
               // calculate correct sizes
               if (widget.type == "list") {
                 this.gridLayout[index].h =
-                  (widget.data.length < 10 ? 5 : 8) + 1.5 * widget.data.length;
+                  (widget.data.length < 10 ? 6 : 10) + 1.5 * widget.data.length;
               }
               if (widget.type == "table") {
                 this.gridLayout[index].h = 6 + 1.5 * widget.rows.length;
