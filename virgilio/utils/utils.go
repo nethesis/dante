@@ -21,7 +21,7 @@
 package utils
 
 import (
-	"crypto/sha1"
+	"crypto/md5"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -180,8 +180,9 @@ func GetDateStringFromWidgetFilePath(filePath string) string {
 }
 
 func Anonymize(value string) string {
-	h := sha1.New()
+	h := md5.New()
 	h.Write([]byte(value))
 	bs := h.Sum(nil)
-	return fmt.Sprintf("%x", bs)
+	anonymizedString := fmt.Sprintf("%x", bs)
+	return anonymizedString[:8]
 }
