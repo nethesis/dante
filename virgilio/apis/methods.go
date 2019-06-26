@@ -510,6 +510,10 @@ func ReadWidget(c *gin.Context) {
 		sort.Slice(listData.Data, func(i, j int) bool {
 			return listData.Data[i].Count > listData.Data[j].Count
 		})
+		// limit number of lsit entries
+		if len(listData.Data) > configuration.Config.Virgilio.MaxEntries {
+			listData.Data = listData.Data[0:configuration.Config.Virgilio.MaxEntries]
+		}
 		widget = listData
 	}
 

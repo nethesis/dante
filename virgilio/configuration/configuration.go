@@ -23,6 +23,7 @@ package configuration
 import (
 	"os"
 	"path"
+	"strconv"
 	"strings"
 )
 
@@ -36,6 +37,7 @@ type Configuration struct {
 		LayoutFile       string
 		CorsAllowOrigins []string
 		MaxDays          int
+		MaxEntries       int
 	}
 	Beatrice struct {
 		BaseDirectory string
@@ -59,7 +61,22 @@ func Init() {
 		Config.Virgilio.StoreDirectory = "./"
 	}
 	Config.Virgilio.LayoutFile = path.Join(Config.Virgilio.StoreDirectory, "layout.json")
+
 	Config.Virgilio.MaxDays = 366
+	if os.Getenv("VIRGILIO_MAX_DAYS") != "" {
+		max, err := strconv.Atoi(os.Getenv("VIRGILIO_MAX_DAYS"))
+		if err == nil {
+			Config.Virgilio.MaxDays = max
+		}
+	}
+
+	Config.Virgilio.MaxEntries = 10
+	if os.Getenv("VIRGILIO_MAX_ENTRIES") != "" {
+		max, err := strconv.Atoi(os.Getenv("VIRGILIO_MAX_ENTRIES"))
+		if err == nil {
+			Config.Virgilio.MaxEntries = max
+		}
+	}
 
 	Config.Beatrice.BaseDirectory = os.Getenv("BEATRICE_BASE_DIR")
 }
