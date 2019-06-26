@@ -218,7 +218,10 @@ http://www.nethesis.it - info@nethesis.it
         >
           <thead>
             <tr>
-              <th v-for="(h,hk) in item.data.columnHeader" :key="hk">{{$t(item.id+'.'+h)}}</th>
+              <th
+                v-for="(h,hk) in item.data.columnHeader"
+                :key="hk"
+              >{{h.length > 0 ? $t(item.id+'.'+h) : h}}</th>
             </tr>
           </thead>
           <tbody>
@@ -821,6 +824,7 @@ export default {
   border-radius: 0.28571429rem;
   outline: 2px dashed #828282;
 }
+
 .vue-grid-item.vue-grid-placeholder {
   background: #e0e1e2;
   border: 2px solid black;

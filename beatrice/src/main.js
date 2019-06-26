@@ -51,7 +51,7 @@ const i18n = new VueI18n({
 var app = new Vue({
   i18n,
   router,
-  apiHost: "your_virgilio_ip",
+  apiHost: CONFIG.VIRGILIO_BASE_URL,
   render: h => h(App)
 });
 

@@ -4,25 +4,28 @@ var moment = require("moment");
 
 var Filters = {
   formatter(value, unit) {
-    value = isNaN(value) ? value : parseInt(value);
-    switch (unit) {
-      case "bytes":
-        return Filters.byteFormat(value);
+    value = isNaN(value) ? value : parseFloat(value);
 
-      case "seconds":
-        return Filters.secondsInHour(value);
+    if (value) {
+      switch (unit) {
+        case "bytes":
+          return Filters.byteFormat(value);
 
-      case "number":
-        return value.toLocaleString();
+        case "seconds":
+          return Filters.secondsInHour(value);
 
-      case "percentage":
-        return value + "%";
+        case "number":
+          return value.toLocaleString();
 
-      case "date":
-        return moment(value).format("LL");
+        case "percentage":
+          return value + "%";
 
-      case "":
-        return value;
+        case "date":
+          return moment(value).format("LL");
+
+        case "":
+          return value;
+      }
     }
   },
   byteFormat: function(size) {
