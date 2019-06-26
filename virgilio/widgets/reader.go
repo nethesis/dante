@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Dante.  If not, see COPYING.
  */
- 
- package widgets
+
+package widgets
 
 import (
 	"encoding/json"
@@ -136,7 +136,7 @@ func ReadDefaultLayout() Layout {
 			w.Type = obj["type"].(string)
 			w.Id = obj["minerId"].(string)
 			w.I = i
-			w.Y = i
+			w.Y = float64(i)
 			if i%2 == 0 {
 				w.X = 0
 			} else {
@@ -158,6 +158,6 @@ func ReadLayout() Layout {
 
 	layout := ParseLayout(configuration.Config.Virgilio.LayoutFile)
 	layout.Default = false
-	
+
 	return layout
 }

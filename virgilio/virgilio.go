@@ -20,6 +20,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/nethesis/dante/virgilio/apis"
@@ -55,5 +57,5 @@ func main() {
 	router.GET("/lang/:langCode", apis.GetLang)
 
 	// listen on default free port
-	router.Run()
+	router.Run(os.Getenv("PORT"))
 }
