@@ -92,7 +92,12 @@ class Mail {
     };
 
     // send mail with defined transport object
-    return await transporter.sendMail(mailOptions);
+    try {
+      return await transporter.sendMail(mailOptions);
+    } catch (error) {
+      console.error(error);
+      process.exit(1);
+    }
   }
 }
 module.exports = Mail;

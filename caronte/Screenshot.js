@@ -36,45 +36,52 @@ class Screenshot {
 
   async shot(url) {
     // create browser instance
-    this.browser = await puppeteer.launch({
-      defaultViewport: {
-        width: 1024,
-        height: 0
-      },
-      executablePath: process.pkg
-        ? puppeteer.executablePath().replace(__dirname, ".")
-        : null,
-      args: ["--no-sandbox"]
-    });
+    try {
+      this.browser = await puppeteer.launch({
+        defaultViewport: {
+          width: 1024,
+          height: 0
+        },
+        executablePath: process.pkg
+          ? puppeteer.executablePath().replace(__dirname, ".")
+          : null,
+        args: ["--no-sandbox"]
+      });
 
-    // create page
-    this.page = await this.browser.newPage();
+      // create page
+      this.page = await this.browser.newPage();
 
-    // open url
-    await this.page.goto(url, { waitUntil: "networkidle2" });
+      // open url
+      await this.page.goto(url, { waitUntil: "networkidle2", timeout: 60000 });
 
-    // wait charts animations
-    await this.page.waitFor(2000);
+      // wait charts animations
+      await this.page.waitFor(2000);
 
-    // take screenshot
-    var image = await this.screenshotDOMElement({
-      selector: ".ui.segment",
-      padding: -1,
-      height: 768
-    });
+      // take screenshot
+      var image = await this.screenshotDOMElement({
+        selector: ".ui.segment",
+        padding: -1,
+        height: 768
+      });
 
-    // take pdf
-    await this.page.emulateMedia("screen");
-    var pdf = await this.page.pdf({
-      format: "Tabloid",
-      printBackground: true
-    });
+      // take pdf
+      await this.page.emulateMedia("screen");
+      var pdf = await this.page.pdf({
+        format: "Tabloid",
+        printBackground: true
+      });
 
-    // return image and pdf
-    return {
-      image: image,
-      pdf: pdf
-    };
+      // return image and pdf
+      return {
+        image: image,
+        pdf: pdf
+      };
+    } catch (error) {
+      // close browser instance and exit process
+      console.error(error);
+      await this.browser.close();
+      process.exit(1);
+    }
   }
 }
 module.exports = Screenshot;
