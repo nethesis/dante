@@ -17,6 +17,9 @@ VIRGILIO_MAX_ENTRIES=10
 # CORS configuration
 VIRGILIO_ALLOW_ORIGIN="*"
 
+# UI base directory
+BEATRICE_BASE_DIR=/usr/share/dante/beatrice
+
 # Set production environment
 GIN_MODE=release
 
