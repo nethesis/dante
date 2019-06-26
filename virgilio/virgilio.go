@@ -54,6 +54,6 @@ func main() {
 	router.DELETE("/layout", apis.DeleteLayout)
 	router.GET("/lang/:langCode", apis.GetLang)
 
-	// listen on default free port
+	// listen on configured port
 	router.Run()
 }

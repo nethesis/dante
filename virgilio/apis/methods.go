@@ -113,13 +113,6 @@ func validate(widgetName string, startDateString string, endDateString string) (
 	return "", startDate, deltaDays
 }
 
-// AggregateCounter decodes a Counter from a map and aggregates its value // todo del
-// func AggregateCounter(widgetData map[string]interface{}, counterData widgets.Counter, valueOutputCounter float64) (widgets.Counter, float64) {
-// 	mapstructure.Decode(widgetData, &counterData)
-// 	valueOutputCounter += counterData.Value
-// 	return counterData, valueOutputCounter
-// }
-
 func initChart(widgetData map[string]interface{}, chartData widgets.Chart, seriesOutputChart []widgets.Series) (widgets.Chart, []widgets.Series) {
 	mapstructure.Decode(widgetData, &chartData)
 	series := chartData.Series
@@ -288,7 +281,6 @@ func ReadWidget(c *gin.Context) {
 	// read most recent widget file
 	for index = len(filePaths) - 1; index >= 0 && !firstFileRead; index-- {
 		filePath := filePaths[index]
-		fmt.Println("reading most recent", filePath) // todo del
 		widgetData, openError, err = utils.ReadJsonIgnoreOpenError(filePath)
 		if err != nil {
 			if openError {
@@ -322,7 +314,7 @@ func ReadWidget(c *gin.Context) {
 				// save most recent value to compute trend
 				mostRecentValueTrend = counterData.Value
 			}
-			// even if it's snapshot, aggregation is needed to display trend
+			// even if it's snapshot, aggregation is needed to compute trend
 			aggregate = true
 		case "chart":
 			chartData, seriesOutputChart = AggregateChart(widgetData, chartData, seriesOutputChart, true)
@@ -336,30 +328,15 @@ func ReadWidget(c *gin.Context) {
 		}
 	}
 
-	// todo refactoring...
-	// if aggregate {
-	// 	switch widgetType {
-	// 	case "counter":
-	// 		aggregateCounter(mostRecentValueTrend)
-	// 	case "chart":
-	// 		aggregateChart()
-	// 	case "table":
-	// 		aggregateTable()
-	// 	case "list":
-	// 		// todo
-	// 	}
-	// }
-
 	if aggregate {
 		// aggregate widget data
 		for ; index >= 0; index-- {
 			filePath := filePaths[index]
-			fmt.Println("aggregating", filePath) // todo del
 			widgetData, openError, err = utils.ReadJsonIgnoreOpenError(filePath)
 			if err != nil {
 				if openError {
 					widgetData = lastValidWidgetData
-					// skip to next most recent widget file
+					// skip to next widget file
 					continue
 				} else {
 					c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
@@ -402,7 +379,6 @@ func ReadWidget(c *gin.Context) {
 	case "label":
 		widget = labelData
 	case "counter":
-		fmt.Println("valueOutputCounter", valueOutputCounter) // todo del
 		counterData.Value = valueOutputCounter
 
 		if counterData.AggregationType == "snapshot" {
@@ -411,7 +387,6 @@ func ReadWidget(c *gin.Context) {
 				c.JSON(http.StatusInternalServerError, gin.H{"message": errorString})
 				return
 			}
-
 		} else if counterData.AggregationType == "sum" {
 			// second aggregation
 			finalValueOutputCounter := valueOutputCounter
@@ -426,7 +401,7 @@ func ReadWidget(c *gin.Context) {
 				if err != nil {
 					if openError {
 						widgetData = lastValidWidgetDataForTrend
-						// skip to next most recent widget file
+						// skip to next widget file
 						continue
 					} else {
 						c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
@@ -447,7 +422,6 @@ func ReadWidget(c *gin.Context) {
 			}
 			leastRecentValueTrend = valueOutputCounter
 			trend, errorString = computeTrendValue(mostRecentValueTrend, leastRecentValueTrend, counterData)
-			fmt.Println("mostRecentValueTrend, leastRecentValueTrend, trend", mostRecentValueTrend, leastRecentValueTrend, trend) // todo del
 			counterData.Value = finalValueOutputCounter
 		}
 		counterData.Trend = trend
@@ -460,7 +434,6 @@ func ReadWidget(c *gin.Context) {
 	case "chart":
 		chartData.Series = seriesOutputChart
 
-		// if it's a pie chart, change structure of output json
 		if chartData.ChartType == "pie" {
 			pieChart := utils.MapChartToPieChart(chartData)
 			widget = pieChart
@@ -469,7 +442,6 @@ func ReadWidget(c *gin.Context) {
 		}
 	case "table":
 		tableUi := utils.MapTableToTableUI(tableData)
-		// tableData.Rows = rowsOutputTable // todo del
 		widget = tableUi
 	case "list":
 		listData.Data = make([]widgets.ListElem, 0)
@@ -501,42 +473,6 @@ func ReadWidget(c *gin.Context) {
 		"widget": widget,
 	})
 }
-
-// func aggregateCounter(filePaths []string, mostRecentValueTrend float64, index int, trendSeries []float64) utils.HttpError {
-// 	for ; index >= 0; index-- {
-// 		var lastValidWidgetData map[string]interface{}
-
-// 		filePath := filePaths[index]
-// 		widgetData, openError, err := utils.ReadJsonIgnoreOpenError(filePath)
-// 		if err != nil {
-// 			if openError {
-// 				widgetData = lastValidWidgetData
-// 				// skip to next most recent widget file
-// 				continue
-// 			} else {
-// 				return &utils.HttpError{http.StatusInternalServerError, err.Error()}
-// 			}
-// 		}
-// 		lastValidWidgetData = widgetData
-// 		mapstructure.Decode(widgetData, &counterData)
-
-// 		if counterData.AggregationType == "sum" {
-// 			valueOutputCounter += counterData.Value
-// 		} else if counterData.aggregationType == "snapshot" {
-// 			// trend series
-// 			trendSeries = append(trendSeries, counterData.Value)
-
-// 			trend, errorString = computeTrendValue(mostRecentValueTrend, counterData, filePaths)
-// 			if errorString != "" {
-// 				c.JSON(http.StatusInternalServerError, gin.H{"message": errorString})
-// 				return
-// 			}
-// 			fmt.Println("snapshot trend", trend) // todo del
-// 			counterData.Trend = trend
-// 		}
-// 	}
-
-// }
 
 // ListMiners list all Ciacco miners
 func ListMiners(c *gin.Context) {
