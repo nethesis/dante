@@ -29,9 +29,6 @@ use warnings;
 use JSON;
 use POSIX qw(strftime);
 
-
-my $limit = 10;
-my $i = 0;
 my $date = strftime "%Y%m%d", localtime;
 my $total_file = "/var/lightsquid/$date/.total";
 my @data;
@@ -48,15 +45,12 @@ if (! -f $total_file) {
 if (-f $total_file) {
     open(my $fh, '<', $total_file);
     while (readline($fh)) {
-        last if ($i>=$limit);
         if ($_ =~ /^tag_none/ || $_ =~ /^user:/ || $_ =~ /^size/) {
             # skip SSL connections and total lines
             next;
         } else {
             my ($host, $bytes, $conn, $other) = split(/\s+/, $_);
             push(@data, {count => int($bytes), name => $host});
-
-            $i++;
         }
     }
     close($fh);
