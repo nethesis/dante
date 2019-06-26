@@ -4,7 +4,7 @@
 %define __strip /bin/true
 
 Name:		dante
-Version:	0.0.2
+Version:	0.0.3
 Release:	0%{?dist}
 Summary:	Single stack reports made simple
 
@@ -70,6 +70,7 @@ cp %{SOURCE7} %{buildroot}/etc/httpd/conf.d/
 %config /etc/sysconfig/dante
 %config /etc/cron.d/dante
 %config /etc/httpd/conf.d/dante.conf
+%config /usr/share/dante/beatrice/config.js
 %dir /usr/share/dante/
 %dir %attr(0755, nobody, nobody) /usr/share/dante/virgilio
 %{_unitdir}/virgilio.service
