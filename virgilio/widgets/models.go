@@ -69,6 +69,7 @@ type Chart struct {
 	Series          []Series `json:"series"`
 	AggregationType string   `json:"aggregationType"`
 	Unit            string   `json:"unit"`
+	Anonymizable    bool     `json:"anonymizable"`
 }
 
 type PieChart struct {
@@ -89,6 +90,7 @@ type Table struct {
 	RowHeader       []string    `json:"rowHeader"`
 	Rows            [][]float64 `json:"rows"`
 	AggregationType string      `json:"aggregationType"`
+	Anonymizable    bool        `json:"anonymizable"`
 }
 
 type TableUI struct {
@@ -112,6 +114,7 @@ type List struct {
 	Data            []ListElem `json:"data"`
 	AggregationType string     `json:"aggregationType"`
 	Unit            string     `json:"unit"`
+	Anonymizable    bool       `json:"anonymizable"`
 }
 
 type ListElem struct {

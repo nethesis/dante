@@ -21,7 +21,6 @@
 package apis
 
 import (
-	"crypto/sha1"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -434,6 +433,12 @@ func ReadWidget(c *gin.Context) {
 	case "chart":
 		chartData.Series = seriesOutputChart
 
+		if configuration.Config.Virgilio.Anonymize && chartData.Anonymizable {
+			for i := 0; i < len(chartData.Categories); i++ {
+				chartData.Categories[i] = utils.Anonymize(chartData.Categories[i])
+			}
+		}
+
 		if chartData.ChartType == "pie" {
 			pieChart := utils.MapChartToPieChart(chartData)
 			widget = pieChart
@@ -441,6 +446,11 @@ func ReadWidget(c *gin.Context) {
 			widget = chartData
 		}
 	case "table":
+		if configuration.Config.Virgilio.Anonymize && tableData.Anonymizable {
+			for i := 0; i < len(tableData.RowHeader); i++ {
+				tableData.RowHeader[i] = utils.Anonymize(tableData.RowHeader[i])
+			}
+		}
 		tableUi := utils.MapTableToTableUI(tableData)
 		widget = tableUi
 	case "list":
@@ -457,12 +467,9 @@ func ReadWidget(c *gin.Context) {
 		if len(listData.Data) > configuration.Config.Virgilio.MaxEntries {
 			listData.Data = listData.Data[0:configuration.Config.Virgilio.MaxEntries]
 		}
-		if configuration.Config.Virgilio.Anonymize {
+		if configuration.Config.Virgilio.Anonymize && listData.Anonymizable {
 			for key, el := range listData.Data {
-				h := sha1.New()
-				h.Write([]byte(el.Name))
-				bs := h.Sum(nil)
-				el.Name = fmt.Sprintf("%x", bs)
+				el.Name = utils.Anonymize(el.Name)
 				listData.Data[key] = el
 			}
 		}

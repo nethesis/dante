@@ -21,6 +21,7 @@
 package utils
 
 import (
+	"crypto/sha1"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -176,4 +177,11 @@ func GetDateStringFromWidgetFilePath(filePath string) string {
 	month := filePathTokens[len(filePathTokens)-3]
 	year := filePathTokens[len(filePathTokens)-4]
 	return year + "-" + month + "-" + day
+}
+
+func Anonymize(value string) string {
+	h := sha1.New()
+	h.Write([]byte(value))
+	bs := h.Sum(nil)
+	return fmt.Sprintf("%x", bs)
 }
