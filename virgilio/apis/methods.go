@@ -21,6 +21,7 @@
 package apis
 
 import (
+	"crypto/sha1"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -510,9 +511,18 @@ func ReadWidget(c *gin.Context) {
 		sort.Slice(listData.Data, func(i, j int) bool {
 			return listData.Data[i].Count > listData.Data[j].Count
 		})
-		// limit number of lsit entries
+		// limit number of list entries
 		if len(listData.Data) > configuration.Config.Virgilio.MaxEntries {
 			listData.Data = listData.Data[0:configuration.Config.Virgilio.MaxEntries]
+		}
+		if configuration.Config.Virgilio.Anonymize {
+			for key, el := range listData.Data {
+				h := sha1.New()
+				h.Write([]byte(el.Name))
+				bs := h.Sum(nil)
+				el.Name = fmt.Sprintf("%x", bs)
+				listData.Data[key] = el
+			}
 		}
 		widget = listData
 	}

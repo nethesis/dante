@@ -38,6 +38,7 @@ type Configuration struct {
 		CorsAllowOrigins []string
 		MaxDays          int
 		MaxEntries       int
+		Anonymize        bool
 	}
 	Beatrice struct {
 		BaseDirectory string
@@ -75,6 +76,14 @@ func Init() {
 		max, err := strconv.Atoi(os.Getenv("VIRGILIO_MAX_ENTRIES"))
 		if err == nil {
 			Config.Virgilio.MaxEntries = max
+		}
+	}
+
+	Config.Virgilio.Anonymize = false
+	if os.Getenv("VIRGILIO_ANONYMIZE") != "" {
+		b, err := strconv.ParseBool(os.Getenv("VIRGILIO_ANONYMIZE"))
+		if err == nil {
+			Config.Virgilio.Anonymize = b
 		}
 	}
 
