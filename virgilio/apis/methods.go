@@ -163,57 +163,25 @@ func AggregateChart(widgetData map[string]interface{}, chartData widgets.Chart, 
 	return chartData, seriesOutputChart
 }
 
-func computeSnapshotTrendValue(mostRecentValueTrend float64, leastRecentValueTrend float64, counterData widgets.Counter) (float64, string) {
-	// retrieve least recent value to compute trend
-	// leastRecentValueTrend, errorString := GetLeastRecentValueSnapshotTrend(filePaths)
-	// if errorString != "" {
-	// 	return 0, errorString
-	// }
+func computeTrendValue(mostRecentValueTrend float64, leastRecentValueTrend float64, counterData widgets.Counter) (float64, string) {
+	var trend float64
 
 	if counterData.TrendType == "number" {
-		trend := mostRecentValueTrend - leastRecentValueTrend
+		trend = mostRecentValueTrend - leastRecentValueTrend
 		return trend, ""
 	} else if counterData.TrendType == "percentage" {
-		trend := (mostRecentValueTrend - leastRecentValueTrend) / leastRecentValueTrend * 100
-		fmt.Println("mostRecentValueTrend", mostRecentValueTrend, "leastRecentValueTrend", leastRecentValueTrend, "trend%", trend) // todo del
+		if leastRecentValueTrend != 0 {
+			trend = (mostRecentValueTrend - leastRecentValueTrend) / leastRecentValueTrend * 100
+		} else {
+			// avoid division by zero
+			trend = 0
+		}
 		trendRounded := math.Round(trend*100) / 100
 		return trendRounded, ""
 	} else {
 		return 0, "TrendType not implemented: " + counterData.TrendType
 	}
 }
-
-// func GetLeastRecentValueSnapshotTrend(filePaths []string) (float64, string) {
-// 	firstFileRead := false
-// 	var counterData widgets.Counter
-
-// 	// read least recent widget file
-// 	for index := 0; index < len(filePaths) && !firstFileRead; index++ {
-// 		filePath := filePaths[index]
-// 		widgetData, openError, err := utils.ReadJsonIgnoreOpenError(filePath)
-// 		if err != nil {
-// 			if openError {
-// 				// skip to next most recent widget file
-// 				continue
-// 			} else {
-// 				return 0, err.Error()
-// 			}
-// 		}
-// 		firstFileRead = true
-
-// 		switch widgetType := widgetData["type"]; widgetType {
-// 		case "counter":
-// 			mapstructure.Decode(widgetData, &counterData)
-// 		case nil:
-// 			errorString := "Cannot retrieve widget type for " + filePath
-// 			return 0, errorString
-// 		default:
-// 			errorString := "Widget type not implemented: " + widgetType.(string)
-// 			return 0, errorString
-// 		}
-// 	}
-// 	return counterData.Value, ""
-// }
 
 func initTable(widgetData map[string]interface{}, tableData widgets.Table, rowsOutputTable [][]float64) (widgets.Table, [][]float64) {
 	mapstructure.Decode(widgetData, &tableData)
@@ -283,6 +251,7 @@ func AggregateList(widgetData map[string]interface{}, listData widgets.List, lis
 func ReadWidget(c *gin.Context) {
 	var widgetData map[string]interface{}
 	var lastValidWidgetData map[string]interface{}
+	var lastValidWidgetDataForTrend map[string]interface{}
 	var openError bool
 	var err error
 	var labelData widgets.Label
@@ -437,7 +406,7 @@ func ReadWidget(c *gin.Context) {
 		counterData.Value = valueOutputCounter
 
 		if counterData.AggregationType == "snapshot" {
-			trend, errorString = computeSnapshotTrendValue(mostRecentValueTrend, leastRecentValueTrend, counterData)
+			trend, errorString = computeTrendValue(mostRecentValueTrend, leastRecentValueTrend, counterData)
 			if errorString != "" {
 				c.JSON(http.StatusInternalServerError, gin.H{"message": errorString})
 				return
@@ -456,7 +425,7 @@ func ReadWidget(c *gin.Context) {
 				widgetData, openError, err = utils.ReadJsonIgnoreOpenError(filePath)
 				if err != nil {
 					if openError {
-						widgetData = lastValidWidgetData
+						widgetData = lastValidWidgetDataForTrend
 						// skip to next most recent widget file
 						continue
 					} else {
@@ -464,6 +433,7 @@ func ReadWidget(c *gin.Context) {
 						return
 					}
 				}
+				lastValidWidgetDataForTrend = widgetData
 
 				widgetType = widgetData["type"].(string)
 				switch widgetType {
@@ -476,7 +446,7 @@ func ReadWidget(c *gin.Context) {
 				}
 			}
 			leastRecentValueTrend = valueOutputCounter
-			trend, errorString = computeSnapshotTrendValue(mostRecentValueTrend, leastRecentValueTrend, counterData)
+			trend, errorString = computeTrendValue(mostRecentValueTrend, leastRecentValueTrend, counterData)
 			fmt.Println("mostRecentValueTrend, leastRecentValueTrend, trend", mostRecentValueTrend, leastRecentValueTrend, trend) // todo del
 			counterData.Value = finalValueOutputCounter
 		}
@@ -556,7 +526,7 @@ func ReadWidget(c *gin.Context) {
 // 			// trend series
 // 			trendSeries = append(trendSeries, counterData.Value)
 
-// 			trend, errorString = computeSnapshotTrendValue(mostRecentValueTrend, counterData, filePaths)
+// 			trend, errorString = computeTrendValue(mostRecentValueTrend, counterData, filePaths)
 // 			if errorString != "" {
 // 				c.JSON(http.StatusInternalServerError, gin.H{"message": errorString})
 // 				return
