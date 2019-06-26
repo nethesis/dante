@@ -7,6 +7,13 @@ CIACCO_OUTPUT_DIR=/var/lib/nethserver/dante
 # Directory where server files are saves
 VIRGILIO_STORE_DIR="/usr/share/dante/virgilio"
 
+# Maximum number of delta days for queries
+# The server will refuse to search data older then VIRGILIO_MAX_DAYS
+VIRGILIO_MAX_DAYS=365
+
+# Maximum number of entries for list widget
+VIRGILIO_MAX_ENTRIES=10
+
 # CORS configuration
 VIRGILIO_ALLOW_ORIGIN="*"
 
