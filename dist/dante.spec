@@ -18,6 +18,7 @@ Source3:    beatrice.tar.gz
 Source4:    virgilio
 Source5:    virgilio.service
 Source6:    dante.cron
+Source7:    dante.conf
 
 BuildRequires: systemd
 
@@ -51,6 +52,7 @@ mkdir -p %{buildroot}/usr/bin
 mkdir -p %{buildroot}/etc/sysconfig/
 mkdir -p %{buildroot}/etc/cron.d/
 mkdir -p %{buildroot}/%{_unitdir}
+mkdir -p %{buildroot}/etc/httpd/conf.d/
 cp ciacco/ciacco %{buildroot}/%{_bindir}
 cp %{SOURCE4} %{buildroot}/%{_bindir}
 mv ciacco/miners %{buildroot}/usr/share/dante/
@@ -59,6 +61,7 @@ mv %{SOURCE2}  %{buildroot}/etc/sysconfig/dante
 tar xvzf %{SOURCE3} -C %{buildroot}/usr/share/dante/beatrice
 cp %{SOURCE5} %{buildroot}/%{_unitdir}
 cp %{SOURCE6} %{buildroot}/etc/cron.d/dante
+cp %{SOURCE7} %{buildroot}/etc/httpd/conf.d/
 
 
 %files
@@ -66,6 +69,7 @@ cp %{SOURCE6} %{buildroot}/etc/cron.d/dante
 %license LICENSE
 %config /etc/sysconfig/dante
 %config /etc/cron.d/dante
+%config /etc/httpd/conf.d/dante.conf
 %dir /usr/share/dante/
 %dir %attr(0755, nobody, nobody) /usr/share/dante/virgilio
 %{_unitdir}/virgilio.service
