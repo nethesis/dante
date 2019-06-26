@@ -67,10 +67,10 @@ cp %{SOURCE7} %{buildroot}/etc/httpd/conf.d/
 %files
 %doc README.md
 %license LICENSE
-%config /etc/sysconfig/dante
-%config /etc/cron.d/dante
-%config /etc/httpd/conf.d/dante.conf
-%config /usr/share/dante/beatrice/config.js
+%config(noreplace) /etc/sysconfig/dante
+%config(noreplace) /etc/cron.d/dante
+%config(noreplace) /etc/httpd/conf.d/dante.conf
+%config(noreplace) /usr/share/dante/beatrice/config.js
 %dir /usr/share/dante/
 %dir %attr(0755, nobody, nobody) /usr/share/dante/virgilio
 %{_unitdir}/virgilio.service
