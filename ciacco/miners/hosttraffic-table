@@ -32,7 +32,6 @@ my $i = 0;
 my @data;
 my $content = {};
 my @rows;
-my $anonymize = shift || '';
 
 system("/usr/bin/curl -s '$api' | grep '^{' > /tmp/result_ntopng");
 
@@ -57,12 +56,8 @@ if (!$content) {
 foreach my $key (sort { int($a) <=> int($b) } keys %{$content->{'rank'}}) {
     my $ip = $content->{'rank'}{$key};
     last if ($i >= $limit);
-    if ($anonymize eq 'true') {
-        push(@rows, "host$i");
-    } else {
-        push(@rows, $ip);
-    }
-        push(@data, [ $content->{'hosts'}{$ip}{'total'}{'sent'}, $content->{'hosts'}{$ip}{'total'}{'received'} ]);
+    push(@rows, $ip);
+    push(@data, [ $content->{'hosts'}{$ip}{'total'}{'sent'}, $content->{'hosts'}{$ip}{'total'}{'received'} ]);
     $i++;
 }
 

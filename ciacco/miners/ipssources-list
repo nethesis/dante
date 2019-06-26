@@ -28,7 +28,6 @@ my @data;
 my $hash;
 my $i = 0;
 my $limit = 5;
-my $anonymize = shift || undef;
 
 my $out = `curl --connect-timeout 2  -G http://localhost:5636/api/1/alerts -d time_range=864000s -s 2>/dev/null`;
 
@@ -46,11 +45,7 @@ if($eve->{'alerts'}) {
 # sort hash accordingly to value
 foreach my $key (sort { $hash->{$b} <=> $hash->{$a} } keys %$hash) {
     last if ($i >= $limit);
-    if ($anonymize eq "true") {
-        push(@data, {"name" => "source$i", "count" => $hash->{$key}});
-    } else {
-        push(@data, {"name" => $key, "count" => $hash->{$key}});
-    }
+    push(@data, {"name" => $key, "count" => $hash->{$key}});
     $i++;
 }
 
