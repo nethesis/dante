@@ -61,5 +61,6 @@ print encode_json({
         type => "list",
         data => \@data,
         unit => "bytes",
+        anonymizable => JSON::true,
         aggregationType => "sum"
     });

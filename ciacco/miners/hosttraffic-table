@@ -68,6 +68,7 @@ print encode_json({
         unit => "bytes",
         aggregationType => "snapshot",
         columnHeader => ["sent", "received"],
+        anonymizable => JSON::true,
         rowHeader => \@rows,
         rows => \@data
     });

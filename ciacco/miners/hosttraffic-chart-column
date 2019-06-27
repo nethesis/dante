@@ -67,5 +67,6 @@ print encode_json({
         chartType => "column",
         aggregationType => "snapshot",
         categories => \@categories,
+        anonymizable => JSON::true,
         series => [ { name => "sent", data => \@sent, unit => "bytes" }, { name => "received", data => \@received, unit => "bytes" }]
     });
