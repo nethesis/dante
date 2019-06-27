@@ -18,13 +18,13 @@
  * along with Dante.  If not, see COPYING.
  */
 
- package widgets
+package widgets
 
- import (
-	 "fmt"
- )
+import (
+	"fmt"
+)
 
- func MapTableToTableUI(table Table) TableUI {
+func MapTableToTableUI(table Table) TableUI {
 	var tableUi TableUI
 	tableUi.Type = table.Type
 	tableUi.MinerId = table.MinerId
@@ -93,4 +93,3 @@ func MapChartToPieChart(chart Chart) PieChart {
 	pieChart.Series = pieChartSeries
 	return pieChart
 }
-
