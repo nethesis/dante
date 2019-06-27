@@ -25,7 +25,7 @@
 value=$(cat /etc/nethserver-release)
 
 # fallback to system-release
-if [ -z "$ns_release" ]; then
+if [ -z "$value" ]; then
     value=$(cat /etc/system-release)
 fi
 
