@@ -4,7 +4,7 @@
 %define __strip /bin/true
 
 Name:		dante
-Version:	0.0.3
+Version:	0.0.4
 Release:	0%{?dist}
 Summary:	Single stack reports made simple
 
