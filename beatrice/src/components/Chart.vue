@@ -1,4 +1,4 @@
-<!-- 
+<!--
 Copyright (C) 2019 Nethesis S.r.l.
 http://www.nethesis.it - info@nethesis.it
  This file is part of Dante project.
@@ -100,7 +100,11 @@ export default {
         dataLabels: {
           enabled: false
         },
-        labels: this.labels ? this.labels : [],
+        labels: this.labels
+          ? this.labels.map(function(l) {
+              return context.$i18n.t(context.chartId + "." + l);
+            })
+          : [],
         title: {
           text: this.sparkline ? "" : this.title,
           floating: false,

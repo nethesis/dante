@@ -777,11 +777,18 @@ export default {
               // calculate correct sizes
               if (widget.type == "list") {
                 this.gridLayout[index].h =
-                  (widget.data.length < 10 ? 6 : 10) + 1.5 * widget.data.length;
+                  (widget.data.length < 10 ? 7 : 10) + 1.5 * widget.data.length;
               }
               if (widget.type == "table") {
                 this.gridLayout[index].h = 6 + 1.5 * widget.rows.length;
               }
+
+              this.gridLayout[index].width = this.widgetDefaults[
+                widget.type
+              ].width;
+              this.gridLayout[index].height = this.widgetDefaults[
+                widget.type
+              ].height;
             }
 
             this.$forceUpdate();
