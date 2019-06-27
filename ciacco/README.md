@@ -17,7 +17,7 @@ The configuration file is `/etc/sysconfig/dante`.
 A miner is a script which collects statistics from the system for the current day.
 
 On success, each miner must always generates output in JSON format and should exit 0.
-On error the miner must exit with non-zero code and can be generate custom output.
+On error the miner must exit with non-zero code and can generate custom output.
 
 The name of the script must respect some naming conventions. The name is composed by 3 parts: `minerId-type-subtype`.
 Both `minerId` and `type` are mandatory, while `subtype` is optional.
@@ -114,6 +114,7 @@ Display a chart without a trend. Extra fields:
     - `name`: name of the serie
     - `data`: array of values
     - `unit`: see above
+- `anonymizable`: boolean value to anonymize the categories (e.g. user names, IP addresses...)
 
 
 #### Example 1: series
@@ -188,6 +189,7 @@ Extra fields:
 - `columnsHeader`: column headers
 - `rowHeader`: row headers
 - `rows`: array of array values for the table
+- `anonymizable`: boolean value to anonymize row headers (e.g. user names, IP addresses...)
 
 #### Example
 
@@ -229,7 +231,8 @@ The server will aggregate data from all days and calculate the "top X items" or 
 
 Extra fields:
 
-- `data`: a list of objects with a label and a counter
+- `data`: a list of objects with a name and a counter
+- `anonymizable`: boolean value to anonymize the names inside the data array (e.g. user names, IP addresses...)
 
 #### Example
 
