@@ -177,7 +177,7 @@ body {
   height: initial !important;
 }
 #app {
-  margin: 20px;
+  margin: 20px !important;
 }
 
 .ui.pointing.menu {

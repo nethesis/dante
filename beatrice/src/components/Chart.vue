@@ -161,7 +161,7 @@ export default {
 }
 
 .dark .apexcharts-menu > .apexcharts-menu-item:hover {
-  background: #88898a;
+  background: #88898a !important;
 }
 
 .apexcharts-tooltip {

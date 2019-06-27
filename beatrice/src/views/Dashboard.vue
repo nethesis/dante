@@ -689,10 +689,10 @@ export default {
               : layout.h;
             layout.width = success.body.default
               ? this.widgetDefaults[layout.type].width
-              : layout.width;
+              : (window.innerWidth * layout.width) / 100;
             layout.height = success.body.default
               ? this.widgetDefaults[layout.type].height
-              : layout.height;
+              : (window.innerHeight * layout.height) / 100;
             layout.data = {
               series: []
             };
@@ -782,13 +782,6 @@ export default {
               if (widget.type == "table") {
                 this.gridLayout[index].h = 6 + 1.5 * widget.rows.length;
               }
-
-              this.gridLayout[index].width = this.widgetDefaults[
-                widget.type
-              ].width;
-              this.gridLayout[index].height = this.widgetDefaults[
-                widget.type
-              ].height;
             }
 
             this.$forceUpdate();
@@ -808,8 +801,8 @@ export default {
           type: w.type,
           w: w.w,
           h: w.h,
-          width: w.width,
-          height: w.height,
+          width: (w.width * 100) / window.innerWidth,
+          height: (w.height * 100) / window.innerHeight,
           text: w.title || ""
         };
       });
@@ -839,31 +832,31 @@ export default {
 
 <style>
 .on-edit {
-  border-radius: 0.28571429rem;
-  outline: 2px dashed #e0e1e2;
+  border-radius: 0.28571429rem !important;
+  outline: 2px dashed #e0e1e2 !important;
 }
 .on-edit-dark {
-  border-radius: 0.28571429rem;
-  outline: 2px dashed #828282;
+  border-radius: 0.28571429rem !important;
+  outline: 2px dashed #828282 !important;
 }
 
 .vue-grid-item.vue-grid-placeholder {
-  background: #e0e1e2;
-  border: 2px solid black;
+  background: #e0e1e2 !important;
+  border: 2px solid black !important;
   border-radius: 0.28571429rem;
 }
 
 .vue-grid-item.vue-draggable-dragging {
-  border: 2px dashed #e0e1e2;
-  border-radius: 0.28571429rem;
+  border: 2px dashed #e0e1e2 !important;
+  border-radius: 0.28571429rem !important;
 }
 
 .empty {
-  border-radius: 0.28571429rem;
+  border-radius: 0.28571429rem !important;
 }
 
 .title-pad {
-  padding: 3px;
+  padding: 3px !important;
 }
 
 .adjust-input-container {
@@ -876,33 +869,33 @@ export default {
   margin-top: 5px !important;
 }
 .adjust-icon:hover {
-  cursor: pointer;
+  cursor: pointer !important;
 }
 .adjust-header {
-  display: inline-block;
+  display: inline-block !important;
 }
 .adjust-remove {
-  cursor: pointer;
+  cursor: pointer !important;
 }
 .adjust-content {
-  display: inline-block;
+  display: inline-block !important;
 }
 .adjust-label-counter {
-  margin-bottom: 15px;
+  margin-bottom: 15px !important;
 }
 .adjust-image-icon {
   padding: 10px !important;
-  cursor: pointer;
+  cursor: pointer !important;
 }
 .adjust-close-icon {
-  position: absolute;
-  right: -2px;
-  top: 1px;
+  position: absolute !important;
+  right: -2px !important;
+  top: 1px !important;
   z-index: 99999 !important;
 }
 .adjust-title-table {
   padding-left: 10px !important;
-  padding-top: 2px;
+  padding-top: 2px !important;
 }
 .adjust-list {
   margin-top: 5px !important;
@@ -912,8 +905,8 @@ export default {
 }
 
 .highlight {
-  border-radius: 0.28571429rem;
-  outline: 2px solid #54c8ff;
+  border-radius: 0.28571429rem !important;
+  outline: 2px solid #54c8ff !important;
 }
 .lowlight {
   opacity: 0.25 !important;
@@ -924,10 +917,10 @@ export default {
   > .vue-grid-layout
   > .vue-grid-item
   > .vue-resizable-handle {
-  filter: invert(100%);
+  filter: invert(100%) !important;
 }
 .ui.segment > .ui > .vue-grid-layout > .vue-grid-item > .vue-resizable-handle {
-  filter: invert(0%);
+  filter: invert(0%) !important;
 }
 
 .add-widget-selected {
@@ -954,10 +947,10 @@ export default {
   margin-left: 0px !important;
   margin-right: 0px !important;
   margin-bottom: 0px !important;
-  max-width: 33.333333%;
+  max-width: 33.333333% !important;
 }
 .vue-resizable-handle {
-  z-index: 2;
+  z-index: 2 !important;
 }
 
 .ui.inverted.definition.table tfoot:not(.full-width) th:first-child,
@@ -967,12 +960,12 @@ export default {
 }
 
 .full-box {
-  width: 100%;
-  height: 100%;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .ui.list .list > .item > .content,
 .ui.list > .item > .content {
-  margin-left: 10px;
+  margin-left: 10px !important;
 }
 </style>
