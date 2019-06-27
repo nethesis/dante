@@ -23,8 +23,8 @@
 # Root partition pie chart
 
 data=$(df --output=used,avail / | tail -n 1)
-used=$(echo $data | cut -d' ' -f 1)
-avail=$(echo $data | cut -d' ' -f 2)
+used=$(( $(echo $data | cut -d' ' -f 1) * 1024))
+avail=$(( $(echo $data | cut -d' ' -f 2) * 1024))
 
 id=$(basename $0)
 type=$(basename $0 | cut -d'-' -f2)
