@@ -44,6 +44,7 @@ const Mail = require("./Mail");
   // get args
   var url = args[0];
   var addresses = args[1];
+  var from = args[2];
 
   // parse url
   var queryStringParsed = new urlparse(url.replace("/#/?", "?")).query;
@@ -57,7 +58,14 @@ const Mail = require("./Mail");
   var html = await template.create(assets.image, url, parsedQuery);
 
   const mail = new Mail();
-  var status = await mail.send(html, addresses, url, parsedQuery, assets.pdf);
+  var status = await mail.send(
+    html,
+    addresses,
+    url,
+    parsedQuery,
+    assets.pdf,
+    from
+  );
 
   process.exit(0);
 })();

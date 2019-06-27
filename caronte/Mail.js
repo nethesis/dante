@@ -25,7 +25,7 @@ const nodemailer = require("nodemailer");
 class Mail {
   constructor() {}
 
-  async send(html, addresses, url, parsedQuery, pdf) {
+  async send(html, addresses, url, parsedQuery, pdf, from) {
     // extract query
     var last = parsedQuery.last;
     var lang = parsedQuery.lang;
@@ -85,7 +85,7 @@ class Mail {
 
     // setup e-mail data with unicode symbols
     var mailOptions = {
-      from: '"Root" <root@' + os.hostname() + ">",
+      from: from,
       to: addresses,
       subject:
         "📈 " +

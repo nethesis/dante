@@ -64,7 +64,8 @@ class Screenshot {
         executablePath: process.pkg
           ? puppeteer.executablePath().replace(__dirname, ".")
           : null,
-        args: ["--no-sandbox"]
+        args: ["--no-sandbox"],
+        ignoreHTTPSErrors: true
       });
 
       // create page
