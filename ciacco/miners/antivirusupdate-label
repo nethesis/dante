@@ -1,0 +1,53 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - info@nethesis.it
+#
+# This script is part of Dante.
+#
+# Dante is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# Dante is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Dante.  If not, see COPYING.
+#
+
+# find latest modified signature
+
+use strict;
+use warnings;
+use JSON;
+
+my $dir = "/var/lib/clamav";
+if (! -d $dir) {
+    exit 1
+}
+
+my $av_db = -1;
+opendir(DIR, $dir);
+while (my $file = readdir(DIR)) {
+    next if ($file =~ m/^\./);
+    my $fname = "$dir/$file";
+
+    if (-l $fname) {
+        $fname = readlink($fname);
+    }
+    my $timestamp = (stat($fname))[9];
+    if ($timestamp > $av_db) {
+        $av_db = $timestamp;
+    }
+}
+
+print encode_json({
+        minerId => "antivirusupdate-label",
+        type => "label",
+        value => scalar localtime $av_db
+    });
