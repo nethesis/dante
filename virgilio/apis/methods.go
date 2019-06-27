@@ -112,25 +112,6 @@ func validate(widgetName string, startDateString string, endDateString string) (
 	return "", startDate, deltaDays
 }
 
-func initChart(widgetData map[string]interface{}, chartData widgets.Chart, seriesOutputChart []widgets.Series) (widgets.Chart, []widgets.Series) {
-	mapstructure.Decode(widgetData, &chartData)
-	series := chartData.Series
-	numSeries := len(series)
-	numCategories := len(chartData.Categories)
-	seriesOutputChart = make([]widgets.Series, numSeries)
-
-	for i := range seriesOutputChart {
-		seriesOutputChart[i].Data = make([]float64, numCategories)
-	}
-
-	for i := 0; i < numSeries; i++ {
-		for j := 0; j < numCategories; j++ {
-			seriesOutputChart[i].Data[j] += series[i].Data[j]
-		}
-	}
-	return chartData, seriesOutputChart
-}
-
 // AggregateChart decodes a Chart from a map and aggregates its series
 func AggregateChart(widgetData map[string]interface{}, chartData widgets.Chart, seriesOutputChart []widgets.Series, initialize bool) (widgets.Chart, []widgets.Series) {
 	mapstructure.Decode(widgetData, &chartData)
@@ -155,12 +136,12 @@ func AggregateChart(widgetData map[string]interface{}, chartData widgets.Chart, 
 	return chartData, seriesOutputChart
 }
 
-func computeTrendValue(mostRecentValueTrend float64, leastRecentValueTrend float64, counterData widgets.Counter) (float64, string) {
+func computeTrendValue(mostRecentValueTrend float64, leastRecentValueTrend float64, counterData widgets.Counter) (float64, error) {
 	var trend float64
 
 	if counterData.TrendType == "number" {
 		trend = mostRecentValueTrend - leastRecentValueTrend
-		return trend, ""
+		return trend, nil
 	} else if counterData.TrendType == "percentage" {
 		if leastRecentValueTrend != 0 {
 			trend = (mostRecentValueTrend - leastRecentValueTrend) / leastRecentValueTrend * 100
@@ -169,29 +150,10 @@ func computeTrendValue(mostRecentValueTrend float64, leastRecentValueTrend float
 			trend = 0
 		}
 		trendRounded := math.Round(trend*100) / 100
-		return trendRounded, ""
+		return trendRounded, nil
 	} else {
-		return 0, "TrendType not implemented: " + counterData.TrendType
+		return 0, &utils.HttpError{http.StatusInternalServerError, "Trend type not implemented: " + counterData.TrendType}
 	}
-}
-
-func initTable(widgetData map[string]interface{}, tableData widgets.Table, rowsOutputTable [][]float64) (widgets.Table, [][]float64) {
-	mapstructure.Decode(widgetData, &tableData)
-	rows := tableData.Rows
-	numRows := len(rows)
-	numColumns := len(rows[0])
-	rowsOutputTable = make([][]float64, numRows)
-
-	for i := range rowsOutputTable {
-		rowsOutputTable[i] = make([]float64, numColumns)
-	}
-
-	for i := 0; i < numRows; i++ {
-		for j := 0; j < numColumns; j++ {
-			rowsOutputTable[i][j] += rows[i][j]
-		}
-	}
-	return tableData, rowsOutputTable
 }
 
 // AggregateTable decodes a Table from a map and aggregates its data cells
@@ -238,48 +200,37 @@ func AggregateList(widgetData map[string]interface{}, listData widgets.List, lis
 	return listData, listMap
 }
 
-// ReadWidget parses query and validate it
-// Finally, return the widget result
-func ReadWidget(c *gin.Context) {
+func readMostRecentWidgetFile(filePaths []string) (widgets.WidgetBlob, error) {
+	var filePathIndex int
 	var widgetData map[string]interface{}
-	var lastValidWidgetData map[string]interface{}
-	var lastValidWidgetDataForTrend map[string]interface{}
+	firstFileRead := false
 	var openError bool
 	var err error
+	aggregate := false
+	var valueOutputCounter float64
+	var lastValidWidgetData map[string]interface{}
 	var labelData widgets.Label
 	var counterData widgets.Counter
-	var valueOutputCounter float64
 	var chartData widgets.Chart
-	var seriesOutputChart []widgets.Series
 	var tableData widgets.Table
-	var rowsOutputTable [][]float64
-	firstFileRead := false
-	var index int
-	aggregate := false
-	var mostRecentValueTrend float64
-	var leastRecentValueTrend float64
-	var errorString string
-	var trend float64
-	var widgetType string
-	var trendSeries []float64
-	var trendCategories []string
-	var listMap map[string]float64
 	var listData widgets.List
+	var trendSeries []float64
+	var widgetType string
+	var trendCategories []string
+	var mostRecentValueTrend float64
+	var seriesOutputChart []widgets.Series
+	var rowsOutputTable [][]float64
+	var listMap map[string]float64
+	var widgetBlob widgets.WidgetBlob
+	var widgetInfo widgets.WidgetInfo
+	var labelInfo widgets.LabelInfo
+	var counterInfo widgets.CounterInfo
+	var chartInfo widgets.ChartInfo
+	var tableInfo widgets.TableInfo
+	var listInfo widgets.ListInfo
 
-	widgetName := c.Param("widgetName")
-	startDateString := c.Query("startDate")
-	endDateString := c.Query("endDate")
-
-	message, startDate, deltaDays := validate(widgetName, startDateString, endDateString)
-	if message != "" {
-		c.JSON(http.StatusBadRequest, gin.H{"message": message})
-		return
-	}
-	filePaths := widgets.GetFileLists(widgetName, startDate, deltaDays)
-
-	// read most recent widget file
-	for index = len(filePaths) - 1; index >= 0 && !firstFileRead; index-- {
-		filePath := filePaths[index]
+	for filePathIndex = len(filePaths) - 1; filePathIndex >= 0 && !firstFileRead; filePathIndex-- {
+		filePath := filePaths[filePathIndex]
 		widgetData, openError, err = utils.ReadJsonIgnoreOpenError(filePath)
 		if err != nil {
 			if openError {
@@ -287,8 +238,7 @@ func ReadWidget(c *gin.Context) {
 				// skip to next most recent widget file
 				continue
 			} else {
-				c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-				return
+				return widgetBlob, &utils.HttpError{http.StatusInternalServerError, err.Error()}
 			}
 		}
 		lastValidWidgetData = widgetData
@@ -302,11 +252,15 @@ func ReadWidget(c *gin.Context) {
 		switch widgetType {
 		case "label":
 			mapstructure.Decode(widgetData, &labelData)
+			labelInfo.LabelData = labelData
+
+			// assign labelInfo to widgetBlob
+			widgetBlob.LabelInfo = labelInfo
 		case "counter":
 			mapstructure.Decode(widgetData, &counterData)
 			valueOutputCounter = counterData.Value
 			trendSeries = append(trendSeries, counterData.Value)
-			dateString := utils.GetDateStringFromWidgetFilePath(filePath)
+			dateString := utils.GetDateStringFromFilePath(filePath)
 			trendCategories = append(trendCategories, dateString)
 
 			if counterData.AggregationType == "snapshot" {
@@ -315,22 +269,84 @@ func ReadWidget(c *gin.Context) {
 			}
 			// even if it's snapshot, aggregation is needed to compute trend
 			aggregate = true
+
+			// assign props to counterInfo object
+			counterInfo.CounterData = counterData
+			counterInfo.TrendSeries = trendSeries
+			counterInfo.ValueOutputCounter = valueOutputCounter
+			counterInfo.TrendCategories = trendCategories
+			counterInfo.MostRecentValueTrend = mostRecentValueTrend
+
+			// assign counterInfo to widgetBlob
+			widgetBlob.CounterInfo = counterInfo
 		case "chart":
 			chartData, seriesOutputChart = AggregateChart(widgetData, chartData, seriesOutputChart, true)
+
+			// assign props to chartInfo object
+			chartInfo.ChartData = chartData
+			chartInfo.SeriesOutputChart = seriesOutputChart
+
+			// assign chartInfo to widgetBlob
+			widgetBlob.ChartInfo = chartInfo
 		case "table":
 			tableData, rowsOutputTable = AggregateTable(widgetData, tableData, rowsOutputTable, true)
+
+			// assign props to tableInfo object
+			tableInfo.TableData = tableData
+			tableInfo.RowsOutputTable = rowsOutputTable
+
+			// assign tableInfo to widgetBlob
+			widgetBlob.TableInfo = tableInfo
 		case "list":
 			listData, listMap = AggregateList(widgetData, listData, listMap, true)
+
+			// assign props to listInfo object
+			listInfo.ListMap = listMap
+			listInfo.ListData = listData
+
+			// assign listInfo to widgetBlob
+			widgetBlob.ListInfo = listInfo
 		default:
-			c.JSON(http.StatusNotImplemented, gin.H{"message": "Widget type not implemented: " + widgetType})
-			return
+			return widgetBlob, &utils.HttpError{http.StatusNotImplemented, "Widget type not implemented: " + widgetType}
 		}
 	}
 
+	widgetInfo.WidgetData = widgetData
+	widgetInfo.LastValidWidgetData = lastValidWidgetData
+	widgetInfo.Aggregate = aggregate
+	widgetInfo.WidgetType = widgetType
+	widgetInfo.FilePaths = filePaths
+	widgetInfo.FilePathIndex = filePathIndex
+
+	widgetBlob.WidgetInfo = widgetInfo
+
+	return widgetBlob, nil
+}
+
+func readCounterWidget(widgetInfo widgets.WidgetInfo, counterInfo widgets.CounterInfo) (widgets.Counter, error) {
+	var openError bool
+	var err error
+	var leastRecentValueTrend float64
+	var trend float64
+	var lastValidWidgetDataForTrend map[string]interface{}
+
+	counterData := counterInfo.CounterData
+	aggregate := widgetInfo.Aggregate
+	filePaths := widgetInfo.FilePaths
+	filePathIndex := widgetInfo.FilePathIndex
+	widgetData := widgetInfo.WidgetData
+	lastValidWidgetData := widgetInfo.LastValidWidgetData
+	widgetName := widgetInfo.WidgetName
+	startDate := widgetInfo.StartDate
+	deltaDays := widgetInfo.DeltaDays
+	valueOutputCounter := counterInfo.ValueOutputCounter
+	trendSeries := counterInfo.TrendSeries
+	trendCategories := counterInfo.TrendCategories
+	mostRecentValueTrend := counterInfo.MostRecentValueTrend
+
 	if aggregate {
-		// aggregate widget data
-		for ; index >= 0; index-- {
-			filePath := filePaths[index]
+		for ; filePathIndex >= 0; filePathIndex-- {
+			filePath := filePaths[filePathIndex]
 			widgetData, openError, err = utils.ReadJsonIgnoreOpenError(filePath)
 			if err != nil {
 				if openError {
@@ -338,139 +354,290 @@ func ReadWidget(c *gin.Context) {
 					// skip to next widget file
 					continue
 				} else {
-					c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-					return
+					return counterData, &utils.HttpError{http.StatusInternalServerError, err.Error()}
 				}
 			}
 			lastValidWidgetData = widgetData
 
-			widgetType = widgetData["type"].(string)
-			switch widgetType {
-			// case "label":
-			// can't aggregate label widget
-			case "counter":
-				mapstructure.Decode(widgetData, &counterData)
-
-				if counterData.AggregationType == "sum" {
-					valueOutputCounter += counterData.Value
-				}
-				// trend management
-				leastRecentValueTrend = counterData.Value
-				trendSeries = append(trendSeries, counterData.Value)
-				dateString := utils.GetDateStringFromWidgetFilePath(filePath)
-				trendCategories = append(trendCategories, dateString)
-			case "chart":
-				chartData, seriesOutputChart = AggregateChart(widgetData, chartData, seriesOutputChart, false)
-			case "table":
-				tableData, rowsOutputTable = AggregateTable(widgetData, tableData, rowsOutputTable, false)
-			case "list":
-				listData, listMap = AggregateList(widgetData, listData, listMap, false)
-			default:
-				c.JSON(http.StatusNotImplemented, gin.H{"message": "Widget type not implemented: " + widgetType})
-				return
+			widgetType := widgetData["type"].(string)
+			if widgetType != "counter" {
+				return counterData, &utils.HttpError{http.StatusInternalServerError, "Unexpected error, widgetType should be counter, but is " + widgetType}
 			}
+
+			mapstructure.Decode(widgetData, &counterData)
+
+			if counterData.AggregationType == "sum" {
+				valueOutputCounter += counterData.Value
+			}
+			// trend management
+			leastRecentValueTrend = counterData.Value
+			trendSeries = append(trendSeries, counterData.Value)
+			dateString := utils.GetDateStringFromFilePath(filePath)
+			trendCategories = append(trendCategories, dateString)
 		}
 	}
+	counterData.Value = valueOutputCounter
+
+	if counterData.AggregationType == "snapshot" {
+		trend, err = computeTrendValue(mostRecentValueTrend, leastRecentValueTrend, counterData)
+		if err != nil {
+			return counterData, err
+		}
+	} else if counterData.AggregationType == "sum" {
+		// second aggregation
+		finalValueOutputCounter := valueOutputCounter
+		mostRecentValueTrend = valueOutputCounter
+		valueOutputCounter = 0
+		startDate = startDate.AddDate(0, 0, -deltaDays-1)
+		filePaths = widgets.GetFileLists(widgetName, startDate, deltaDays)
+
+		for filePathIndex = len(filePaths) - 1; filePathIndex >= 0; filePathIndex-- {
+			filePath := filePaths[filePathIndex]
+			widgetData, openError, err = utils.ReadJsonIgnoreOpenError(filePath)
+			if err != nil {
+				if openError {
+					widgetData = lastValidWidgetDataForTrend
+					// skip to next widget file
+					continue
+				} else {
+					return counterData, &utils.HttpError{http.StatusInternalServerError, err.Error()}
+				}
+			}
+			lastValidWidgetDataForTrend = widgetData
+
+			mapstructure.Decode(widgetData, &counterData)
+			valueOutputCounter += counterData.Value
+		}
+		leastRecentValueTrend = valueOutputCounter
+		trend, err = computeTrendValue(mostRecentValueTrend, leastRecentValueTrend, counterData)
+		if err != nil {
+			return counterData, err
+		}
+		counterData.Value = finalValueOutputCounter
+	}
+	counterData.Trend = trend
+	trendSeries = utils.ReverseSliceFloat(trendSeries)
+	trendSeriesJson := widgets.TrendSeries{"trendSeries", trendSeries}
+	counterData.TrendSeries = []widgets.TrendSeries{trendSeriesJson}
+	trendCategories = utils.ReverseSliceString(trendCategories)
+	counterData.TrendCategories = trendCategories
+	return counterData, nil
+}
+
+func readChartWidget(widgetInfo widgets.WidgetInfo, chartInfo widgets.ChartInfo) (interface{}, error) {
+	var openError bool
+	var err error
+
+	aggregate := widgetInfo.Aggregate
+	filePaths := widgetInfo.FilePaths
+	filePathIndex := widgetInfo.FilePathIndex
+	widgetData := widgetInfo.WidgetData
+	lastValidWidgetData := widgetInfo.LastValidWidgetData
+	chartData := chartInfo.ChartData
+	seriesOutputChart := chartInfo.SeriesOutputChart
+
+	if aggregate {
+		for ; filePathIndex >= 0; filePathIndex-- {
+			filePath := filePaths[filePathIndex]
+			widgetData, openError, err = utils.ReadJsonIgnoreOpenError(filePath)
+			if err != nil {
+				if openError {
+					widgetData = lastValidWidgetData
+					// skip to next widget file
+					continue
+				} else {
+					return chartData, &utils.HttpError{http.StatusInternalServerError, err.Error()}
+				}
+			}
+			lastValidWidgetData = widgetData
+
+			widgetType := widgetData["type"].(string)
+			if widgetType != "chart" {
+				return chartData, &utils.HttpError{http.StatusInternalServerError, "Unexpected error, widgetType should be chart, but is " + widgetType}
+			}
+			chartData, seriesOutputChart = AggregateChart(widgetData, chartData, seriesOutputChart, false)
+		}
+	}
+	chartData.Series = seriesOutputChart
+
+	if configuration.Config.Virgilio.Anonymize && chartData.Anonymizable {
+		for i := 0; i < len(chartData.Categories); i++ {
+			chartData.Categories[i] = utils.Anonymize(chartData.Categories[i])
+		}
+	}
+
+	if chartData.ChartType == "pie" {
+		pieChart := widgets.MapChartToPieChart(chartData)
+		return pieChart, nil
+	}
+	return chartData, nil
+}
+
+func readTableWidget(widgetInfo widgets.WidgetInfo, tableInfo widgets.TableInfo) (widgets.TableUI, error) {
+	var openError bool
+	var err error
+	var tableUi widgets.TableUI
+
+	aggregate := widgetInfo.Aggregate
+	filePaths := widgetInfo.FilePaths
+	filePathIndex := widgetInfo.FilePathIndex
+	widgetData := widgetInfo.WidgetData
+	lastValidWidgetData := widgetInfo.LastValidWidgetData
+	tableData := tableInfo.TableData
+	rowsOutputTable := tableInfo.RowsOutputTable
+
+	if aggregate {
+		for ; filePathIndex >= 0; filePathIndex-- {
+			filePath := filePaths[filePathIndex]
+			widgetData, openError, err = utils.ReadJsonIgnoreOpenError(filePath)
+			if err != nil {
+				if openError {
+					widgetData = lastValidWidgetData
+					// skip to next widget file
+					continue
+				} else {
+					return tableUi, &utils.HttpError{http.StatusInternalServerError, err.Error()}
+				}
+			}
+			lastValidWidgetData = widgetData
+
+			widgetType := widgetData["type"].(string)
+			if widgetType != "table" {
+				return tableUi, &utils.HttpError{http.StatusInternalServerError, "Unexpected error, widgetType should be table, but is " + widgetType}
+			}
+			tableData, rowsOutputTable = AggregateTable(widgetData, tableData, rowsOutputTable, false)
+		}
+	}
+
+	if configuration.Config.Virgilio.Anonymize && tableData.Anonymizable {
+		for i := 0; i < len(tableData.RowHeader); i++ {
+			tableData.RowHeader[i] = utils.Anonymize(tableData.RowHeader[i])
+		}
+	}
+	tableUi = widgets.MapTableToTableUI(tableData)
+	return tableUi, nil
+}
+
+func readListWidget(widgetInfo widgets.WidgetInfo, listInfo widgets.ListInfo) (widgets.List, error) {
+	var openError bool
+	var err error
+
+	aggregate := widgetInfo.Aggregate
+	filePaths := widgetInfo.FilePaths
+	filePathIndex := widgetInfo.FilePathIndex
+	widgetData := widgetInfo.WidgetData
+	lastValidWidgetData := widgetInfo.LastValidWidgetData
+	listData := listInfo.ListData
+	listMap := listInfo.ListMap
+
+	if aggregate {
+		for ; filePathIndex >= 0; filePathIndex-- {
+			filePath := filePaths[filePathIndex]
+			widgetData, openError, err = utils.ReadJsonIgnoreOpenError(filePath)
+			if err != nil {
+				if openError {
+					widgetData = lastValidWidgetData
+					// skip to next widget file
+					continue
+				} else {
+					return listData, &utils.HttpError{http.StatusInternalServerError, err.Error()}
+				}
+			}
+			lastValidWidgetData = widgetData
+
+			widgetType := widgetData["type"].(string)
+			if widgetType != "list" {
+				return listData, &utils.HttpError{http.StatusInternalServerError, "Unexpected error, widgetType should be list, but is " + widgetType}
+			}
+			listData, listMap = AggregateList(widgetData, listData, listMap, false)
+		}
+	}
+	listData.Data = make([]widgets.ListElem, 0)
+
+	for key, value := range listMap {
+		listElem := widgets.ListElem{key, value}
+		listData.Data = append(listData.Data, listElem)
+	}
+	sort.Slice(listData.Data, func(i, j int) bool {
+		return listData.Data[i].Count > listData.Data[j].Count
+	})
+	// limit number of list entries
+	if len(listData.Data) > configuration.Config.Virgilio.MaxEntries {
+		listData.Data = listData.Data[0:configuration.Config.Virgilio.MaxEntries]
+	}
+	if configuration.Config.Virgilio.Anonymize && listData.Anonymizable {
+		for key, el := range listData.Data {
+			el.Name = utils.Anonymize(el.Name)
+			listData.Data[key] = el
+		}
+	}
+	return listData, nil
+}
+
+// ReadWidget parses query and validate it
+// Finally, return the widget result
+func ReadWidget(c *gin.Context) {
 	var widget interface{}
 
-	widgetType = widgetData["type"].(string)
-	switch widgetType {
-	case "label":
-		widget = labelData
-	case "counter":
-		counterData.Value = valueOutputCounter
+	widgetName := c.Param("widgetName")
+	startDateString := c.Query("startDate")
+	endDateString := c.Query("endDate")
 
-		if counterData.AggregationType == "snapshot" {
-			trend, errorString = computeTrendValue(mostRecentValueTrend, leastRecentValueTrend, counterData)
-			if errorString != "" {
-				c.JSON(http.StatusInternalServerError, gin.H{"message": errorString})
+	message, startDate, deltaDays := validate(widgetName, startDateString, endDateString)
+	if message != "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": message})
+		return
+	}
+	filePaths := widgets.GetFileLists(widgetName, startDate, deltaDays)
+
+	widgetBlob, err := readMostRecentWidgetFile(filePaths)
+	if err != nil {
+		if httpError, ok := err.(*utils.HttpError); ok {
+			c.JSON(httpError.Code, gin.H{"message": httpError.ErrorString})
+			return
+		}
+	}
+
+	widgetInfo := widgetBlob.WidgetInfo
+	widgetInfo.WidgetName = widgetName
+	widgetInfo.StartDate = startDate
+	widgetInfo.DeltaDays = deltaDays
+
+	switch widgetInfo.WidgetType {
+	case "label":
+		widget = widgetBlob.LabelInfo.LabelData
+	case "counter":
+		counterData, err := readCounterWidget(widgetInfo, widgetBlob.CounterInfo)
+		if err != nil {
+			if httpError, ok := err.(*utils.HttpError); ok {
+				c.JSON(httpError.Code, gin.H{"message": httpError.ErrorString})
 				return
 			}
-		} else if counterData.AggregationType == "sum" {
-			// second aggregation
-			finalValueOutputCounter := valueOutputCounter
-			mostRecentValueTrend = valueOutputCounter
-			valueOutputCounter = 0
-			startDate = startDate.AddDate(0, 0, -deltaDays-1)
-			filePaths = widgets.GetFileLists(widgetName, startDate, deltaDays)
-
-			for index = len(filePaths) - 1; index >= 0; index-- {
-				filePath := filePaths[index]
-				widgetData, openError, err = utils.ReadJsonIgnoreOpenError(filePath)
-				if err != nil {
-					if openError {
-						widgetData = lastValidWidgetDataForTrend
-						// skip to next widget file
-						continue
-					} else {
-						c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-						return
-					}
-				}
-				lastValidWidgetDataForTrend = widgetData
-
-				widgetType = widgetData["type"].(string)
-				switch widgetType {
-				case "counter":
-					mapstructure.Decode(widgetData, &counterData)
-					valueOutputCounter += counterData.Value
-				default:
-					c.JSON(http.StatusNotImplemented, gin.H{"message": "Widget type not expected, expecting counter: " + widgetType})
-					return
-				}
-			}
-			leastRecentValueTrend = valueOutputCounter
-			trend, errorString = computeTrendValue(mostRecentValueTrend, leastRecentValueTrend, counterData)
-			counterData.Value = finalValueOutputCounter
 		}
-		counterData.Trend = trend
-		trendSeries = utils.ReverseSliceFloat(trendSeries)
-		trendSeriesJson := widgets.TrendSeries{"trendSeries", trendSeries}
-		counterData.TrendSeries = []widgets.TrendSeries{trendSeriesJson}
-		trendCategories = utils.ReverseSliceString(trendCategories)
-		counterData.TrendCategories = trendCategories
 		widget = counterData
 	case "chart":
-		chartData.Series = seriesOutputChart
-
-		if configuration.Config.Virgilio.Anonymize && chartData.Anonymizable {
-			for i := 0; i < len(chartData.Categories); i++ {
-				chartData.Categories[i] = utils.Anonymize(chartData.Categories[i])
+		widget, err = readChartWidget(widgetInfo, widgetBlob.ChartInfo)
+		if err != nil {
+			if httpError, ok := err.(*utils.HttpError); ok {
+				c.JSON(httpError.Code, gin.H{"message": httpError.ErrorString})
+				return
 			}
-		}
-
-		if chartData.ChartType == "pie" {
-			pieChart := widgets.MapChartToPieChart(chartData)
-			widget = pieChart
-		} else {
-			widget = chartData
 		}
 	case "table":
-		if configuration.Config.Virgilio.Anonymize && tableData.Anonymizable {
-			for i := 0; i < len(tableData.RowHeader); i++ {
-				tableData.RowHeader[i] = utils.Anonymize(tableData.RowHeader[i])
+		tableData, err := readTableWidget(widgetInfo, widgetBlob.TableInfo)
+		if err != nil {
+			if httpError, ok := err.(*utils.HttpError); ok {
+				c.JSON(httpError.Code, gin.H{"message": httpError.ErrorString})
+				return
 			}
 		}
-		tableUi := widgets.MapTableToTableUI(tableData)
-		widget = tableUi
+		widget = tableData
 	case "list":
-		listData.Data = make([]widgets.ListElem, 0)
-
-		for key, value := range listMap {
-			listElem := widgets.ListElem{key, value}
-			listData.Data = append(listData.Data, listElem)
-		}
-		sort.Slice(listData.Data, func(i, j int) bool {
-			return listData.Data[i].Count > listData.Data[j].Count
-		})
-		// limit number of list entries
-		if len(listData.Data) > configuration.Config.Virgilio.MaxEntries {
-			listData.Data = listData.Data[0:configuration.Config.Virgilio.MaxEntries]
-		}
-		if configuration.Config.Virgilio.Anonymize && listData.Anonymizable {
-			for key, el := range listData.Data {
-				el.Name = utils.Anonymize(el.Name)
-				listData.Data[key] = el
+		listData, err := readListWidget(widgetInfo, widgetBlob.ListInfo)
+		if err != nil {
+			if httpError, ok := err.(*utils.HttpError); ok {
+				c.JSON(httpError.Code, gin.H{"message": httpError.ErrorString})
+				return
 			}
 		}
 		widget = listData

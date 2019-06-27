@@ -20,6 +20,8 @@
 
 package widgets
 
+import "time"
+
 type Layout struct {
 	Widgets []Widget `json:"layout"`
 	Default bool     `json:"default"`
@@ -120,4 +122,52 @@ type List struct {
 type ListElem struct {
 	Name  string  `json:"name"`
 	Count float64 `json:"count"`
+}
+
+type WidgetBlob struct {
+	WidgetInfo  WidgetInfo
+	LabelInfo   LabelInfo
+	CounterInfo CounterInfo
+	ChartInfo   ChartInfo
+	TableInfo   TableInfo
+	ListInfo    ListInfo
+}
+
+type WidgetInfo struct {
+	WidgetData          map[string]interface{}
+	LastValidWidgetData map[string]interface{}
+	WidgetType          string
+	FilePaths           []string
+	FilePathIndex       int
+	Aggregate           bool
+	WidgetName          string
+	StartDate           time.Time
+	DeltaDays           int
+}
+
+type LabelInfo struct {
+	LabelData Label
+}
+
+type CounterInfo struct {
+	CounterData          Counter
+	TrendSeries          []float64
+	ValueOutputCounter   float64
+	TrendCategories      []string
+	MostRecentValueTrend float64
+}
+
+type ChartInfo struct {
+	ChartData         Chart
+	SeriesOutputChart []Series
+}
+
+type TableInfo struct {
+	TableData       Table
+	RowsOutputTable [][]float64
+}
+
+type ListInfo struct {
+	ListData List
+	ListMap  map[string]float64
 }

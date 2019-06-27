@@ -99,7 +99,7 @@ func ReverseSliceString(slice []string) []string {
 	return slice
 }
 
-func GetDateStringFromWidgetFilePath(filePath string) string {
+func GetDateStringFromFilePath(filePath string) string {
 	filePathTokens := strings.Split(filePath, "/")
 	day := filePathTokens[len(filePathTokens)-2]
 	month := filePathTokens[len(filePathTokens)-3]
