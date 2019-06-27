@@ -1,5 +1,5 @@
 # Execute all miners each day at 23:45
-0 5 * * *   root /usr/bin/ciacco
+45 23 * * *   root /usr/bin/ciacco
 
 # Send notification mail once a week, after miner execution
 0 5 * * 1   root cd /usr/share/dante/caronte && ./caronte 'http://localhost/beatrice/#/?theme=light&palette=palette1&last=week&lang=en' root@localhost 
