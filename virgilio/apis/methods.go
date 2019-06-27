@@ -440,7 +440,7 @@ func ReadWidget(c *gin.Context) {
 		}
 
 		if chartData.ChartType == "pie" {
-			pieChart := utils.MapChartToPieChart(chartData)
+			pieChart := widgets.MapChartToPieChart(chartData)
 			widget = pieChart
 		} else {
 			widget = chartData
@@ -451,7 +451,7 @@ func ReadWidget(c *gin.Context) {
 				tableData.RowHeader[i] = utils.Anonymize(tableData.RowHeader[i])
 			}
 		}
-		tableUi := utils.MapTableToTableUI(tableData)
+		tableUi := widgets.MapTableToTableUI(tableData)
 		widget = tableUi
 	case "list":
 		listData.Data = make([]widgets.ListElem, 0)

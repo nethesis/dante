@@ -28,10 +28,13 @@ import (
 	"path"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/nethesis/dante/virgilio/configuration"
+	"github.com/nethesis/dante/virgilio/utils"
 )
 
 func GetFileLists(widgetName string, startDate time.Time, deltaDays int) []string {
@@ -129,6 +132,37 @@ func ReadDefaultLayout() Layout {
 	if err != nil {
 		return Layout{}
 	}
+	topWidgets := []string{"df-chart-pie", "df-counter", "hardware-label", "hostname-label", "release-label"}
+	typesOrderInLayout := []string{"label", "counter", "chart", "list", "table"}
+
+	// sort widgets
+	sort.Slice(files, func(i, j int) bool {
+		fileNameI := strings.Split(files[i].Name(), ".")[0]
+		fileNameJ := strings.Split(files[j].Name(), ".")[0]
+
+		// some widgets stay at the top of the layout
+		isTopWidgetI := utils.ContainsString(topWidgets, fileNameI)
+		isTopWidgetJ := utils.ContainsString(topWidgets, fileNameJ)
+
+		if isTopWidgetI && !isTopWidgetJ {
+			return true
+		}
+		if isTopWidgetJ && !isTopWidgetI {
+			return false
+		}
+
+		// split file name by dash or dot
+		tokensI := strings.FieldsFunc(files[i].Name(), utils.IsDashOrDot)
+		tokensJ := strings.FieldsFunc(files[j].Name(), utils.IsDashOrDot)
+		// get widget types
+		typeI := tokensI[1]
+		typeJ := tokensJ[1]
+		// sort types
+		rankI := utils.IndexOf(typeI, typesOrderInLayout)
+		rankJ := utils.IndexOf(typeJ, typesOrderInLayout)
+		return rankI < rankJ
+	})
+
 	for _, f := range files {
 		var w Widget
 		if !f.IsDir() {
@@ -136,7 +170,7 @@ func ReadDefaultLayout() Layout {
 			w.Type = obj["type"].(string)
 			w.Id = obj["minerId"].(string)
 			w.I = i
-			w.Y = float64(i)
+			w.Y = float64(i / 2)
 			if i%2 == 0 {
 				w.X = 0
 			} else {
@@ -146,7 +180,6 @@ func ReadDefaultLayout() Layout {
 			i++
 		}
 	}
-
 	return Layout{widgets, true}
 }
 

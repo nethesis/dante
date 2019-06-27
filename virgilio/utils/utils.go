@@ -27,8 +27,6 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
-
-	"github.com/nethesis/dante/virgilio/widgets"
 )
 
 type HttpError struct {
@@ -47,76 +45,6 @@ func ContainsString(stringSlice []string, searchString string) bool {
 		}
 	}
 	return false
-}
-
-func MapTableToTableUI(table widgets.Table) widgets.TableUI {
-	var tableUi widgets.TableUI
-	tableUi.Type = table.Type
-	tableUi.MinerId = table.MinerId
-	tableUi.Unit = table.Unit
-	tableUi.AggregationType = table.AggregationType
-
-	tableUi.Rows = make([][]string, len(table.Rows))
-
-	if len(table.RowHeader) > 0 {
-		tableUi.RowHeader = true
-		if len(table.ColumnHeader) > 0 {
-			// put an empty string at the beginning of the column header (top-left cell)
-			tableUi.ColumnHeader = make([]string, len(table.ColumnHeader)+1)
-			copy(tableUi.ColumnHeader, table.ColumnHeader)
-			copy(tableUi.ColumnHeader[1:], tableUi.ColumnHeader[:])
-			tableUi.ColumnHeader[0] = ""
-		} else {
-			tableUi.ColumnHeader = make([]string, 0)
-		}
-
-		// initialize tableUi.Rows
-		for i := range tableUi.Rows {
-			tableUi.Rows[i] = make([]string, len(table.Rows[0])+1)
-		}
-
-		// put every row header at the beginning of every row
-		for i := 0; i < len(table.RowHeader); i++ {
-			tableUi.Rows[i][0] = table.RowHeader[i]
-
-			for j := 0; j < len(table.Rows[0]); j++ {
-				tableUi.Rows[i][j+1] = fmt.Sprintf("%g", table.Rows[i][j])
-			}
-		}
-	} else {
-		// no row headers
-		tableUi.ColumnHeader = table.ColumnHeader
-
-		// initialize tableUi.Rows
-		for i := range tableUi.Rows {
-			tableUi.Rows[i] = make([]string, len(table.Rows[0]))
-		}
-
-		for i := 0; i < len(table.Rows); i++ {
-			for j := 0; j < len(table.Rows[0]); j++ {
-				tableUi.Rows[i][j] = fmt.Sprintf("%g", table.Rows[i][j])
-			}
-		}
-	}
-	return tableUi
-}
-
-func MapChartToPieChart(chart widgets.Chart) widgets.PieChart {
-	var pieChart widgets.PieChart
-	pieChart.Type = chart.Type
-	pieChart.ChartType = chart.ChartType
-	pieChart.MinerId = chart.MinerId
-	pieChart.AggregationType = chart.AggregationType
-	pieChart.Labels = chart.Categories
-	// charts of type "pie" always have only one series
-	pieChartSeries := make([]float64, len(chart.Series[0].Data))
-	pieChart.Unit = chart.Unit
-
-	for i, value := range chart.Series[0].Data {
-		pieChartSeries[i] = value
-	}
-	pieChart.Series = pieChartSeries
-	return pieChart
 }
 
 func ReadJson(filePath string) (map[string]interface{}, error) {
@@ -185,4 +113,30 @@ func Anonymize(value string) string {
 	bs := h.Sum(nil)
 	anonymizedString := fmt.Sprintf("%x", bs)
 	return anonymizedString[:8]
+}
+
+func IndexOf(element string, data []string) int {
+	for k, v := range data {
+		if element == v {
+			return k
+		}
+	}
+	return -1 //not found
+}
+
+func IsDashOrDot(r rune) bool {
+	switch r {
+	case '-', '.':
+		return true
+	}
+	return false
+}
+
+func moveStringAtIndex(val string, indexWhereToInsert int, slice []string) {
+	indexToRemove := IndexOf(val, slice)
+	slice = append(slice[:indexToRemove], slice[indexToRemove+1:]...)
+	newSlice := make([]string, indexWhereToInsert+1)
+	copy(newSlice, slice[:indexWhereToInsert])
+	newSlice[indexWhereToInsert] = val
+	slice = append(newSlice, slice[indexWhereToInsert:]...)
 }
