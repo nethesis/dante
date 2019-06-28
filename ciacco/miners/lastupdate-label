@@ -20,9 +20,29 @@
 # along with Dante.  If not, see COPYING.
 #
 
-# Return the NethServer or system-release
+# Return last yum update
 
-value=$(tail -n 1 /var/log/yum.log | awk '{print $1 " " $2 " " $3}')
+
+TMP_FILE=$(mktemp)
+LOG="/var/log/yum.log"
+DAY=$(date +"%b %d")
+line=""
+
+# Exit if yum log is empty
+if [ -f $LOG ] && [ -s $LOG ]; then
+    line=$(tail -n 1 $LOG)
+else
+    # find newest rotated log
+    PREVIOUS_LOG=$(find $(dirname $LOG) -name yum.log-\* -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" ")
+    if [ -f "$PREVIOUS_LOG" ]; then
+        line=$(tail -n 1 $PREVIOUS_LOG)  
+    elif [ -f "$PREVIOUS_LOG.gz" ]; then
+        line=$(zcat $PREVIOUS_LOG | tail -n 1)  
+    fi
+fi
+
+
+value=$(echo $line | awk '{print $1 " " $2 " " $3}')
 
 id=$(basename $0)
 type=$(basename $0 | cut -d'-' -f2)
