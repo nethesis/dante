@@ -32,8 +32,8 @@ class Mail {
 
     // initialize transporter
     var transporter = nodemailer.createTransport({
-      host: "localhost",
-      port: 587,
+      host: "127.0.0.1",
+      port: 25,
       secure: false,
       ignoreTLS: true
     });
