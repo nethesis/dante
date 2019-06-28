@@ -606,21 +606,21 @@ export default {
       this.$forceUpdate();
     },
     addElement() {
-      var lastY = 0;
-      var lastI = 0;
       var type = this.newObject.selected;
 
       // prepare new element position
       this.gridLayout.map(function(elem) {
-        if (elem.y > lastY) lastY = elem.y;
-        if (elem.i > lastI) lastI = elem.i;
+        elem.y++;
+        elem.i++;
+
+        return elem;
       });
 
       // prepare new object structure
       var obj = this.widgetDefaults[type];
       obj.x = 0;
-      obj.y = lastY + 1;
-      obj.i = this.gridLayout.length == 0 ? 0 : lastI + 1;
+      obj.y = 0;
+      obj.i = 0;
       obj.type = type;
       obj.id = this.newObject.widget.name;
 
@@ -632,7 +632,7 @@ export default {
       obj.title = this.$i18n.t("dashboard.empty_" + obj.type + "_title");
 
       // add element to grid
-      this.gridLayout.push(JSON.parse(JSON.stringify(obj)));
+      this.gridLayout.unshift(JSON.parse(JSON.stringify(obj)));
 
       // get widget info
       if (type != "title") {
