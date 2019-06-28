@@ -68,5 +68,6 @@ print encode_json({
         aggregationType => "snapshot",
         categories => \@categories,
         anonymizable => JSON::true,
-        series => [ { name => "sent", data => \@sent, unit => "bytes" }, { name => "received", data => \@received, unit => "bytes" }]
+	unit => "bytes",
+        series => [ { name => "sent", data => \@sent }, { name => "received", data => \@received }]
     });
