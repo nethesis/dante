@@ -45,7 +45,7 @@ if (! -f $total_file) {
 if (-f $total_file) {
     open(my $fh, '<', $total_file);
     while (readline($fh)) {
-        if ($_ =~ /^tag_none/ || $_ =~ /^user:/ || $_ =~ /^size/) {
+        if ($_ =~ /^tag_none/ || $_ =~ /^tcp_miss/ || $_ =~ /^user:/ || $_ =~ /^size/) {
             # skip SSL connections and total lines
             next;
         } else {

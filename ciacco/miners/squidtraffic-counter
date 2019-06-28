@@ -31,6 +31,8 @@ use POSIX qw(strftime);
 my $date = strftime "%Y%m%d", localtime;
 my $total_file = "/var/lightsquid/$date/.total";
 my $traffic = 0;
+# used to fix bad counter
+my $bad_counter = 0;
 
 # run lightparser once
 if (-f "/sbin/lightparser.pl" && ! -f $total_file) {
@@ -46,7 +48,11 @@ if (-f $total_file) {
     while (readline($fh)) {
         if ($_ =~ /size: (\d+)/) {
             $traffic = int($1);
-            last;
+        }
+        # cleanup total from bad counters
+        if ($_ =~ /^tag_none/ || $_ =~ /^tag_miss/ ) {
+            my ($host, $bytes, $conn, $other) = split(/\s+/, $_);
+            $bad_counter += int($bytes);
         }
     }
     close($fh);
@@ -58,6 +64,6 @@ print encode_json({
         trendType => "percentage",
         unit => "bytes",
         aggregationType => "sum",
-        value => $traffic,
+        value => $traffic-$bad_counter,
 
     });
