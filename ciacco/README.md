@@ -49,7 +49,7 @@ Each miner has a specific set of fields, but there are some common ones which ar
    - `table`
    - `list`
 
-Extra commond fields:
+Extra common fields:
 
 - `unit`: the data type (not valid for `label` type), valid types are:
   - `number`
@@ -58,7 +58,6 @@ Extra commond fields:
   - `time`
 - `aggregationType`: how data will aggreagate by server for the selected span of time:
    - `sum`: values will be summed
-   - `average`: average calculation
    - `snapshot`: values will not be aggregated
 
 
