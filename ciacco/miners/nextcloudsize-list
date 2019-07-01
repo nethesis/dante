@@ -1,0 +1,70 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - info@nethesis.it
+#
+# This script is part of Dante.
+#
+# Dante is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# Dante is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Dante.  If not, see COPYING.
+#
+
+#
+# List nextcloud users by disk usage
+#
+#
+use strict;
+use warnings;
+use JSON;
+use POSIX qw(strftime);
+use File::Basename;
+
+my $date = strftime "%Y%m%d", localtime;
+my @data;
+
+if (! -d '/var/lib/nethserver/nextcloud') {
+    exit 1;
+}
+
+my $users = decode_json(`su - apache -s /bin/bash -c "source /opt/rh/rh-php72/enable; cd /usr/share/nextcloud/; php occ --output=json user:list" 2>/dev/null`);
+
+if (!$users) {
+    exit 1;
+}
+    
+my $i = 0;
+open(my $fh, "du -b --max-depth=1 -c /var/lib/nethserver/nextcloud/ 2>/dev/null| sort -n -r |");
+while (readline($fh)) {
+    $i++;
+    next if ($i <= 3); # skip total lines
+    my ($bytes, $dir) = split(/\s+/, $_);
+    my $name = basename($dir);
+    if ($users->{$name}) {
+        push(@data, {count => int($bytes), name => $users->{$name}});
+    }
+}
+close($fh);
+
+if (scalar @data == 0) {
+    exit 1;
+}
+
+print encode_json({
+        minerId => "nextcloudsize-list",
+        type => "list",
+        data => \@data,
+        unit => "bytes",
+        anonymizable => JSON::true,
+        aggregationType => "snapshot"
+    });
