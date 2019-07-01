@@ -1,0 +1,58 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - info@nethesis.it
+#
+# This script is part of Dante.
+#
+# Dante is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# Dante is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Dante.  If not, see COPYING.
+#
+
+# Bar chart for sources with most match
+
+use JSON;
+use File::Basename;
+
+my $value = 0;
+my $out = `suricatasc -c dump-counters`;
+
+if ($? > 0) {
+    exit 1;
+}
+my $suricata = decode_json($out);
+
+if (!$suricata) {
+    exit 1;
+}
+
+$value = $suricata->{'message'}{'ips'}{'rejected'} +  $suricata->{'message'}{'ips'}{'replaced'} +  $suricata->{'message'}{'ips'}{'blocked'};
+
+if ($? > 0) {
+    exit 1;
+}
+
+print encode_json({
+        minerId => basename($0),
+        type => "chart",
+        chartType => "pie",
+        unit => "number",
+        aggregationType => "snapshot",
+        categories => ["accepted", "blocked"],
+        series => [{
+                name => "attacks",
+                data => [ $suricata->{'message'}{'ips'}{'accepted'}, $value ]
+            }]
+    });
+
