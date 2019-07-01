@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - info@nethesis.it
+#
+# This script is part of Dante.
+#
+# Dante is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# Dante is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Dante.  If not, see COPYING.
+#
+
+# List mailbox by disk usage
+
+use strict;
+use warnings;
+use esmith::ConfigDB;
+use JSON;
+
+my @data;
+my $cdb = esmith::ConfigDB->open_ro();
+my $quota_status = $cdb->get_prop('dovecot', 'QuotaStatus') || 'disabled';
+if ($quota_status eq 'enabled' && -f '/usr/libexec/nethserver/mail-quota') {
+    my $quota = decode_json(`/usr/libexec/nethserver/mail-quota`);
+    foreach (keys %$quota) {
+        my $size = int($quota->{$_}{'size'} || 0);
+        next if ($size == 0);
+        push(@data, {name => $_, count => ($size * 1024)});
+    }
+} else {
+    exit 1;
+}
+
+@data = sort { $b->{'count'} <=> $a->{'count'} } @data;
+
+print encode_json({
+        minerId => "mailsize-list",
+        type => "list",
+        data => \@data,
+        unit => "bytes",
+        anonymizable => JSON::true,
+        aggregationType => "snapshot"
+    });
+
