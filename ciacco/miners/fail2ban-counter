@@ -1,0 +1,53 @@
+#!/bin/bash
+
+#
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - info@nethesis.it
+#
+# This script is part of Dante.
+#
+# Dante is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# Dante is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Dante.  If not, see COPYING.
+#
+
+# Count IP banned
+
+TMP_FILE=$(mktemp)
+LOG="/var/log/fail2ban.log"
+DAY=$(date +"%Y-%m-%d")
+
+# Exit if fail2ban is not installed or log is empty
+if [ ! -f $LOG ] || [ ! -f /etc/e-smith/db/configuration/defaults/fail2ban/type ]; then 
+    exit 1
+fi
+
+PREVIOUS_LOG=$(find $(dirname $LOG) -name fail2ban.log-\* -type f -printf '%T@ %p\n' 2> /dev/null | sort -n | tail -1 | cut -f2- -d" ")
+
+if [ -f "$PREVIOUS_LOG" ] || [ -f "$PREVIOUS_LOG.gz" ]; then
+    zgrep "$DAY" $PREVIOUS_LOG*  > $TMP_FILE
+fi
+
+grep "$DAY" $LOG >> $TMP_FILE
+
+value=0
+value=$(grep " Ban " $TMP_FILE | wc -l)
+
+id=$(basename $0)
+type=$(basename $0 | cut -d'-' -f2)
+trendType="percentage"
+unit="number"
+aggregation="sum"
+
+echo -n "{\"value\":$value,\"type\":\"$type\",\"minerId\":\"$id\",\"aggregationType\":\"$aggregation\",\"unit\":\"$unit\",\"trendType\":\"$trendType\"}"
+
+rm -f $TMP_FILE 2>/dev/null
