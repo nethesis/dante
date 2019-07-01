@@ -1,0 +1,76 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - info@nethesis.it
+#
+# This script is part of Dante.
+#
+# Dante is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# Dante is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Dante.  If not, see COPYING.
+#
+
+# List of top senders by count
+
+use strict;
+use warnings;
+use JSON;
+use File::Path qw(make_path);
+use File::Basename;
+
+if ( ! -f '/usr/libexec/nethserver/api/nethserver-mail/dashboard/pflogsumj') {
+    exit 1;
+}
+
+my @list;
+my $out = '';
+my $spool_dir = '/var/spool/nethserver-dante/';
+my $spool_file = $spool_dir.'/mail-miners.json';
+make_path($spool_dir);
+
+# if the cache has non-zero size and been created in the last 60 minutes, just return it
+if (-s $spool_file && ((stat $spool_file)[9])+3600 > time() ) {
+    open my $fh, '<', $spool_file or exit 1;
+    $/ = undef;
+    $out = <$fh>;
+    close $fh;
+} else {
+    $out = `/usr/libexec/nethserver/api/nethserver-mail/dashboard/pflogsumj --zero_fill --detail 20 -d today /var/log/maillog`;
+
+    # write cache file
+    my $fh;
+    open($fh, '>', $spool_file) or exit(0); # ignore errors
+    print $fh $out;
+    close $fh;
+}
+
+my $data = decode_json($out);
+
+if (!$out) {
+    exit 1;
+}
+
+foreach (@{$data->{'senders-size'}}) {
+    push(@list, {name => $_->{'address'}, count => $_->{'value'}});
+}
+
+
+print encode_json({
+        minerId => basename($0),
+        type => "list",
+        data => \@list,
+        unit => "bytes",
+        anonymizable => JSON::true,
+        aggregationType => "sum"
+    });
+
