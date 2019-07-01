@@ -51,6 +51,10 @@ spam=$((spam+$(grep -e "soft reject" -e "reject" -e "add header" $TMP_FILE | wc 
 # Cleanup temporary file
 rm -f $TMP_FILE 2>/dev/null
 
+if [ "$spam" -eq 0 ] && [ "$virus" -eq 0 ]; then
+    exit 1
+fi
+
 id=$(basename $0)
 type=$(basename $0 | cut -d'-' -f2)
 chartType=$(basename $0 | cut -d'-' -f3)
