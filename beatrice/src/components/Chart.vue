@@ -22,7 +22,7 @@ http://www.nethesis.it - info@nethesis.it
       :ref="chartId"
       :type="type"
       :width="width"
-      :height="height-30"
+      :height="type == 'bar' ? height+30 : height-30"
       :options="options"
       :series="series"
     />

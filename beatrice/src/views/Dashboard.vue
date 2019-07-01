@@ -32,14 +32,14 @@ http://www.nethesis.it - info@nethesis.it
     </div>
 
     <button
-      v-show="!view.isLoading && gridLayout.length > 0"
+      v-show="!view.isLoading && gridLayout.length > 0 && !view.isMobile"
       @click="toggleMode()"
       class="compact ui button right floated grey"
       :class="$parent.lightTheme ? '' : 'inverted'"
     >{{mode == 'edit' ? $t('dashboard.edit_done') : $t('dashboard.edit_widgets')}}</button>
 
     <button
-      v-show="!view.isLoading && gridLayout.length > 0"
+      v-show="!view.isLoading && gridLayout.length > 0 && !view.isMobile"
       @click="openAddElement()"
       class="ui compact labeled icon button right floated blue"
       :class="$parent.lightTheme ? '' : 'inverted'"
@@ -48,7 +48,7 @@ http://www.nethesis.it - info@nethesis.it
       {{$t('dashboard.add_widget')}}
     </button>
     <button
-      v-show="!view.isLoading && gridLayout.length > 0 && mode == 'edit'"
+      v-show="!view.isLoading && gridLayout.length > 0 && mode == 'edit' && !view.isMobile"
       @click="resetLayout()"
       class="ui compact labeled icon button right floated red"
       :class="$parent.lightTheme ? '' : 'inverted'"
@@ -67,6 +67,7 @@ http://www.nethesis.it - info@nethesis.it
         {{$t('dashboard.no_widgets')}}
       </div>
       <button
+        v-if="!view.isMobile"
         @click="openAddElement()"
         class="ui compact labeled icon button right floated blue"
         :disabled="mode == 'edit'"
@@ -213,7 +214,7 @@ http://www.nethesis.it - info@nethesis.it
         </span>
         <table
           v-if="item.type == 'table' && item.data && item.data.rows && item.data.rows.length > 0"
-          class="ui striped selectable table"
+          class="ui striped selectable table unstackable"
           :class="[$parent.lightTheme ? '' : 'inverted', item.data.rowHeader ? 'definition' : '']"
         >
           <thead>
@@ -275,7 +276,7 @@ http://www.nethesis.it - info@nethesis.it
           <div v-for="(l,lk) in item.data.list" :key="lk" class="item">
             <div class="content">
               <div class="ui header" :class="setListTitle(lk)">{{l.name}}</div>
-              {{l.count | formatter(item.data.unit)}}
+              <div class="ui">{{l.count | formatter(item.data.unit)}}</div>
             </div>
           </div>
         </div>
@@ -524,7 +525,8 @@ export default {
       freeWidgets: [],
       newObject: this.initNewObject(),
       view: {
-        isLoading: true
+        isLoading: true,
+        isMobile: this.$parent.isMobile
       },
       apiHost: this.$root.$options.apiHost
     };
@@ -699,6 +701,18 @@ export default {
             layout.newTitle = "";
             layout.title = layout.text;
 
+            if (this.$parent.isMobile) {
+              layout.w = 12;
+
+              if (layout.type == "chart") {
+                layout.width = window.innerWidth - 70;
+                layout.height =
+                  window.orientation == 90 || window.orientation == -90
+                    ? window.innerHeight / 1.5
+                    : layout.height;
+              }
+            }
+
             if (layout.type != "title") {
               this.getWidgetData(layout.id, l);
             }
@@ -851,6 +865,10 @@ export default {
   border-radius: 0.28571429rem !important;
 }
 
+.vue-grid-item.no-touch {
+  touch-action: auto !important;
+}
+
 .empty {
   border-radius: 0.28571429rem !important;
 }
@@ -967,5 +985,36 @@ export default {
 .ui.list .list > .item > .content,
 .ui.list > .item > .content {
   margin-left: 10px !important;
+}
+
+.huge-title {
+  font-size: 3.75vmin !important;
+}
+
+.large-title {
+  font-size: 3.25vmin !important;
+}
+
+.medium-title {
+  font-size: 3vmin !important;
+}
+
+.small-title {
+  font-size: 2.75vmin !important;
+}
+
+.tiny-title {
+  font-size: 2.5vmin !important;
+}
+
+.value-title {
+  font-size: 2.5vmin !important;
+  font-family: Lato, "Helvetica Neue", Arial, Helvetica, sans-serif;
+  font-weight: 400;
+  line-height: 1em;
+  color: #1b1c1d;
+  text-transform: uppercase;
+  text-align: center;
+  margin-top: 0;
 }
 </style>

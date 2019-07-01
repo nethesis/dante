@@ -18,7 +18,7 @@ http://www.nethesis.it - info@nethesis.it
 -->
 <template>
   <div id="app">
-    <div :class="['ui pointing menu', lightTheme ? '' : 'inverted']">
+    <div v-if="!isMobile" :class="['ui pointing menu', lightTheme ? '' : 'inverted']">
       <a href="#/" :class="[getCurrentPath('') ? 'active' : '', 'item']">{{$t('home.title')}}</a>
       <div class="item">
         <div class="ui buttons" :class="lightTheme ? '' : 'inverted'">
@@ -123,6 +123,12 @@ http://www.nethesis.it - info@nethesis.it
 <script>
 export default {
   name: "home",
+  mounted() {
+    document.title =
+      this.$t("home.title") +
+      ": " +
+      this.$t("caronte.last_" + this.$route.query.last);
+  },
   data() {
     return {
       lightTheme: this.$route.query.theme
@@ -131,7 +137,10 @@ export default {
       colorPalette: this.$route.query.palette || "palette1",
       filterDate: this.$route.query.last || "week",
       language: this.$route.query.lang || "en",
-      searchString: ""
+      searchString: "",
+      isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      )
     };
   },
   methods: {
@@ -145,6 +154,10 @@ export default {
     },
     setFilterDate(last) {
       this.filterDate = last;
+      document.title =
+        this.$i18n.t("home.title") +
+        ": " +
+        this.$i18n.t("caronte.last_" + last);
       this.updateQuery();
     },
     updateQuery() {
