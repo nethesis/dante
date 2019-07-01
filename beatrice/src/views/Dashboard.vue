@@ -560,15 +560,15 @@ export default {
     setListTitle(index) {
       switch (index) {
         case 0:
-          return "huge";
+          return "huge-title";
         case 1:
-          return "large";
+          return "large-title";
         case 2:
-          return "medium";
+          return "medium-title";
         case 3:
-          return "small";
+          return "small-title";
         default:
-          return "tiny";
+          return "tiny-title";
       }
     },
     closeModal() {
@@ -791,7 +791,8 @@ export default {
               // calculate correct sizes
               if (widget.type == "list") {
                 this.gridLayout[index].h =
-                  (widget.data.length < 10 ? 7 : 10) + 1.5 * widget.data.length;
+                  (widget.data.length < 10 ? 7 : 10) +
+                  1.75 * widget.data.length;
               }
               if (widget.type == "table") {
                 this.gridLayout[index].h = 6 + 1.5 * widget.rows.length;
@@ -805,7 +806,7 @@ export default {
           }
         );
     },
-    setLayout(newLayout) {
+    setLayout(newLayout, reload) {
       newLayout = newLayout.map(function(w) {
         return {
           id: w.id,
@@ -823,6 +824,9 @@ export default {
       this.$http.post(this.apiHost + "/layout", { layout: newLayout }).then(
         success => {
           console.info("saved");
+          if (reload) {
+            window.location.reload();
+          }
         },
         error => {
           console.error(error);
@@ -832,8 +836,7 @@ export default {
     resetLayout() {
       this.$http.delete(this.apiHost + "/layout").then(
         success => {
-          console.info("reset");
-          this.getLayout();
+          this.setLayout(this.gridLayout, true);
         },
         error => {
           console.error(error);
@@ -988,23 +991,23 @@ export default {
 }
 
 .huge-title {
-  font-size: 3.75vmin !important;
-}
-
-.large-title {
   font-size: 3.25vmin !important;
 }
 
-.medium-title {
-  font-size: 3vmin !important;
-}
-
-.small-title {
+.large-title {
   font-size: 2.75vmin !important;
 }
 
-.tiny-title {
+.medium-title {
   font-size: 2.5vmin !important;
+}
+
+.small-title {
+  font-size: 2.25vmin !important;
+}
+
+.tiny-title {
+  font-size: 2vmin !important;
 }
 
 .value-title {
@@ -1016,5 +1019,9 @@ export default {
   text-transform: uppercase;
   text-align: center;
   margin-top: 0;
+}
+
+div {
+  word-break: break-all !important;
 }
 </style>
