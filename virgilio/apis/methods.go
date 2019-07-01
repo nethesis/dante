@@ -670,7 +670,9 @@ func GetMiners() ([]miner, string) {
 
 	for _, f := range files {
 		var m miner
-		if !f.IsDir() {
+
+		// exclude directories and file names starting with "." (e.g. Vim swap files)
+		if !f.IsDir() && string(f.Name()[0]) != "." {
 			parts := strings.Split(f.Name(), "-")
 			m.Name = f.Name()
 			m.Type = parts[1]

@@ -165,7 +165,9 @@ func ReadDefaultLayout() Layout {
 
 	for _, f := range files {
 		var w Widget
-		if !f.IsDir() {
+
+		// exclude directories and file names starting with "." (e.g. Vim swap files)
+		if !f.IsDir() && string(f.Name()[0]) != "." {
 			obj := ParseWidget(path.Join(newest, f.Name()))
 			w.Type = obj["type"].(string)
 			w.Id = obj["minerId"].(string)
