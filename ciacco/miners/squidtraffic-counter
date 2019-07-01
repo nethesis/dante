@@ -50,7 +50,7 @@ if (-f $total_file) {
             $traffic = int($1);
         }
         # cleanup total from bad counters
-        if ($_ =~ /^tag_none/ || $_ =~ /^tag_miss/ ) {
+        if ($_ =~ /^tag_none/ || $_ =~ /^tag_miss/ || $_ =~ /^tcp_mem_hit/) {
             my ($host, $bytes, $conn, $other) = split(/\s+/, $_);
             $bad_counter += int($bytes);
         }

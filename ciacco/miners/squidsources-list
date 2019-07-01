@@ -45,12 +45,14 @@ if (! -f $total_file) {
 if (-f $total_file) {
     open(my $fh, '<', $total_file);
     while (readline($fh)) {
-        if ($_ =~ /^tag_none/ || $_ =~ /^tcp_miss/ || $_ =~ /^user:/ || $_ =~ /^size/) {
+        if ($_ =~ /^tag_none/ || $_ =~ /^tcp_miss/ || $_ =~ /^tcp_mem_hit/ || $_ =~ /^user:/ || $_ =~ /^size/) {
             # skip SSL connections and total lines
             next;
         } else {
             my ($host, $bytes, $conn, $other) = split(/\s+/, $_);
-            push(@data, {count => int($bytes), name => $host});
+            $bytes = int($bytes);
+            next if ($bytes <= 10000) || (!$host) ;
+            push(@data, {count => $bytes, name => $host});
         }
     }
     close($fh);
