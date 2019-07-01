@@ -22,7 +22,6 @@
 
 # Root paritition usage
 
-pos=50
 id=$(basename $0)
 type=$(basename $0 | cut -d'-' -f2)
 value=$(( $(df --output=used / | tail -n 1 | cut -d' ' -f1) * 1024))
