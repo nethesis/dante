@@ -20,23 +20,25 @@
 # along with Dante.  If not, see COPYING.
 #
 
-# Calculate a pie chart of filtered mail
+# Count sent mails
 
 TMP_FILE=$(mktemp)
 LOG="/var/log/maillog"
-DAY=$(date +"%b %d")
+# Create a valid regexp
+DAY=$(date +"%b\s+%-d")
 
 # Exit if dovecot is not installed or log is empty
 if [ ! -f $LOG ] || [ ! -f /etc/e-smith/db/configuration/defaults/dovecot/type ]; then 
     exit 1
 fi
 
-PREVIOUS_LOG="$LOG-"$(date -d "-1 day" +"%Y%m%d")
-if [ -f "$PREVIOUS_LOG" ] || [ -f "$PREVIOUS_LOG.gz" ]; then
-    zgrep "$DAY" $PREVIOUS_LOG*  > $TMP_FILE
+PREVIOUS_LOG=$(find $(dirname $LOG) -name maillog-\* -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" ")
+if [ -f "$PREVIOUS_LOG" ]; then
+    zgrep -E "$DAY" $PREVIOUS_LOG*  > $TMP_FILE
 fi
 
-grep "$DAY" /var/log/maillog >> $TMP_FILE
+# Match also dates like "Jul  1"
+grep -E "$DAY" /var/log/maillog >> $TMP_FILE
 
 value=0
 
