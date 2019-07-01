@@ -1,1 +1,5 @@
-{"title":"Traffic by host"}
+{
+    "title": "Traffic by host",
+    "sent": "Sent",
+    "received": "Received"
+}
