@@ -35,6 +35,8 @@ if ($quota_status eq 'enabled' && -f '/usr/libexec/nethserver/mail-quota') {
         $value += ($fields->{'size'} || 0);
     }
     $value = $value * 1024;
+} else {
+    exit 1;
 }
 
 print encode_json({

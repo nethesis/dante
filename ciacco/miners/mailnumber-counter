@@ -34,6 +34,8 @@ if ($quota_status eq 'enabled' && -f '/usr/libexec/nethserver/mail-quota') {
         my $fields = $quota->{$_};
         $value += ($fields->{'msg'} || 0);
     }
+} else {
+    exit 1;
 }
 
 print encode_json({
