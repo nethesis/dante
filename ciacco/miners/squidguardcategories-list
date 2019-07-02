@@ -45,8 +45,8 @@ sorted_categories = sorted(categories.items(), key=operator.itemgetter(1), rever
 
 output_categories = []
 
-for site in sorted_categories:
-    elem = { "name": site[0], "count": site[1] }
+for category in sorted_categories:
+    elem = { "name": category[0], "count": category[1] }
     output_categories.append(elem)
 
 output = simplejson.dumps({ 'minerId': 'squidguardcategories-list', 'type': 'list', 'aggregationType': 'sum', 'unit': 'number', 'anonymizable': False, 'data': output_categories })

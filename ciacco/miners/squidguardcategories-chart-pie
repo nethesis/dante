@@ -20,34 +20,32 @@
 # along with Dante.  If not, see COPYING.
 #
 
-# Top blocked hosts
+# Top blocked categories
 
 import squidguardlib
 import re
-import operator
 import simplejson
 
 blocked_lines = squidguardlib.grep_blocked_lines()
-hosts = {}
+categories = {}
 
 for line in blocked_lines:
     # regexp from https://github.com/darold/squidanalyzer
     search_res = re.search("^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2}) .*(BLOCK) ([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+(.*)$", line)
     groups = search_res.groups()
-    host = groups[8]
+    category = groups[10]
 
-    if host in hosts:
-        hosts[host] += 1
+    if category in categories:
+        categories[category] += 1
     else:
-        hosts[host] = 1
+        categories[category] = 1
 
-sorted_hosts = sorted(hosts.items(), key=operator.itemgetter(1), reverse=True)
+output_categories = []
+series = [{'name': 'top_blocked_categories', 'data': []}]
 
-output_hosts = []
+for category, count in categories.iteritems():
+    output_categories.append(category)
+    series[0]['data'].append(count)
 
-for host in sorted_hosts:
-    elem = { "name": host[0], "count": host[1] }
-    output_hosts.append(elem)
-
-output = simplejson.dumps({ 'minerId': 'squidguardhosts-list', 'type': 'list', 'aggregationType': 'sum', 'unit': 'number', 'anonymizable': True, 'data': output_hosts })
+output = simplejson.dumps({ 'minerId': 'squidguardcategories-chart-pie', 'type': 'chart', 'chartType': 'pie', 'aggregationType': 'sum', 'unit': 'number', 'anonymizable': False, 'series': series, 'categories': output_categories })
 print (output)
