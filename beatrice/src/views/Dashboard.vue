@@ -791,7 +791,7 @@ export default {
               // calculate correct sizes
               if (widget.type == "list") {
                 this.gridLayout[index].h =
-                  (widget.data.length < 10 ? 7 : 10) +
+                  (widget.data.length < 10 ? 6 : 10) +
                   1.75 * widget.data.length;
               }
               if (widget.type == "table") {
@@ -799,7 +799,7 @@ export default {
               }
             }
 
-            this.$forceUpdate();
+            window.dispatchEvent(new Event("resize"));
           },
           error => {
             console.error(error);
@@ -833,11 +833,13 @@ export default {
     resetLayout() {
       this.$http.delete(this.apiHost + "/layout").then(
         success => {
-          window.location.reload();
+          window.dispatchEvent(new Event("resize"));
+          this.getLayout();
         },
         error => {
           console.error(error);
-          window.location.reload();
+          window.dispatchEvent(new Event("resize"));
+          this.getLayout();
         }
       );
     }
