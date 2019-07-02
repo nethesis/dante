@@ -1,0 +1,53 @@
+#!/usr/bin/python
+
+#
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - info@nethesis.it
+#
+# This script is part of Dante.
+#
+# Dante is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# Dante is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Dante.  If not, see COPYING.
+#
+
+# Top blocked hosts
+
+import squidguardlib
+import re
+import operator
+import simplejson
+
+blocked_lines = squidguardlib.grep_blocked_lines()
+hosts = {}
+
+for line in blocked_lines:
+    # regexp from https://github.com/darold/squidanalyzer
+    search_res = re.search("^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2}) .*(BLOCK) ([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+(.*)$", line)
+    groups = search_res.groups()
+    host = groups[8]
+
+    if host in hosts:
+        hosts[host] += 1
+    else:
+        hosts[host] = 1
+
+sorted_hosts = sorted(hosts.items(), key=operator.itemgetter(1), reverse=True)
+
+output_hosts = []
+
+for site in sorted_hosts:
+    elem = { "name": site[0], "count": site[1] }
+    output_hosts.append(elem)
+
+output = simplejson.dumps({ 'minerId': 'squidguardhosts-list', 'type': 'list', 'aggregationType': 'sum', 'unit': 'number', 'anonymizable': True, 'data': output_hosts })
+print (output)
