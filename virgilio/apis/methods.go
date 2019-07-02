@@ -705,6 +705,16 @@ func GetLayout(c *gin.Context) {
 	})
 }
 
+// GetDefaultLayout returns the default layout
+func GetDefaultLayout(c *gin.Context) {
+	layout := widgets.ReadDefaultLayout()
+
+	c.JSON(http.StatusOK, gin.H{
+		"layout":  layout.Widgets,
+		"default": layout.Default,
+	})
+}
+
 // SetLayoyt saves the layout inside VIRGILIO_STORE_DIR
 func SetLayout(c *gin.Context) {
 	var layout widgets.Layout
