@@ -43,7 +43,6 @@ my $filterdate = sprintf("%04d%02d%02d",$year+1900,$mon+1,$mday);;
 my $filterdatestart = timelocal( 0, 0, 0,$mday,$mon,$year);
 my $filterdatestop = timelocal(59,59,23,$mday,$mon,$year);
 
-my $i = 0;
 open(my $fh, '<', $log) or exit 1;
 while (my $row = <$fh>) {
 
@@ -54,6 +53,7 @@ while (my $row = <$fh>) {
     }
     my $timestamp = $1;
     my ($t, $s, $ip, $action, $size, $method, $site, $tail) = split(/\s+/, $row);
+    next if (!$site);
     if ($timestamp < $filterdatestart or $timestamp > $filterdatestop) {
         next;
     };
