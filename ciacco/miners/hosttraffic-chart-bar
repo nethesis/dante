@@ -64,7 +64,7 @@ foreach my $key (sort { int($a) <=> int($b) } keys %{$content->{'rank'}}) {
 print encode_json({
         minerId => "hosttraffic-chart-column",
         type => "chart",
-        chartType => "column",
+        chartType => "bar",
         aggregationType => "snapshot",
         categories => \@categories,
         anonymizable => JSON::true,
