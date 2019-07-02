@@ -23,6 +23,7 @@
 use strict;
 use warnings;
 use JSON;
+use File::Basename;
 
 my $api = 'http://127.0.0.1:3000/lua/hosts_traffic.lua';
 my $limit = 10;
@@ -62,12 +63,12 @@ foreach my $key (sort { int($a) <=> int($b) } keys %{$content->{'rank'}}) {
 }
 
 print encode_json({
-        minerId => "hosttraffic-chart-column",
+        minerId => basename($0),
         type => "chart",
         chartType => "bar",
         aggregationType => "snapshot",
         categories => \@categories,
         anonymizable => JSON::true,
-	unit => "bytes",
+	    unit => "bytes",
         series => [ { name => "sent", data => \@sent }, { name => "received", data => \@received }]
     });
