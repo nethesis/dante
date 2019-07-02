@@ -20,10 +20,8 @@
 # along with Dante.  If not, see COPYING.
 #
 
-# Most blocked sites
+# Top blocked sites
 
-import tempfile
-import shutil
 import os
 import gzip
 import re
