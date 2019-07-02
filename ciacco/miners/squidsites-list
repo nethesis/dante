@@ -1,0 +1,86 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - info@nethesis.it
+#
+# This script is part of Dante.
+#
+# Dante is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# Dante is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Dante.  If not, see COPYING.
+#
+
+#
+# List most visited sites
+#
+use strict;
+use warnings;
+use JSON;
+use POSIX qw(strftime);
+use Time::Local 'timelocal';
+use File::Basename;
+
+my @data;
+my $log = "/var/log/squid/access.log";
+
+if (! -f $log) {
+    exit 1;
+}
+
+my %sites;
+my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime;
+my $filterdate = sprintf("%04d%02d%02d",$year+1900,$mon+1,$mday);;
+my $filterdatestart = timelocal( 0, 0, 0,$mday,$mon,$year);
+my $filterdatestop = timelocal(59,59,23,$mday,$mon,$year);
+
+my $i = 0;
+open(my $fh, '<', $log) or exit 1;
+while (my $row = <$fh>) {
+
+    chomp $row;
+    # skip lines not starting with timestamp
+    if ($row !~ /^(\d\d\d\d\d\d\d\d\d\d)\.\d\d\d/) {
+        next;
+    }
+    my $timestamp = $1;
+    my ($t, $s, $ip, $action, $size, $method, $site, $tail) = split(/\s+/, $row);
+    if ($timestamp < $filterdatestart or $timestamp > $filterdatestop) {
+        next;
+    };
+
+    if (!defined($sites{$site})) {
+        $sites{$site} = 0;
+    }
+    $sites{$site}++;
+}
+close($fh);
+
+foreach my $name (sort { $sites{$b} <=> $sites{$a} } keys %sites) {
+    # exclude sites with 10 hits or less
+    next if ($sites{$name} <= 10);
+    my $k = $name;
+    # remove the port part
+    if ($name =~ /(.*):(\d+)/) {
+        $name = $1;
+    }
+    push(@data, {name => $name, count => $sites{$k}});
+}
+
+print encode_json({
+        minerId => basename($0),
+        type => "list",
+        data => \@data,
+        unit => "number",
+        anonymizable => JSON::true,
+        aggregationType => "sum"
+    });
