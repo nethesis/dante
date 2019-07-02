@@ -45,7 +45,10 @@ var params = new URLSearchParams(url.search);
 
 const lang = params.get("lang") || "en";
 const i18n = new VueI18n({
-  locale: lang
+  locale: lang,
+  missing: function(lang, missing, a, b) {
+    return missing.split(".")[1];
+  }
 });
 
 var app = new Vue({

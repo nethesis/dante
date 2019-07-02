@@ -102,7 +102,7 @@ export default {
         },
         labels: this.labels
           ? this.labels.map(function(l) {
-              return context.$i18n.t(context.chartId + "." + l);
+              return context.$t(context.chartId + "." + l);
             })
           : [],
         title: {
