@@ -824,9 +824,6 @@ export default {
       this.$http.post(this.apiHost + "/layout", { layout: newLayout }).then(
         success => {
           console.info("saved");
-          if (reload) {
-            window.location.reload();
-          }
         },
         error => {
           console.error(error);
@@ -836,10 +833,11 @@ export default {
     resetLayout() {
       this.$http.delete(this.apiHost + "/layout").then(
         success => {
-          this.setLayout(this.gridLayout, true);
+          window.location.reload();
         },
         error => {
           console.error(error);
+          window.location.reload();
         }
       );
     }
