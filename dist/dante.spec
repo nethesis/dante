@@ -28,6 +28,9 @@ Single stack reports made simple
 %prep
 %setup -q -n dante-master
 
+%build
+python -m compileall ciacco/lib/squidguard.py
+
 %post
 %systemd_post virgilio.service
 
@@ -53,6 +56,9 @@ mkdir -p %{buildroot}/etc/sysconfig/
 mkdir -p %{buildroot}/etc/cron.d/
 mkdir -p %{buildroot}/%{_unitdir}
 mkdir -p %{buildroot}/etc/httpd/conf.d/
+mkdir -p %{buildroot}/%{python2_sitelib}
+mv ciacco/lib/squidguardlib.py* %{buildroot}%{python2_sitelib}
+rm -rf ciacco/lib/
 cp ciacco/ciacco %{buildroot}/%{_bindir}
 cp %{SOURCE4} %{buildroot}/%{_bindir}
 mv ciacco/miners %{buildroot}/usr/share/dante/
@@ -76,6 +82,7 @@ cp %{SOURCE7} %{buildroot}/etc/httpd/conf.d/
 %{_unitdir}/virgilio.service
 %{_bindir}/ciacco
 %{_bindir}/virgilio
+%{python2_sitelib}/squidguardlib.py*
 /usr/share/dante/miners/
 /usr/share/dante/beatrice
 
