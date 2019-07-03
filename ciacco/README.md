@@ -3,7 +3,13 @@
 The `ciacco` script execute all miners from the `CIACCO_MINER_DIRECTORY`.
 The output of each miner is saved inside the `CIACCO_OUTPUT_DIR`.
 
-## Configuration file
+##### Table of Contents  
+[Configuration](#configuration)  
+[Miners](#miners)  
+[Miner types](#miner-types)  
+[Create a new miner](#create-a-new-miner)
+
+## Configuration
 
 The configuration file is `/etc/sysconfig/dante`.
 
@@ -28,7 +34,7 @@ Valid naming examples:
 - hostname-label
 
 
-## Miners output file
+### Miners output file
 
 Ciacco defines the structure of the output file of a miner.
 The file produced by a miner can represent different kinds of graphical widgets:
@@ -60,6 +66,7 @@ Extra common fields:
    - `sum`: values will be summed
    - `snapshot`: values will not be aggregated
 
+## Miner types
 
 ### label
 
@@ -257,3 +264,10 @@ Extra fields:
 
 ```
 
+## Create a new miner
+
+To create a new miner:
+- Choose the appropriate type of miner, according to the input data you have and the kind of widget you want to display
+- Choose the scripting language you prefer and code your miner
+- Place miner script inside `CIACCO_MINER_DIRECTORY`
+- Provide i18n strings used by your miner inside `BEATRICE_BASE_DIR/i18n/<langCode>/<miner-name>.json`
