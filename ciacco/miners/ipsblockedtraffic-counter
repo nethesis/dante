@@ -31,7 +31,13 @@ my $out = `suricatasc -c dump-counters`;
 if ($? > 0) {
     exit 1;
 }
-my $suricata = decode_json($out);
+
+eval {
+    $suricata = decode_json($out);
+    1;
+} or do {
+    exit 1;
+};
 
 if (!$suricata) {
     exit 1;
