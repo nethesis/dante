@@ -734,7 +734,7 @@ func SetLayout(c *gin.Context) {
 func GetLang(c *gin.Context) {
 	langCode := c.Param("langCode")
 	basePath := configuration.Config.Beatrice.BaseDirectory + "/i18n/"
-	i18nFile := basePath + langCode + ".json"
+	i18nFile := basePath + "/" + langCode + "/main.json"
 	i18nMap, err := utils.ReadJson(i18nFile)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
@@ -749,7 +749,7 @@ func GetLang(c *gin.Context) {
 
 	for _, miner := range miners {
 		minerName := miner.Name
-		minerI18nFile := basePath + minerName + "-" + langCode + ".json"
+		minerI18nFile := basePath + "/" + langCode + "/" + minerName + ".json"
 		minerI18nMap, err := utils.ReadJson(minerI18nFile)
 		if err != nil {
 			// non-fatal error
