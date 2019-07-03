@@ -42,6 +42,8 @@ python -m compileall ciacco/lib/squidguard.py
 %systemd_postun_with_restart virgilio.service
 
 %package caronte
+Version: 0.0.9
+Release: 0%{?dist}
 Summary: Caronte package for Dante
 Requires: dante
 %description caronte
@@ -92,4 +94,5 @@ cp %{SOURCE7} %{buildroot}/etc/httpd/conf.d/
 
 
 %changelog
-
+* Wed Jul 03 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> 0.0.9-0
+- First alpha release
