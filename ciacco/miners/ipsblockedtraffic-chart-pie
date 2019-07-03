@@ -26,16 +26,19 @@ use JSON;
 use File::Basename;
 
 my $value = 0;
+my $suricata;
 my $out = `suricatasc -c dump-counters`;
 
 if ($? > 0) {
     exit 1;
 }
-my $suricata = decode_json($out);
 
-if (!$suricata) {
+eval {
+    $suricata = decode_json($out);
+    1;
+} or do {
     exit 1;
-}
+};
 
 $value = $suricata->{'message'}{'ips'}{'rejected'} +  $suricata->{'message'}{'ips'}{'replaced'} +  $suricata->{'message'}{'ips'}{'blocked'};
 
