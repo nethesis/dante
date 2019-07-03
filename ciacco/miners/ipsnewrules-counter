@@ -22,9 +22,15 @@
 
 # Count downloaded new rules
 
+LOG=/var/log/sid_changes.log
+
+if [ ! -f "$LOG" ]; then
+    exit 1
+fi
+
 id=$(basename $0)
 type=$(basename $0 | cut -d'-' -f2)
-value=$(tac /var/log/sid_changes.log | grep New | tail -n 1 | tr -dc '0-9')
+value=$(tac $LOG | grep New | tail -n 1 | tr -dc '0-9')
 trend="number"
 aggregation='sum'
 unit="number"
