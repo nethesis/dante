@@ -370,7 +370,10 @@ func readCounterWidget(widgetInfo widgets.WidgetInfo, counterInfo widgets.Counte
 				valueOutputCounter += counterData.Value
 			}
 			// trend management
-			leastRecentValueTrend = counterData.Value
+			if filePathIndex == 0 {
+				// used if aggregationType == snapshot
+				leastRecentValueTrend = counterData.Value
+			}
 			trendSeries = append(trendSeries, counterData.Value)
 			dateString := utils.GetDateStringFromFilePath(filePath)
 			trendCategories = append(trendCategories, dateString)
