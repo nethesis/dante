@@ -4,7 +4,7 @@
 %define __strip /bin/true
 
 Name:		dante
-Version:	0.0.9
+Version:	0.0.10
 Release:	0%{?dist}
 Summary:	Single stack reports made simple
 
@@ -42,7 +42,7 @@ python -m compileall ciacco/lib/squidguard.py
 %systemd_postun_with_restart virgilio.service
 
 %package caronte
-Version: 0.0.9
+Version: 0.0.10
 Release: 0%{?dist}
 Summary: Caronte package for Dante
 Requires: dante
