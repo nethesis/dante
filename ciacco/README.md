@@ -114,7 +114,7 @@ Extra fields:
 
 Display a chart without a trend. Extra fields:
 
-- `chartType`: "pie" or "bar" or "line" or "area" or "column"
+- `chartType`: "pie" or "bar" or "line" or "area"
 - `categories`: array of categories (for pie, bar and columns charts) or values on the x-axis (for line and area charts)
 - `series`: array of values/objects associated to the categories
     - `name`: name of the serie
