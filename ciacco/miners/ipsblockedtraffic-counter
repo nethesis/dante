@@ -26,7 +26,7 @@ use JSON;
 use File::Basename;
 
 my $value = 0;
-my $out = `suricatasc -c dump-counters`;
+my $out = `suricatasc -c dump-counters 2>/dev/null`;
 
 if ($? > 0) {
     exit 1;
