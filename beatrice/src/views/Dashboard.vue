@@ -890,10 +890,12 @@ export default {
 .on-edit {
   border-radius: 0.28571429rem !important;
   outline: 2px dashed #e0e1e2 !important;
+  padding: 5px !important;
 }
 .on-edit-dark {
   border-radius: 0.28571429rem !important;
   outline: 2px dashed #828282 !important;
+  padding: 5px !important;
 }
 
 .normal {
