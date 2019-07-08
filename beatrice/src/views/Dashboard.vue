@@ -18,10 +18,11 @@ http://www.nethesis.it - info@nethesis.it
 -->
 <template>
   <div class="ui">
-    <h1
+    <h2
       class="ui header adjust-header"
       :class="$parent.lightTheme ? '' : 'inverted'"
-    >{{$t('home.dashboard')}}</h1>
+    >{{$t('home.dashboard')}} |</h2>
+    <span class="range-date">{{range()}}</span>
 
     <div
       v-show="view.isLoading"
@@ -99,7 +100,7 @@ http://www.nethesis.it - info@nethesis.it
         :w="item.w"
         :h="item.h"
         :i="item.i"
-        :class="[item.type == 'chart' ? '' : 'empty', item.highlight ? 'highlight' : $parent.searchString.length > 0 ? 'lowlight' : '', mode == 'edit' ? $parent.lightTheme ? 'on-edit' : 'on-edit-dark' : '']"
+        :class="[item.type == 'chart' ? '' : 'empty', item.highlight ? 'highlight' : $parent.searchString.length > 0 ? 'lowlight' : '', mode == 'edit' ? $parent.lightTheme ? 'on-edit' : 'on-edit-dark' : $parent.lightTheme ? 'normal' : 'normal-dark']"
         :isResizable="mode == 'edit' ? true : false"
         @resized="itemResized"
       >
@@ -184,11 +185,7 @@ http://www.nethesis.it - info@nethesis.it
             </div>
           </div>
           <div class="statistic">
-            <div class="label adjust-label-counter">
-              {{$t('dashboard.trend')}}
-              <br>
-              <span class="ui header grey">({{$t('home.last_'+$parent.filterDate)}})</span>
-            </div>
+            <div class="label adjust-label-counter">{{$t('dashboard.trend')}}</div>
             <div
               class="ui value header"
               :class="item.data.trend <= 0 ? 'red' : 'green'"
@@ -275,7 +272,7 @@ http://www.nethesis.it - info@nethesis.it
         >
           <div v-for="(l,lk) in item.data.list" :key="lk" class="item">
             <div class="content">
-              <div class="ui header" :class="setListTitle(lk)">{{l.name}}</div>
+              <div class="ui header truncate" :class="setListTitle(lk)">{{l.name}}</div>
               <div class="ui">{{l.count | formatter(item.data.unit)}}</div>
             </div>
           </div>
@@ -485,6 +482,9 @@ export default {
     this.getWidgets();
   },
   data() {
+    // set locale
+    moment.locale(this.$options.lang);
+
     var offset = 30;
     var widgetDefaults = {
       chart: {
@@ -528,7 +528,46 @@ export default {
         isLoading: true,
         isMobile: this.$parent.isMobile
       },
-      apiHost: this.$root.$options.apiHost
+      apiHost: this.$root.$options.apiHost,
+      range: function() {
+        var dateRange = "";
+        switch (this.$parent.filterDate) {
+          case "week":
+            dateRange =
+              moment()
+                .subtract(7, "days")
+                .format("DD MMM YYYY") +
+              " - " +
+              moment()
+                .subtract(1, "days")
+                .format("DD MMM YYYY");
+            break;
+
+          case "month":
+            dateRange =
+              moment()
+                .subtract(1, "months")
+                .format("DD MMM YYYY") +
+              " - " +
+              moment()
+                .subtract(1, "days")
+                .format("DD MMM YYYY");
+            break;
+
+          case "halfyear":
+            dateRange =
+              moment()
+                .subtract(6, "months")
+                .format("DD MMM YYYY") +
+              " - " +
+              moment()
+                .subtract(1, "days")
+                .format("DD MMM YYYY");
+            break;
+        }
+
+        return dateRange;
+      }
     };
   },
   methods: {
@@ -857,6 +896,18 @@ export default {
   outline: 2px dashed #828282 !important;
 }
 
+.normal {
+  border: 1px solid #d7dbde;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.08);
+  padding: 5px;
+}
+
+.normal-dark {
+  border: 1px solid #4e4e4e;
+  box-shadow: 0px 1px 3px rgba(255, 255, 255, 0.08);
+  padding: 5px;
+}
+
 .vue-grid-item.vue-grid-placeholder {
   background: #e0e1e2 !important;
   border: 2px solid black !important;
@@ -917,6 +968,7 @@ export default {
 .adjust-title-table {
   padding-left: 10px !important;
   padding-top: 2px !important;
+  text-align: center !important;
 }
 .adjust-list {
   margin-top: 5px !important;
@@ -990,6 +1042,13 @@ export default {
   margin-left: 10px !important;
 }
 
+.truncate {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .huge-title {
   font-size: 3.25vmin !important;
 }
@@ -1023,5 +1082,11 @@ export default {
 
 div {
   word-break: break-all !important;
+}
+
+.range-date {
+  margin-left: 5px !important;
+  font-weight: 600 !important;
+  font-size: 20px !important;
 }
 </style>

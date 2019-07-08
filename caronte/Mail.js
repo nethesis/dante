@@ -73,9 +73,10 @@ class Mail {
         break;
 
       case "halfyear":
-        moment()
-          .subtract(6, "months")
-          .format("DD MMM YYYY") +
+        dateRange =
+          moment()
+            .subtract(6, "months")
+            .format("DD MMM YYYY") +
           " - " +
           moment()
             .subtract(1, "days")

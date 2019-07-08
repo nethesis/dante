@@ -55,6 +55,7 @@ var app = new Vue({
   i18n,
   router,
   apiHost: CONFIG.VIRGILIO_BASE_URL,
+  lang: lang,
   render: h => h(App)
 });
 
