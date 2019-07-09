@@ -37,8 +37,8 @@ class Template {
     i18n.configure({
       locales: [lang],
       directory: process.pkg
-        ? "/usr/share/dante/beatrice/i18n/"
-        : __dirname + "/../beatrice/public/i18n/",
+        ? "/usr/share/dante/beatrice/i18n/" + lang + "/"
+        : __dirname + "/../beatrice/public/i18n/" + lang + "/",
       objectNotation: true
     });
     moment.locale(lang);
