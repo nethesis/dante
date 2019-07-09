@@ -39,7 +39,9 @@
     "choose_label": "Choose label",
     "choose_list": "Choose list",
     "no_widgets": "No widgets found. Click on the button below to add a new one.",
-    "retrieving_data": "Retrieving data..."
+    "retrieving_data": "Retrieving data...",
+    "no_miners_data": "No miners data available. Wait until tomorrow for fresh data.",
+    "mining_now": "Mining now"
   },
   "caronte": {
     "report_title": "Here's your Report!",

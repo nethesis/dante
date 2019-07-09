@@ -59,7 +59,7 @@ http://www.nethesis.it - info@nethesis.it
     </button>
 
     <div
-      v-show="!view.isLoading && gridLayout.length == 0"
+      v-show="!view.isLoading && gridLayout.length == 0 && !view.emptyData"
       class="ui placeholder segment"
       :class="$parent.lightTheme ? '' : 'inverted'"
     >
@@ -77,6 +77,17 @@ http://www.nethesis.it - info@nethesis.it
         <i class="add icon"></i>
         {{$t('dashboard.add_widget')}}
       </button>
+    </div>
+
+    <div
+      v-show="!view.isLoading && gridLayout.length == 0 && view.emptyData"
+      class="ui placeholder segment"
+      :class="$parent.lightTheme ? '' : 'inverted'"
+    >
+      <div class="ui icon header">
+        <i class="dolly icon"></i>
+        {{$t('dashboard.no_miners_data')}}
+      </div>
     </div>
 
     <grid-layout
@@ -530,7 +541,8 @@ export default {
       newObject: this.initNewObject(),
       view: {
         isLoading: true,
-        isMobile: this.$parent.isMobile
+        isMobile: this.$parent.isMobile,
+        emptyData: false
       },
       apiHost: this.$root.$options.apiHost,
       range: function() {
@@ -723,45 +735,51 @@ export default {
         success => {
           var layouts = success.body.layout;
 
-          for (var l in layouts) {
-            var layout = layouts[l];
+          if (layouts && layouts.length > 0) {
+            for (var l in layouts) {
+              var layout = layouts[l];
 
-            layout.w = success.body.default
-              ? this.widgetDefaults[layout.type].w
-              : layout.w;
-            layout.h = success.body.default
-              ? this.widgetDefaults[layout.type].h
-              : layout.h;
-            layout.width = success.body.default
-              ? this.widgetDefaults[layout.type].width
-              : (window.innerWidth * layout.width) / 100;
-            layout.height = success.body.default
-              ? this.widgetDefaults[layout.type].height
-              : (window.innerHeight * layout.height) / 100;
-            layout.data = {
-              series: []
-            };
-            layout.newTitle = "";
-            layout.title = layout.text;
+              layout.w = success.body.default
+                ? this.widgetDefaults[layout.type].w
+                : layout.w;
+              layout.h = success.body.default
+                ? this.widgetDefaults[layout.type].h
+                : layout.h;
+              layout.width = success.body.default
+                ? this.widgetDefaults[layout.type].width
+                : (window.innerWidth * layout.width) / 100;
+              layout.height = success.body.default
+                ? this.widgetDefaults[layout.type].height
+                : (window.innerHeight * layout.height) / 100;
+              layout.data = {
+                series: []
+              };
+              layout.newTitle = "";
+              layout.title = layout.text;
 
-            if (this.$parent.isMobile) {
-              layout.w = 12;
+              if (this.$parent.isMobile) {
+                layout.w = 12;
 
-              if (layout.type == "chart") {
-                layout.width = window.innerWidth - 70;
-                layout.height =
-                  window.orientation == 90 || window.orientation == -90
-                    ? window.innerHeight / 1.5
-                    : layout.height;
+                if (layout.type == "chart") {
+                  layout.width = window.innerWidth - 70;
+                  layout.height =
+                    window.orientation == 90 || window.orientation == -90
+                      ? window.innerHeight / 1.5
+                      : layout.height;
+                }
+              }
+
+              if (layout.type != "title") {
+                this.getWidgetData(layout.id, l);
               }
             }
 
-            if (layout.type != "title") {
-              this.getWidgetData(layout.id, l);
-            }
+            this.gridLayout = layouts;
+            this.view.emptyData = false;
+          } else {
+            this.gridLayout = [];
+            this.view.emptyData = true;
           }
-
-          this.gridLayout = layouts;
           this.view.isLoading = false;
         },
         error => {
@@ -832,12 +850,12 @@ export default {
                 widget.aggregationType;
 
               // calculate correct sizes
-              if (widget.type == "list") {
+              if (widget.type == "list" && widget.data) {
                 this.gridLayout[index].h =
                   (widget.data.length < 10 ? 6 : 10) +
                   1.75 * widget.data.length;
               }
-              if (widget.type == "table") {
+              if (widget.type == "table" && widget.data) {
                 this.gridLayout[index].h = 6 + 1.5 * widget.rows.length;
               }
             }
