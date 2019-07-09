@@ -4,6 +4,7 @@ var moment = require("moment");
 
 var Filters = {
   formatter(value, unit) {
+    var lang = window.app.__vue__.$options.lang;
     value = isNaN(value) ? value : parseFloat(value);
 
     if (value || value == 0) {
@@ -15,10 +16,16 @@ var Filters = {
           return Filters.secondsInHour(value);
 
         case "number":
-          return value.toLocaleString();
+          return new Intl.NumberFormat(lang, {
+            style: "decimal"
+          }).format(value);
 
         case "percentage":
-          return value + "%";
+          return (
+            new Intl.NumberFormat(lang, {
+              style: "decimal"
+            }).format(value) + "%"
+          );
 
         case "date":
           return moment(value).format("LL");
@@ -29,6 +36,7 @@ var Filters = {
     }
   },
   byteFormat: function(size) {
+    var lang = window.app.__vue__.$options.lang;
     var result;
 
     switch (true) {
@@ -37,23 +45,38 @@ var Filters = {
         break;
 
       case size >= 0 && size < 1024:
-        result = size + " B";
+        result =
+          new Intl.NumberFormat(lang, {
+            style: "decimal"
+          }).format(size) + " B";
         break;
 
       case size >= 1024 && size < Math.pow(1024, 2):
-        result = Math.round((size / 1024) * 100) / 100 + " KB";
+        result =
+          new Intl.NumberFormat(lang, {
+            style: "decimal"
+          }).format(Math.round((size / 1024) * 100) / 100) + " KB";
         break;
 
       case size >= Math.pow(1024, 2) && size < Math.pow(1024, 3):
-        result = Math.round((size / Math.pow(1024, 2)) * 100) / 100 + " MB";
+        result =
+          new Intl.NumberFormat(lang, {
+            style: "decimal"
+          }).format(Math.round((size / Math.pow(1024, 2)) * 100) / 100) + " MB";
         break;
 
       case size >= Math.pow(1024, 3) && size < Math.pow(1024, 4):
-        result = Math.round((size / Math.pow(1024, 3)) * 100) / 100 + " GB";
+        result =
+          new Intl.NumberFormat(lang, {
+            style: "decimal"
+          }).format(Math.round((size / Math.pow(1024, 3)) * 100) / 100) + " GB";
         break;
 
       default:
-        result = Math.round((size / Math.pow(1024, 4)) * 100) / 100 + " TB";
+        result =
+          new Intl.NumberFormat(lang, {
+            style: "decimal"
+          }).format(Math.round((size / Math.pow(1024, 4)) * 100) / 100) + " TB";
     }
 
     return result;

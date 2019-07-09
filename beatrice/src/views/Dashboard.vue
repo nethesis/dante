@@ -272,7 +272,11 @@ http://www.nethesis.it - info@nethesis.it
         >
           <div v-for="(l,lk) in item.data.list" :key="lk" class="item">
             <div class="content">
-              <div class="ui header truncate" :class="setListTitle(lk)">{{l.name}}</div>
+              <div
+                :data-content="l.name"
+                class="ui header truncate"
+                :class="setListTitle(lk)"
+              >{{l.name}}</div>
               <div class="ui">{{l.count | formatter(item.data.unit)}}</div>
             </div>
           </div>
@@ -838,6 +842,12 @@ export default {
               }
             }
 
+            // enable popup on list
+            $(".header.truncate").popup({
+              position: "top center"
+            });
+
+            // dispatch resize event to adjust layout
             window.dispatchEvent(new Event("resize"));
           },
           error => {
