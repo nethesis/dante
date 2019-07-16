@@ -168,7 +168,13 @@ func ReadDefaultLayout() Layout {
 
 		// exclude directories and file names starting with "." (e.g. Vim swap files)
 		if !f.IsDir() && string(f.Name()[0]) != "." {
-			obj := ParseWidget(path.Join(newest, f.Name()))
+			filename := path.Join(newest, f.Name())
+			obj := ParseWidget(filename)
+
+			if obj["type"] == nil {
+				fmt.Fprintf(os.Stderr, "Malformed widget data: %s\n", filename)
+				continue
+			}
 			w.Type = obj["type"].(string)
 			w.Id = obj["minerId"].(string)
 			w.I = i
