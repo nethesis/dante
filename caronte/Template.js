@@ -128,7 +128,7 @@ class Template {
         i18n.__("caronte.report_title") +
         ` 🎉</mj-text>
 
-          <mj-text mj-class="mjclass" align="center" font-size="80px">📆</mj-text>
+          <mj-text mj-class="mjclass" align="center" font-size="80px">📊</mj-text>
 
             <mj-text mj-class="mjclass" align="center" font-size="16px">` +
         htmlString +
