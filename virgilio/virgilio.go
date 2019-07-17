@@ -49,9 +49,9 @@ func main() {
 
 	router.GET("/widget/:widgetName", apis.ReadWidget)
 	router.GET("/miners", apis.ListMiners)
+	router.GET("/default_layout", apis.GetDefaultLayout)
 	router.GET("/layout", apis.GetLayout)
 	router.POST("/layout", apis.SetLayout)
-	router.GET("/default_layout", apis.GetDefaultLayout)
 	router.DELETE("/layout", apis.DeleteLayout)
 	router.GET("/lang/:langCode", apis.GetLang)
 

@@ -133,7 +133,7 @@ export default {
     return {
       lightTheme: this.$route.query.theme
         ? this.$route.query.theme == "light"
-        : "light",
+        : true,
       colorPalette: this.$route.query.palette || "palette1",
       filterDate: this.$route.query.last || "week",
       language: this.$route.query.lang || "en",
