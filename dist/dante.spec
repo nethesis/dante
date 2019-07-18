@@ -4,8 +4,8 @@
 %define __strip /bin/true
 
 Name:		dante
-Version:	0.0.10
-Release:	0%{?dist}
+Version:	0.0.11
+Release:	1%{?dist}
 Summary:	Single stack reports made simple
 
 License:	GPLv3
@@ -82,5 +82,9 @@ cp %{SOURCE7} %{buildroot}/etc/httpd/conf.d/
 
 
 %changelog
+* Thu Jul 18 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> 0.0.11-1
+- Remove dante-caronte sub-package
+- Move caronte to bin directory
+
 * Wed Jul 03 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> 0.0.9-0
 - First alpha release
