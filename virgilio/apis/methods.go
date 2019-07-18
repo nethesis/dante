@@ -390,6 +390,7 @@ func readCounterWidget(widgetInfo widgets.WidgetInfo, counterInfo widgets.Counte
 		valueOutputCounter = 0
 		startDate = startDate.AddDate(0, 0, -deltaDays-1)
 		filePaths = widgets.GetFileLists(widgetName, startDate, deltaDays)
+		leastRecentValueTrendFirstAggregation := leastRecentValueTrend
 
 		for filePathIndex = len(filePaths) - 1; filePathIndex >= 0; filePathIndex-- {
 			filePath := filePaths[filePathIndex]
@@ -409,6 +410,11 @@ func readCounterWidget(widgetInfo widgets.WidgetInfo, counterInfo widgets.Counte
 			valueOutputCounter += counterData.Value
 		}
 		leastRecentValueTrend = valueOutputCounter
+
+		// if there is no data available in second aggregation, use least recent value of first aggregation
+		if leastRecentValueTrend == 0 {
+			leastRecentValueTrend = leastRecentValueTrendFirstAggregation
+		}
 		trend, err = computeTrendValue(mostRecentValueTrend, leastRecentValueTrend, counterData)
 		if err != nil {
 			return counterData, err
