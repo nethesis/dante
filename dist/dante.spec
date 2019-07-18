@@ -4,15 +4,15 @@
 %define __strip /bin/true
 
 Name:		dante
-Version:	0.0.10
-Release:	0%{?dist}
+Version:	0.0.11
+Release:	1%{?dist}
 Summary:	Single stack reports made simple
 
 License:	GPLv3
 URL:	    https://github.com/nethesis/dante	
 Source0:	https://github.com/nethesis/dante/archive/master.tar.gz
 # Execute ./prep-source to create Source1, Source3 and Source4
-Source1:    caronte.tar.gz
+Source1:    caronte
 Source2:    dante.sysconf
 Source3:    beatrice.tar.gz
 Source4:    virgilio
@@ -41,17 +41,7 @@ python -m compileall ciacco/lib/squidguard.py
 %postun
 %systemd_postun_with_restart virgilio.service
 
-%package caronte
-Version: 0.0.10
-Release: 0%{?dist}
-Summary: Caronte package for Dante
-Requires: dante
-%description caronte
-Caronte creates the report preview using NodeJS and puppeteer.
-
-
 %install
-mkdir -p %{buildroot}/usr/share/dante/caronte
 mkdir -p %{buildroot}/usr/share/dante/beatrice
 mkdir -p %{buildroot}/usr/share/dante/virgilio
 mkdir -p %{buildroot}/usr/bin
@@ -63,9 +53,9 @@ mkdir -p %{buildroot}/%{python_sitelib}
 mv ciacco/lib/squidguardlib.py* %{buildroot}%{python_sitelib}
 rm -rf ciacco/lib/
 cp ciacco/ciacco %{buildroot}/%{_bindir}
+cp %{SOURCE1} %{buildroot}/%{_bindir}
 cp %{SOURCE4} %{buildroot}/%{_bindir}
 mv ciacco/miners %{buildroot}/usr/share/dante/
-tar xvzf %{SOURCE1} -C %{buildroot}/usr/share/dante/caronte
 mv %{SOURCE2}  %{buildroot}/etc/sysconfig/dante
 tar xvzf %{SOURCE3} -C %{buildroot}/usr/share/dante/beatrice
 cp %{SOURCE5} %{buildroot}/%{_unitdir}
@@ -84,15 +74,17 @@ cp %{SOURCE7} %{buildroot}/etc/httpd/conf.d/
 %dir %attr(0755, nobody, nobody) /usr/share/dante/virgilio
 %{_unitdir}/virgilio.service
 %{_bindir}/ciacco
+%{_bindir}/caronte
 %{_bindir}/virgilio
 %{python_sitelib}/squidguardlib.py*
 /usr/share/dante/miners/
 /usr/share/dante/beatrice
 
-%files caronte
-/usr/share/dante/caronte
-
 
 %changelog
+* Thu Jul 18 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> 0.0.11-1
+- Remove dante-caronte sub-package
+- Move caronte to bin directory
+
 * Wed Jul 03 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> 0.0.9-0
 - First alpha release

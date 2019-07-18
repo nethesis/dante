@@ -22,7 +22,6 @@ const querystring = require("querystring");
  * along with Dante.  If not, see COPYING.
  */
 
-const Screenshot = require("./Screenshot");
 const Template = require("./Template");
 const Mail = require("./Mail");
 
@@ -50,12 +49,9 @@ const Mail = require("./Mail");
   var queryStringParsed = new urlparse(url.replace("/#/?", "?")).query;
   var parsedQuery = querystring.parse(queryStringParsed);
 
-  // process images and send mail
-  const screenshot = new Screenshot();
-  var assets = await screenshot.shot(url);
-
+  // create template and send mail
   const template = new Template();
-  var html = await template.create(assets.image, url, parsedQuery);
+  var html = await template.create(url, parsedQuery);
 
   const mail = new Mail();
   var status = await mail.send(
@@ -63,7 +59,6 @@ const Mail = require("./Mail");
     addresses,
     url,
     parsedQuery,
-    assets.pdf,
     from
   );
 

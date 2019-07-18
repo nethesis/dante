@@ -25,7 +25,7 @@ const nodemailer = require("nodemailer");
 class Mail {
   constructor() {}
 
-  async send(html, addresses, url, parsedQuery, pdf, from) {
+  async send(html, addresses, url, parsedQuery, from) {
     // extract query
     var last = parsedQuery.last;
     var lang = parsedQuery.lang;
@@ -101,14 +101,7 @@ class Mail {
         os.hostname() +
         ") link: " +
         url,
-      html: html,
-      attachments: [
-        {
-          filename: last + "ly_report.pdf",
-          content: pdf.toString("base64"),
-          encoding: "base64"
-        }
-      ]
+      html: html
     };
 
     // send mail with defined transport object
