@@ -8,8 +8,7 @@ set -e
 pushd ../caronte
 npm install
 npm run pkg
-tar cvzf caronte.tar.gz -C build .
-cp caronte.tar.gz ../dist/
+cp build/caronte ../dist/
 popd
 
 #
