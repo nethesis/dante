@@ -41,15 +41,6 @@ python -m compileall ciacco/lib/squidguard.py
 %postun
 %systemd_postun_with_restart virgilio.service
 
-%package caronte
-Version: 0.0.10
-Release: 0%{?dist}
-Summary: Caronte package for Dante
-Requires: dante
-%description caronte
-Caronte creates the report preview using NodeJS and puppeteer.
-
-
 %install
 mkdir -p %{buildroot}/usr/share/dante/caronte
 mkdir -p %{buildroot}/usr/share/dante/beatrice
@@ -88,8 +79,6 @@ cp %{SOURCE7} %{buildroot}/etc/httpd/conf.d/
 %{python_sitelib}/squidguardlib.py*
 /usr/share/dante/miners/
 /usr/share/dante/beatrice
-
-%files caronte
 /usr/share/dante/caronte
 
 
