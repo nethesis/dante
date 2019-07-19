@@ -22,21 +22,39 @@ http://www.nethesis.it - info@nethesis.it
       <a href="#/" :class="[getCurrentPath('') ? 'active' : '', 'item']">{{$t('home.title')}}</a>
       <div class="item">
         <div class="ui buttons" :class="lightTheme ? '' : 'inverted'">
-          <button
-            @click="setFilterDate('week')"
-            class="ui button"
-            :class="[lightTheme ? '' : 'inverted', filterDate == 'week' ? 'active' : '']"
-          >{{$t('home.last_week')}}</button>
-          <button
-            @click="setFilterDate('month')"
-            class="ui button"
-            :class="[lightTheme ? '' : 'inverted', filterDate == 'month' ? 'active' : '']"
-          >{{$t('home.last_month')}}</button>
-          <button
-            @click="setFilterDate('halfyear')"
-            class="ui button"
-            :class="[lightTheme ? '' : 'inverted', filterDate == 'halfyear' ? 'active' : '']"
-          >{{$t('home.last_halfyear')}}</button>
+          <span
+            :data-tooltip="maxDays < 7 ? $t('home.data_not_available_in_range') : null"
+            data-position="bottom center"
+          >
+            <button
+              :disabled="maxDays < 7"
+              @click="setFilterDate('week')"
+              class="ui button"
+              :class="[lightTheme ? '' : 'inverted', filterDate == 'week' ? 'active' : '']"
+            >{{$t('home.last_week')}}</button>
+          </span>
+          <span
+            :data-tooltip="maxDays < 31 ? $t('home.data_not_available_in_range') : null"
+            data-position="bottom center"
+          >
+            <button
+              :disabled="maxDays < 31"
+              @click="setFilterDate('month')"
+              class="ui button"
+              :class="[lightTheme ? '' : 'inverted', filterDate == 'month' ? 'active' : '']"
+            >{{$t('home.last_month')}}</button>
+          </span>
+          <span
+            :data-tooltip="maxDays < 181 ? $t('home.data_not_available_in_range') : null"
+            data-position="bottom center"
+          >
+            <button
+              :disabled="maxDays < 181"
+              @click="setFilterDate('halfyear')"
+              class="ui button"
+              :class="[lightTheme ? '' : 'inverted', filterDate == 'halfyear' ? 'active' : '']"
+            >{{$t('home.last_halfyear')}}</button>
+          </span>
         </div>
       </div>
       <div class="item">
@@ -140,7 +158,8 @@ export default {
       searchString: "",
       isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
         navigator.userAgent
-      )
+      ),
+      maxDays: 0
     };
   },
   methods: {

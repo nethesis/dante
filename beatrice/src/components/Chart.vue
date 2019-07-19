@@ -44,7 +44,6 @@ export default {
     theme: Boolean,
     palette: String,
     sparkline: Boolean,
-    title: String,
     labels: Array,
     unit: String
   },
@@ -77,7 +76,7 @@ export default {
             tools: this.sparkline
               ? false
               : {
-                  download: true,
+                  download: false,
                   selection: false,
                   zoom: false,
                   zoomin: false,
@@ -105,15 +104,6 @@ export default {
               return context.$t(context.chartId + "." + l);
             })
           : [],
-        title: {
-          text: this.sparkline ? "" : this.title,
-          floating: false,
-          align: "left",
-          style: {
-            fontSize: "14px",
-            color: this.theme ? "black" : "white"
-          }
-        },
         markers: {
           size: this.sparkline ? 0 : 4
         },
@@ -138,6 +128,7 @@ export default {
         },
         legend: {
           position: "top",
+          horizontalAlign: "left",
           onItemClick: {
             toggleDataSeries: false
           }

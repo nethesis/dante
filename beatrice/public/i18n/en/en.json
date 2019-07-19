@@ -10,11 +10,13 @@
     "colors": "Colors",
     "palette": "Palette",
     "light_theme": "Light theme",
-    "dark_theme": "Dark theme"
+    "dark_theme": "Dark theme",
+    "data_not_available_in_range": "Data not available in this date range"
   },
   "dashboard": {
     "cancel": "Cancel",
     "add": "Add",
+    "value": "value",
     "trend": "Trend",
     "insert_new_title": "Insert new title",
     "add_widget": "Add widget",
@@ -41,7 +43,7 @@
     "no_widgets": "No widgets found. Click on the button below to add a new one.",
     "retrieving_data": "Retrieving data...",
     "no_miners_data": "No miners data available. Wait until tomorrow for fresh data.",
-    "mining_now": "Mining now"
+    "no_data": "No widget data available"
   },
   "caronte": {
     "report_title": "Here's your Report!",

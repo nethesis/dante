@@ -134,6 +134,15 @@ http://www.nethesis.it - info@nethesis.it
         >
           <div class="ui indeterminate text loader">{{$t('dashboard.retrieving_data')}}</div>
         </div>
+        <span
+          v-if="item.type == 'chart'"
+          class="ui header"
+          :class="$parent.lightTheme ? '' : 'inverted'"
+        >
+          <h5
+            class="adjust-title-table"
+          >{{item.data && item.data.title && item.data.title.toUpperCase() || '-'}}</h5>
+        </span>
         <div
           class="ui statistics"
           v-if="item.type == 'chart'  && item.data && item.data.series && item.data.series.length > 0"
@@ -149,7 +158,6 @@ http://www.nethesis.it - info@nethesis.it
                 :height="item.height"
                 :theme="$parent.lightTheme"
                 :palette="$parent.colorPalette"
-                :title="item.data.title"
                 :unit="item.data.unit"
                 :labels="item.data.labels"
                 :class="mode == 'edit' ? 'adjust-content' : ''"
@@ -167,13 +175,22 @@ http://www.nethesis.it - info@nethesis.it
         >
           <div class="ui indeterminate text loader">{{$t('dashboard.retrieving_data')}}</div>
         </div>
+        <span
+          v-if="item.type == 'counter'"
+          class="ui header"
+          :class="$parent.lightTheme ? '' : 'inverted'"
+        >
+          <h5
+            class="adjust-title-table"
+          >{{item.data && item.data.title && item.data.title.toUpperCase() || '-'}}</h5>
+        </span>
         <div
           v-if="item.type == 'counter' && item.data && (item.data.series.length > 0)"
           class="ui three statistics"
           :class="[$parent.lightTheme ? '' : 'inverted', 'mini']"
         >
           <div class="statistic">
-            <div class="label adjust-label-counter">{{item.data.title || '-'}}</div>
+            <div class="label adjust-label-counter">{{$t('dashboard.value')}}</div>
             <div class="value">{{item.data.value || 0 | formatter(item.data.unit)}}</div>
           </div>
           <div class="statistic">
@@ -323,6 +340,34 @@ http://www.nethesis.it - info@nethesis.it
           </div>
         </span>
         <!-- END TITLE -->
+
+        <!-- NO DATA -->
+        <div
+          v-if="item.type == 'list' && (!item.data || (item.data && item.data.list && item.data.list.length == 0))"
+          class="ui active dimmer"
+          :class="$parent.lightTheme ? 'inverted' : ''"
+        >{{$t('dashboard.no_data')}}</div>
+        <div
+          v-if="item.type == 'chart' && (!item.data || (item.data && item.data.series && item.data.series.lenght == 0))"
+          class="ui active dimmer"
+          :class="$parent.lightTheme ? 'inverted' : ''"
+        >{{$t('dashboard.no_data')}}</div>
+        <div
+          v-if="item.type == 'counter' && (!item.data || (item.data && item.data.series && item.data.series.lenght == 0))"
+          class="ui active dimmer"
+          :class="$parent.lightTheme ? 'inverted' : ''"
+        >{{$t('dashboard.no_data')}}</div>
+        <div
+          v-if="item.type == 'table' && (!item.data || (item.data && item.data.rows && item.data.rows.lenght == 0))"
+          class="ui active dimmer"
+          :class="$parent.lightTheme ? 'inverted' : ''"
+        >{{$t('dashboard.no_data')}}</div>
+        <div
+          v-if="item.type == 'label' && (!item.data || (item.data && !item.data.value))"
+          class="ui active dimmer"
+          :class="$parent.lightTheme ? 'inverted' : ''"
+        >{{$t('dashboard.no_data')}}</div>
+        <!-- END NO DATA -->
       </grid-item>
     </grid-layout>
 
@@ -504,13 +549,13 @@ export default {
     var widgetDefaults = {
       chart: {
         w: 6,
-        h: 14,
+        h: 16,
         width: window.innerWidth / 2 - (offset + 3.5 * 6),
         height: window.innerHeight / 3
       },
       counter: {
         w: 6,
-        h: 4,
+        h: 5,
         width: window.innerWidth / 6,
         height: window.innerHeight / 12
       },
@@ -734,6 +779,7 @@ export default {
       this.$http.get(this.apiHost + "/layout").then(
         success => {
           var layouts = success.body.layout;
+          this.$parent.maxDays = success.body.availableDays || 0;
 
           if (layouts && layouts.length > 0) {
             for (var l in layouts) {
@@ -855,20 +901,25 @@ export default {
                   (widget.data.length < 10 ? 6 : 10) +
                   1.75 * widget.data.length;
               }
-              if (widget.type == "table" && widget.data) {
+              if (widget.type == "table" && widget.rows) {
                 this.gridLayout[index].h = 6 + 1.5 * widget.rows.length;
               }
+            } else {
+              this.gridLayout[index].data = null;
             }
 
             // enable popup on list
-            $(".header.truncate").popup({
-              position: "top center"
-            });
+            setTimeout(function() {
+              $(".header.truncate").popup({
+                position: "top center"
+              });
+            }, 250);
 
             // dispatch resize event to adjust layout
             window.dispatchEvent(new Event("resize"));
           },
           error => {
+            this.gridLayout[index].data = null;
             console.error(error);
           }
         );
@@ -984,6 +1035,7 @@ export default {
 }
 .adjust-label-counter {
   margin-bottom: 15px !important;
+  padding-top: 5px !important;
 }
 .adjust-image-icon {
   padding: 10px !important;
@@ -997,7 +1049,7 @@ export default {
 }
 .adjust-title-table {
   padding-left: 10px !important;
-  padding-top: 2px !important;
+  padding-top: 5px !important;
   text-align: center !important;
 }
 .adjust-list {
