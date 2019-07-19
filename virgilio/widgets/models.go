@@ -23,8 +23,9 @@ package widgets
 import "time"
 
 type Layout struct {
-	Widgets []Widget `json:"layout"`
-	Default bool     `json:"default"`
+	Widgets       []Widget `json:"layout"`
+	Default       bool     `json:"default"`
+	AvailableDays int      `json:availableDays`
 }
 
 type Widget struct {
