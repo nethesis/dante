@@ -115,7 +115,7 @@ http://www.nethesis.it - info@nethesis.it
       <div class="right menu">
         <div class="item">
           <div class="ui transparent icon input" :class="lightTheme ? '' : 'inverted'">
-            <input v-model="searchString" type="text" placeholder="Search...">
+            <input v-model="searchString" type="text" :placeholder="$t('home.search')+'...'" />
             <i
               @click="searchString.length > 0 ? searchString = '' : undefined"
               :class="[searchString.length > 0 ? 'remove link' : 'search', 'icon']"
@@ -133,7 +133,7 @@ http://www.nethesis.it - info@nethesis.it
       </div>
     </div>
     <div :class="['ui segment', lightTheme ? '' : 'inverted']">
-      <router-view/>
+      <router-view />
     </div>
   </div>
 </template>

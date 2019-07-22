@@ -39,8 +39,10 @@ class Template {
       directory: process.pkg
         ? "/usr/share/dante/beatrice/i18n/" + lang + "/"
         : __dirname + "/../beatrice/public/i18n/" + lang + "/",
-      objectNotation: true
+      objectNotation: true,
+      register: global
     });
+    i18n.setLocale(lang);
     moment.locale(lang);
 
     // create machine string

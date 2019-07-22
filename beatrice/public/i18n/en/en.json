@@ -11,7 +11,8 @@
     "palette": "Palette",
     "light_theme": "Light theme",
     "dark_theme": "Dark theme",
-    "data_not_available_in_range": "Data not available in this date range"
+    "data_not_available_in_range": "Data not available in this date range",
+    "search": "Search"
   },
   "dashboard": {
     "cancel": "Cancel",

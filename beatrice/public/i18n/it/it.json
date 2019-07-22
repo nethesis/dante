@@ -9,12 +9,15 @@
     "last_halfyear": "Ultimi 6 mesi",
     "colors": "Colori",
     "palette": "Palette",
-    "light_theme": "Tema Light",
-    "dark_theme": "Tema Dark"
+    "light_theme": "Tema chiaro",
+    "dark_theme": "Tema scuro",
+    "data_not_available_in_range": "Dati non disponibili in questo intervallo di date",
+    "search": "Cerca"
   },
   "dashboard": {
     "cancel": "Cancella",
     "add": "Aggiungi",
+    "value": "value",
     "trend": "Trend",
     "insert_new_title": "Inserisci nuovo titolo",
     "add_widget": "Aggiungi widget",
@@ -38,9 +41,9 @@
     "choose_table": "Scegli tabella",
     "choose_label": "Scegli etichetta",
     "choose_list": "Scegli lista",
-    "no_widgets": "Non ci sono widget.Clicca il bottone sottostante per aggiungerene uno.",
+    "no_widgets": "Non ci sono widget. Clicca il bottone sottostante per aggiungerene uno.",
     "retrieving_data": "Recupero dati...",
-    "no_miners_data": "Non ci sono miners disponibili in questo momento.I primi saranni disponibili da domani.",
+    "no_miners_data": "Non ci sono miners disponibili in questo momento. I primi saranni disponibili da domani.",
     "mining_now": "Sto estraendo i dati"
   },
   "caronte": {
