@@ -1,5 +1,6 @@
 {
-    "title": "Traffic by host",
-    "sent": "Sent",
-    "received": "Received"
+    "title": "Traffico per host",
+    "sent": "Inviato",
+    "received": "Ricevuto"
+    
 }
