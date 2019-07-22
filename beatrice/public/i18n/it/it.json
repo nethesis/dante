@@ -17,7 +17,7 @@
   "dashboard": {
     "cancel": "Cancella",
     "add": "Aggiungi",
-    "value": "value",
+    "value": "Valore",
     "trend": "Trend",
     "insert_new_title": "Inserisci nuovo titolo",
     "add_widget": "Aggiungi widget",
@@ -36,7 +36,7 @@
     "title": "Titolo",
     "list": "Ranking",
     "label": "Etichetta",
-    "choose_chart": "Scegli Grafico",
+    "choose_chart": "Scegli grafico",
     "choose_counter": "Scegli contatore",
     "choose_table": "Scegli tabella",
     "choose_label": "Scegli etichetta",
@@ -47,14 +47,14 @@
     "mining_now": "Sto estraendo i dati"
   },
   "caronte": {
-    "report_title": "Ecco il tuo Report!",
+    "report_title": "Ecco il tuo report!",
     "machine": "Macchina",
-    "view_more": "Di più",
+    "view_more": "Visualizza",
     "last_week": "Ultima settimana",
     "last_month": "Ultimo mese",
     "last_halfyear": "Ultimi 6 mesi",
-    "weekly": "Settimanale",
-    "monthly": "Mensile",
-    "halfyearly": "Semestrale"
+    "weekly": "Report settimanale",
+    "monthly": "Report mensile",
+    "halfyearly": "Report semestrale"
   }
 }

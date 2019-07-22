@@ -17,7 +17,7 @@
   "dashboard": {
     "cancel": "Cancel",
     "add": "Add",
-    "value": "value",
+    "value": "Value",
     "trend": "Trend",
     "insert_new_title": "Insert new title",
     "add_widget": "Add widget",
@@ -47,14 +47,14 @@
     "no_data": "No widget data available"
   },
   "caronte": {
-    "report_title": "Here's your Report!",
+    "report_title": "Here's your report!",
     "machine": "Machine",
     "view_more": "View more",
     "last_week": "Last week",
     "last_month": "Last month",
     "last_halfyear": "Last 6 months",
-    "weekly": "Weekly",
-    "monthly": "Monthly",
-    "halfyearly": "Half-yearly"
+    "weekly": "Weekly report",
+    "monthly": "Monthly report",
+    "halfyearly": "Half-yearly report"
   }
 }
