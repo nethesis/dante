@@ -44,7 +44,7 @@
     "no_widgets": "Non ci sono widget. Clicca il bottone sottostante per aggiungerene uno.",
     "retrieving_data": "Recupero dati...",
     "no_miners_data": "Non ci sono miners disponibili in questo momento. I primi saranni disponibili da domani.",
-    "mining_now": "Sto estraendo i dati"
+    "no_data": "No widget data available"
   },
   "caronte": {
     "report_title": "Ecco il tuo report!",

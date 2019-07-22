@@ -331,7 +331,7 @@ http://www.nethesis.it - info@nethesis.it
               type="text"
               class="ui input massive adjust-input"
               :placeholder="$t('dashboard.insert_new_title')"
-            >
+            />
             <i
               @click="item.newTitle && item.newTitle.length > 0 ? editTitle(item, false) : null"
               class="icon adjust-icon"
@@ -549,7 +549,7 @@ export default {
     var widgetDefaults = {
       chart: {
         w: 6,
-        h: 16,
+        h: 15,
         width: window.innerWidth / 2 - (offset + 3.5 * 6),
         height: window.innerHeight / 3
       },
@@ -685,13 +685,13 @@ export default {
       switch (this.gridLayout[i].type) {
         case "chart":
           defaultW =
-            window.innerWidth / (12 / newW) - (this.offset + 7.5 * newW);
+            window.innerWidth / (12 / newW) - (this.offset + 3.5 * newW);
           defaultH = window.innerHeight / 3.5 / (12 / newH);
           break;
         case "counter":
           defaultW =
             window.innerWidth / (12 / newW) / 3 - (newW == 12 ? 10 : 0);
-          defaultH = window.innerHeight / 3.5 / (12 / newH);
+          defaultH = window.innerHeight / 3.5 / (12 / newH) - this.offset * 2;
       }
 
       this.gridLayout[i].width = defaultW;
