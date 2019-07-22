@@ -188,17 +188,50 @@ func ReadDefaultLayout() Layout {
 			i++
 		}
 	}
-	return Layout{widgets, true}
+	availableDays := GetAvailableDays()
+	return Layout{widgets, true, availableDays}
 }
 
 func ReadLayout() Layout {
+	var layout Layout
+
 	_, err := os.Stat(configuration.Config.Virgilio.LayoutFile)
 	if os.IsNotExist(err) {
-		return ReadDefaultLayout()
+		layout = ReadDefaultLayout()
+	} else {
+		layout = ParseLayout(configuration.Config.Virgilio.LayoutFile)
+		layout.Default = false
+		layout.AvailableDays = GetAvailableDays()
 	}
-
-	layout := ParseLayout(configuration.Config.Virgilio.LayoutFile)
-	layout.Default = false
-
 	return layout
+}
+
+// GetAvailableDays returns the number of days in the past since some widget data is present
+func GetAvailableDays() int {
+	yearsDirs, err := ioutil.ReadDir(configuration.Config.Ciacco.OutputDirectory)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error reading ciacco years directory")
+	}
+	firstYearString := yearsDirs[0].Name()
+	firstYear, _ := strconv.Atoi(firstYearString)
+
+	monthsDir, err := ioutil.ReadDir(configuration.Config.Ciacco.OutputDirectory + "/" + firstYearString)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error reading ciacco months directory")
+	}
+	firstMonthString := monthsDir[0].Name()
+	firstMonth, _ := strconv.Atoi(firstMonthString)
+
+	daysDir, err := ioutil.ReadDir(configuration.Config.Ciacco.OutputDirectory + "/" + firstYearString + "/" + firstMonthString)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error reading ciacco days directory")
+	}
+	firstDayString := daysDir[0].Name()
+	firstDay, _ := strconv.Atoi(firstDayString)
+
+	dayOne := time.Date(firstYear, time.Month(firstMonth), firstDay, 0, 0, 0, 0, time.UTC)
+	now := time.Now()
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
+	availableDays := today.Sub(dayOne).Hours() / 24
+	return int(availableDays)
 }

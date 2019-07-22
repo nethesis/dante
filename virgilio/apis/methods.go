@@ -706,8 +706,9 @@ func GetLayout(c *gin.Context) {
 	layout := widgets.ReadLayout()
 
 	c.JSON(http.StatusOK, gin.H{
-		"layout":  layout.Widgets,
-		"default": layout.Default,
+		"layout":        layout.Widgets,
+		"default":       layout.Default,
+		"availableDays": layout.AvailableDays,
 	})
 }
 
@@ -716,8 +717,9 @@ func GetDefaultLayout(c *gin.Context) {
 	layout := widgets.ReadDefaultLayout()
 
 	c.JSON(http.StatusOK, gin.H{
-		"layout":  layout.Widgets,
-		"default": layout.Default,
+		"layout":        layout.Widgets,
+		"default":       layout.Default,
+		"availableDays": layout.AvailableDays,
 	})
 }
 
