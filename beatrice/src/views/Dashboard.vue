@@ -128,7 +128,7 @@ http://www.nethesis.it - info@nethesis.it
 
         <!-- CHART -->
         <div
-          v-if="item.type == 'chart' && item.data && item.data.series && item.data.series.length == 0"
+          v-if="item.type == 'chart' && item.isLoading"
           class="ui active dimmer"
           :class="$parent.lightTheme ? 'inverted' : ''"
         >
@@ -145,7 +145,7 @@ http://www.nethesis.it - info@nethesis.it
         </span>
         <div
           class="ui statistics"
-          v-if="item.type == 'chart'  && item.data && item.data.series && item.data.series.length > 0"
+          v-if="item.type == 'chart'  && item.data && item.data.series && item.data.series.length > 0 && !item.isLoading"
         >
           <div class="statistic">
             <div class="text value">
@@ -169,7 +169,7 @@ http://www.nethesis.it - info@nethesis.it
 
         <!-- COUNTER -->
         <div
-          v-if="item.type == 'counter' && item.data && (item.data.series.length == 0)"
+          v-if="item.type == 'counter' && item.isLoading"
           class="ui active dimmer"
           :class="$parent.lightTheme ? 'inverted' : ''"
         >
@@ -185,7 +185,7 @@ http://www.nethesis.it - info@nethesis.it
           >{{item.data && item.data.title && item.data.title.toUpperCase() || '-'}}</h5>
         </span>
         <div
-          v-if="item.type == 'counter' && item.data && (item.data.series.length > 0)"
+          v-if="item.type == 'counter' && item.data && item.data.series && item.data.series.length > 0 && !item.isLoading"
           class="ui three statistics"
           :class="[$parent.lightTheme ? '' : 'inverted', 'mini']"
         >
@@ -224,14 +224,14 @@ http://www.nethesis.it - info@nethesis.it
 
         <!-- TABLE -->
         <div
-          v-if="item.type == 'table' && item.data && item.data.rows && item.data.rows.length == 0"
+          v-if="item.type == 'table' && item.isLoading"
           class="ui active dimmer"
           :class="$parent.lightTheme ? 'inverted' : ''"
         >
           <div class="ui indeterminate text loader">{{$t('dashboard.retrieving_data')}}</div>
         </div>
         <span
-          v-if="item.type == 'table' && item.data && item.data.rows && item.data.rows.length > 0"
+          v-if="item.type == 'table' && item.data && item.data.rows && item.data.rows.length > 0 && !item.isLoading"
           class="ui header"
           :class="$parent.lightTheme ? '' : 'inverted'"
         >
@@ -260,14 +260,14 @@ http://www.nethesis.it - info@nethesis.it
 
         <!-- LABEL -->
         <div
-          v-if="item.type == 'label' && item.data && !item.data.value"
+          v-if="item.type == 'label' && item.isLoading"
           class="ui active dimmer"
           :class="$parent.lightTheme ? 'inverted' : ''"
         >
           <div class="ui indeterminate text loader">{{$t('dashboard.retrieving_data')}}</div>
         </div>
         <div
-          v-if="item.type == 'label' && item.data && item.data.value"
+          v-if="item.type == 'label' && item.data && item.data.value && !item.isLoading"
           class="ui one statistics full-box"
           :class="[$parent.lightTheme ? '' : 'inverted', 'mini']"
         >
@@ -280,14 +280,14 @@ http://www.nethesis.it - info@nethesis.it
 
         <!-- LIST -->
         <div
-          v-if="item.type == 'list' && item.data && !item.data.list"
+          v-if="item.type == 'list' && item.isLoading"
           class="ui active dimmer"
           :class="$parent.lightTheme ? 'inverted' : ''"
         >
           <div class="ui indeterminate text loader">{{$t('dashboard.retrieving_data')}}</div>
         </div>
         <span
-          v-if="item.type == 'list' && item.data && item.data.list"
+          v-if="item.type == 'list' && item.data && item.data.list && !item.isLoading"
           class="ui header"
           :class="$parent.lightTheme ? '' : 'inverted'"
         >
@@ -343,27 +343,27 @@ http://www.nethesis.it - info@nethesis.it
 
         <!-- NO DATA -->
         <div
-          v-if="item.type == 'list' && (!item.data || (item.data && item.data.list && item.data.list.length == 0))"
+          v-if="!item.isLoading && item.type == 'list' && (!item.data || (item.data && item.data.list && item.data.list.length == 0))"
           class="ui active dimmer"
           :class="$parent.lightTheme ? 'inverted' : ''"
         >{{$t('dashboard.no_data')}}</div>
         <div
-          v-if="item.type == 'chart' && (!item.data || (item.data && item.data.series && item.data.series.lenght == 0))"
+          v-if="!item.isLoading && item.type == 'chart' && (!item.data || (item.data && item.data.series && item.data.series.length == 0))"
           class="ui active dimmer"
           :class="$parent.lightTheme ? 'inverted' : ''"
         >{{$t('dashboard.no_data')}}</div>
         <div
-          v-if="item.type == 'counter' && (!item.data || (item.data && item.data.series && item.data.series.lenght == 0))"
+          v-if="!item.isLoading && item.type == 'counter' && (!item.data || (item.data && item.data.series && item.data.series.length == 0))"
           class="ui active dimmer"
           :class="$parent.lightTheme ? 'inverted' : ''"
         >{{$t('dashboard.no_data')}}</div>
         <div
-          v-if="item.type == 'table' && (!item.data || (item.data && item.data.rows && item.data.rows.lenght == 0))"
+          v-if="!item.isLoading && item.type == 'table' && (!item.data || (item.data && item.data.rows && item.data.rows.length == 0))"
           class="ui active dimmer"
           :class="$parent.lightTheme ? 'inverted' : ''"
         >{{$t('dashboard.no_data')}}</div>
         <div
-          v-if="item.type == 'label' && (!item.data || (item.data && !item.data.value))"
+          v-if="!item.isLoading && item.type == 'label' && (!item.data || (item.data && !item.data.value))"
           class="ui active dimmer"
           :class="$parent.lightTheme ? 'inverted' : ''"
         >{{$t('dashboard.no_data')}}</div>
@@ -729,6 +729,7 @@ export default {
       obj.data = {
         series: []
       };
+      obj.isLoading = true;
 
       obj.newTitle = "";
       obj.title = this.$i18n.t("dashboard.empty_" + obj.type + "_title");
@@ -802,6 +803,7 @@ export default {
               };
               layout.newTitle = "";
               layout.title = layout.text;
+              layout.isLoading = true;
 
               if (this.$parent.isMobile) {
                 layout.w = 12;
@@ -873,6 +875,7 @@ export default {
           success => {
             // get body data
             var widget = success.body.widget;
+            this.gridLayout[index].isLoading = false;
 
             if (widget) {
               this.gridLayout[index].data.title =
@@ -919,6 +922,7 @@ export default {
             window.dispatchEvent(new Event("resize"));
           },
           error => {
+            this.gridLayout[index].isLoading = false;
             this.gridLayout[index].data = null;
             console.error(error);
           }

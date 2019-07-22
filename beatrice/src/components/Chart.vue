@@ -69,6 +69,7 @@ export default {
   methods: {
     initOptions() {
       var context = this;
+
       return {
         chart: {
           toolbar: {
@@ -138,7 +139,13 @@ export default {
           palette: this.palette || "palette1"
         },
         tooltip: {
-          fillSeriesColor: true
+          fillSeriesColor: true,
+          x: {
+            show: true,
+            formatter: function(value, timestamp, index) {
+              return Filters.formatter(context.categories[value - 1], "");
+            }
+          }
         }
       };
     }
