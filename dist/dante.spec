@@ -10,7 +10,7 @@ Summary:	Single stack reports made simple
 
 License:	GPLv3
 URL:	    https://github.com/nethesis/dante	
-Source0:	https://github.com/nethesis/dante/archive/master.tar.gz
+Source0:	dante.tar.gz
 # Execute ./prep-source to create Source1, Source3 and Source4
 Source1:    caronte
 Source2:    dante.sysconf
@@ -27,7 +27,7 @@ BuildRequires: python
 Single stack reports made simple
 
 %prep
-%setup -q -n dante-master
+%setup -q -n dante
 
 %build
 python -m compileall ciacco/lib/squidguard.py

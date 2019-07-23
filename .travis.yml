@@ -36,7 +36,7 @@ before_install:
     - sudo pip install transifex-client
 
 install:
-    - cd dist && ./prep-sources >/dev/null
+    - cd dist && ./prep-sources >/dev/null && cp -r ../.git .
 
 script: >
     docker run -ti --name makerpms ${EVARS}
