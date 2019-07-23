@@ -4,8 +4,8 @@
 %define __strip /bin/true
 
 Name:		dante
-Version:	0.1.1
-Release:	1%{?dist}
+Version: 0.1.2
+Release: 1%{?dist}
 Summary:	Single stack reports made simple
 
 License:	GPLv3
@@ -82,6 +82,9 @@ cp %{SOURCE7} %{buildroot}/etc/httpd/conf.d/
 
 
 %changelog
+* Tue Jul 23 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 0.1.2-1
+- beatrice. small fix in horizontal resize
+
 * Mon Jul 22 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> 0.1.1-1
 - Add Italian translation
 
