@@ -551,13 +551,13 @@ export default {
         w: 6,
         h: 15,
         width: window.innerWidth / 2 - (offset + 3.5 * 6),
-        height: window.innerHeight / 3
+        height: 1000 / 3
       },
       counter: {
         w: 6,
         h: 5,
         width: window.innerWidth / 6,
-        height: window.innerHeight / 12
+        height: 1000 / 12
       },
       table: {
         w: 6,
@@ -686,12 +686,12 @@ export default {
         case "chart":
           defaultW =
             window.innerWidth / (12 / newW) - (this.offset + 3.5 * newW);
-          defaultH = window.innerHeight / 3.5 / (12 / newH);
+          defaultH = 1000 / 3.5 / (12 / newH);
           break;
         case "counter":
           defaultW =
             window.innerWidth / (12 / newW) / 3 - (newW == 12 ? 10 : 0);
-          defaultH = window.innerHeight / 3.5 / (12 / newH) - this.offset * 2;
+          defaultH = 1000 / 3.5 / (12 / newH) - this.offset * 2;
       }
 
       this.gridLayout[i].width = defaultW;
@@ -797,7 +797,7 @@ export default {
                 : (window.innerWidth * layout.width) / 100;
               layout.height = success.body.default
                 ? this.widgetDefaults[layout.type].height
-                : (window.innerHeight * layout.height) / 100;
+                : (1000 * layout.height) / 100;
               layout.data = {
                 series: []
               };
@@ -812,7 +812,7 @@ export default {
                   layout.width = window.innerWidth - 70;
                   layout.height =
                     window.orientation == 90 || window.orientation == -90
-                      ? window.innerHeight / 1.5
+                      ? 1000 / 1.5
                       : layout.height;
                 }
               }
@@ -902,7 +902,7 @@ export default {
               if (widget.type == "list" && widget.data) {
                 this.gridLayout[index].h =
                   (widget.data.length < 10 ? 6 : 10) +
-                  1.75 * widget.data.length;
+                  window.innerHeight/500 * widget.data.length;
               }
               if (widget.type == "table" && widget.rows) {
                 this.gridLayout[index].h = 6 + 1.5 * widget.rows.length;
@@ -939,7 +939,7 @@ export default {
           w: w.w,
           h: w.h,
           width: (w.width * 100) / window.innerWidth,
-          height: (w.height * 100) / window.innerHeight,
+          height: (w.height * 100) / 1000,
           text: w.title || ""
         };
       });
