@@ -545,11 +545,11 @@ export default {
     // set locale
     moment.locale(this.$options.lang);
 
-    var offset = 30;
+    var offset = 50;
     var widgetDefaults = {
       chart: {
         w: 6,
-        h: 15,
+        h: 16,
         width: window.innerWidth / 2 - (offset + 3.5 * 6),
         height: 1000 / 3
       },
@@ -686,7 +686,7 @@ export default {
         case "chart":
           defaultW =
             window.innerWidth / (12 / newW) - (this.offset + 3.5 * newW);
-          defaultH = 1000 / 3.5 / (12 / newH);
+          defaultH = 1000 / 3.5 / (12 / newH) - this.offset;
           break;
         case "counter":
           defaultW =
@@ -902,7 +902,7 @@ export default {
               if (widget.type == "list" && widget.data) {
                 this.gridLayout[index].h =
                   (widget.data.length < 10 ? 6 : 10) +
-                  window.innerHeight/500 * widget.data.length;
+                  (window.innerHeight / 500) * widget.data.length;
               }
               if (widget.type == "table" && widget.rows) {
                 this.gridLayout[index].h = 6 + 1.5 * widget.rows.length;
