@@ -82,7 +82,7 @@ cp %{SOURCE7} %{buildroot}/etc/httpd/conf.d/
 
 
 %changelog
-* Mon Jul 21 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> 0.1.1-1
+* Mon Jul 22 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> 0.1.1-1
 - Add Italian translation
 
 * Fri Jul 19 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> 0.1.0-1
