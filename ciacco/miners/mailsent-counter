@@ -42,7 +42,7 @@ grep -E "$DAY" /var/log/maillog >> $TMP_FILE
 
 value=0
 
-value=$(grep "postfix/smtp" $TMP_FILE | wc -l)
+value=$(grep -E 'postfix\/smtp\[.*status=sent' $TMP_FILE | wc -l)
 
 id=$(basename $0)
 type=$(basename $0 | cut -d'-' -f2)
