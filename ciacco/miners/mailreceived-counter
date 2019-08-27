@@ -42,8 +42,7 @@ grep -E "$DAY" /var/log/maillog >> $TMP_FILE
 
 value=0
 
-value=$(grep "postfix/smtpd" $TMP_FILE | wc -l)
-value=$((value+$(grep "default: F (no action)" $TMP_FILE | wc -l)))
+value=$(grep -E 'postfix\/lmtp\[.*status=sent' $TMP_FILE | wc -l)
 
 id=$(basename $0)
 type=$(basename $0 | cut -d'-' -f2)
