@@ -4,7 +4,7 @@
 %define __strip /bin/true
 
 Name:		dante
-Version: 0.1.2
+Version: 0.1.3
 Release: 1%{?dist}
 Summary:	Single stack reports made simple
 
@@ -82,6 +82,9 @@ cp %{SOURCE7} %{buildroot}/etc/httpd/conf.d/
 
 
 %changelog
+* Tue Aug 27 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 0.1.3-1
+- Fix mail counters
+
 * Tue Jul 23 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 0.1.2-1
 - beatrice. small fix in horizontal resize
 
