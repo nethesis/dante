@@ -7,12 +7,16 @@
     "last_week": "Last week",
     "last_month": "Last month",
     "last_halfyear": "Last 6 months",
+    "custom_interval": "Custom interval",
     "colors": "Colors",
     "palette": "Palette",
     "light_theme": "Light theme",
     "dark_theme": "Dark theme",
     "data_not_available_in_range": "Data not available in this date range",
-    "search": "Search"
+    "search": "Search",
+    "start_date": "Start date",
+    "end_date": "End date",
+    "ok": "Ok"
   },
   "dashboard": {
     "cancel": "Cancel",
@@ -53,6 +57,7 @@
     "last_week": "Last week",
     "last_month": "Last month",
     "last_halfyear": "Last 6 months",
+    "last_custom": "Custom interval",
     "weekly": "Weekly report",
     "monthly": "Monthly report",
     "halfyearly": "Half-yearly report"

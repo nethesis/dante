@@ -55,6 +55,33 @@ http://www.nethesis.it - info@nethesis.it
               :class="[lightTheme ? '' : 'inverted', filterDate == 'halfyear' ? 'active' : '']"
             >{{$t('home.last_halfyear')}}</button>
           </span>
+          <span data-position="bottom center">
+            <button
+              @click="setFilterDate('custom')"
+              class="ui button"
+              :class="[lightTheme ? '' : 'inverted', filterDate == 'custom' ? 'active' : '']"
+            >{{$t('home.custom_interval')}}</button>
+          </span>
+        </div>
+        <div v-if="showCustomInterval" class="customIntervalPanel">
+          <div>
+            <datepicker
+              class="datepicker"
+              :class="lightTheme ? '' : 'inverted'"
+              :placeholder="$t('home.start_date')"
+              v-model="customStartDate"
+              :disabled-dates="disabledDates"
+            ></datepicker>
+          </div>
+          <div>
+            <datepicker
+              class="datepicker"
+              :class="lightTheme ? '' : 'inverted'"
+              :placeholder="$t('home.end_date')"
+              v-model="customEndDate"
+              :disabled-dates="disabledDates"
+            ></datepicker>
+          </div>
         </div>
       </div>
       <div class="item">
@@ -139,6 +166,9 @@ http://www.nethesis.it - info@nethesis.it
 </template>
 
 <script>
+import Datepicker from 'vuejs-datepicker';
+var moment = require("moment");
+
 export default {
   name: "home",
   mounted() {
@@ -148,6 +178,9 @@ export default {
       this.$t("caronte.last_" + this.$route.query.last);
   },
   data() {
+    // set locale
+    moment.locale(this.$options.lang);
+
     return {
       lightTheme: this.$route.query.theme
         ? this.$route.query.theme == "light"
@@ -159,8 +192,18 @@ export default {
       isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
         navigator.userAgent
       ),
-      maxDays: 0
+      maxDays: 0,
+      customStartDate: moment().subtract(7, "days").startOf("day").toDate(),
+      customEndDate: moment().subtract(1, "days").startOf("day").toDate(),
+      disabledDates: {
+        from: moment().toDate(),
+        to: moment().subtract(181, "days").toDate()
+      },
+      showCustomInterval: false
     };
+  },
+  components: {
+  	Datepicker
   },
   methods: {
     setTheme() {
@@ -173,21 +216,47 @@ export default {
     },
     setFilterDate(last) {
       this.filterDate = last;
-      document.title =
-        this.$i18n.t("home.title") +
-        ": " +
-        this.$i18n.t("caronte.last_" + last);
-      this.updateQuery();
+
+      if (last != "custom") {
+        this.showCustomInterval = false;
+        document.title =
+          this.$i18n.t("home.title") +
+          ": " +
+          this.$i18n.t("caronte.last_" + last);
+        this.updateQuery();
+      } else {
+        // custom interval dates
+        this.showCustomInterval = true;
+        document.title =
+          this.$i18n.t("home.title") +
+          ": " +
+          this.customStartDate +
+          " - " +
+          this.customEndDate +
+        this.updateQuery(true);
+      }
     },
-    updateQuery() {
-      this.$router.push({
-        query: {
+    updateQuery(customInterval) {
+      var query;
+
+      if (customInterval) {
+        query = {
+          theme: this.lightTheme ? "light" : "dark",
+          palette: this.colorPalette,
+          last: this.filterDate,
+          lang: this.language,
+          customStartDate: this.customStartDate,
+          customEndDate: this.customEndDate
+        }
+      } else {
+        query = {
           theme: this.lightTheme ? "light" : "dark",
           palette: this.colorPalette,
           last: this.filterDate,
           lang: this.language
         }
-      });
+      }
+      this.$router.push(query);
     },
     getCurrentPath(route, offset) {
       if (offset) {
@@ -222,5 +291,46 @@ body {
 .ui.inverted.segment,
 .ui.primary.inverted.segment {
   background: #1d1e1e !important;
+}
+.datepicker {
+  font-size: 1rem;
+}
+.datepicker input {
+  text-align: center;
+  border-color: transparent;
+  border-radius: 0.28571429rem;
+  background-color: #f1f1f1;
+  width: 120px;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-left: 10px;
+}
+.datepicker.inverted input {
+  background-color: #1d1e1e;
+  color: white;
+  border-color: #5d5e5e;
+  border-style: solid;
+}
+.customIntervalPanel {
+  display: flex;
+}
+.datepicker.inverted .vdp-datepicker__calendar {
+  background-color: #1d1e1e;
+  color: white;
+}
+.datepicker.inverted .vdp-datepicker__calendar .disabled {
+  color: #5d5e5e;
+}
+.datepicker.inverted .vdp-datepicker__calendar .prev {
+  background-color: #5d5e5e;
+}
+.datepicker.inverted .vdp-datepicker__calendar .next {
+  background-color: #5d5e5e;
+}
+.datepicker.inverted .day__month_btn.up:hover {
+  color: #1d1e1e;
+}
+.datepicker.inverted .month__year_btn.up:hover {
+  color: #1d1e1e;
 }
 </style>
