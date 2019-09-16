@@ -796,6 +796,7 @@ export default {
         success => {
           var layouts = success.body.layout;
           this.$parent.maxDays = success.body.availableDays || 0;
+          this.$parent.disabledDates.to = moment().subtract(success.body.availableDays + 1, "days").toDate()
 
           if (layouts && layouts.length > 0) {
             for (var l in layouts) {
