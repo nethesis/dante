@@ -30,7 +30,7 @@ http://www.nethesis.it - info@nethesis.it
               :disabled="maxDays < 7"
               @click="setFilterDate('week')"
               class="ui button"
-              :class="[lightTheme ? '' : 'inverted', filterDate == 'week' ? 'active' : '']"
+              :class="[lightTheme ? '' : 'inverted', filterDate == 'week' && !showCustomInterval ? 'active' : '']"
             >{{$t('home.last_week')}}</button>
           </span>
           <span
@@ -41,7 +41,7 @@ http://www.nethesis.it - info@nethesis.it
               :disabled="maxDays < 31"
               @click="setFilterDate('month')"
               class="ui button"
-              :class="[lightTheme ? '' : 'inverted', filterDate == 'month' ? 'active' : '']"
+              :class="[lightTheme ? '' : 'inverted', filterDate == 'month' && !showCustomInterval ? 'active' : '']"
             >{{$t('home.last_month')}}</button>
           </span>
           <span
@@ -52,91 +52,35 @@ http://www.nethesis.it - info@nethesis.it
               :disabled="maxDays < 181"
               @click="setFilterDate('halfyear')"
               class="ui button"
-              :class="[lightTheme ? '' : 'inverted', filterDate == 'halfyear' ? 'active' : '']"
+              :class="[lightTheme ? '' : 'inverted', filterDate == 'halfyear' && !showCustomInterval ? 'active' : '']"
             >{{$t('home.last_halfyear')}}</button>
           </span>
           <span data-position="bottom center">
             <button
-              @click="setFilterDate('custom')"
-              class="ui button"
-              :class="[lightTheme ? '' : 'inverted', filterDate == 'custom' ? 'active' : '']"
+              @click="setCustomInterval()"
+              class="ui button mg-left-15"
+              :class="[lightTheme ? '' : 'inverted', showCustomInterval ? 'active' : '']"
             >{{$t('home.custom_interval')}}</button>
           </span>
         </div>
-        <div v-if="showCustomInterval" class="customIntervalPanel">
-          <div>
-            <datepicker
-              class="datepicker"
-              :class="lightTheme ? '' : 'inverted'"
-              :placeholder="$t('home.start_date')"
-              v-model="customStartDate"
-              :disabled-dates="disabledDates"
-            ></datepicker>
-          </div>
-          <div>
-            <datepicker
-              class="datepicker"
-              :class="lightTheme ? '' : 'inverted'"
-              :placeholder="$t('home.end_date')"
-              v-model="customEndDate"
-              :disabled-dates="disabledDates"
-            ></datepicker>
-          </div>
-        </div>
-      </div>
-      <div class="item">
-        <div class="ui compact menu" :class="lightTheme ? '' : 'inverted'">
-          <div class="ui simple dropdown item">
-            {{$t('home.colors')}}
-            <i class="dropdown icon"></i>
-            <div class="menu">
-              <div
-                @click="setPalette(1)"
-                class="item"
-                :class="colorPalette == 'palette1' ? 'selected' : ''"
-              >{{$t('home.palette')}} 1</div>
-              <div
-                @click="setPalette(2)"
-                class="item"
-                :class="colorPalette == 'palette2' ? 'selected' : ''"
-              >{{$t('home.palette')}} 2</div>
-              <div
-                @click="setPalette(3)"
-                class="item"
-                :class="colorPalette == 'palette3' ? 'selected' : ''"
-              >{{$t('home.palette')}} 3</div>
-              <div
-                @click="setPalette(4)"
-                class="item"
-                :class="colorPalette == 'palette4' ? 'selected' : ''"
-              >{{$t('home.palette')}} 4</div>
-              <div
-                @click="setPalette(5)"
-                class="item"
-                :class="colorPalette == 'palette5' ? 'selected' : ''"
-              >{{$t('home.palette')}} 5</div>
-              <div
-                @click="setPalette(6)"
-                class="item"
-                :class="colorPalette == 'palette6' ? 'selected' : ''"
-              >{{$t('home.palette')}} 6</div>
-              <div
-                @click="setPalette(7)"
-                class="item"
-                :class="colorPalette == 'palette7' ? 'selected' : ''"
-              >{{$t('home.palette')}} 7</div>
-              <div
-                @click="setPalette(8)"
-                class="item"
-                :class="colorPalette == 'palette8' ? 'selected' : ''"
-              >{{$t('home.palette')}} 8</div>
-              <div
-                @click="setPalette(9)"
-                class="item"
-                :class="colorPalette == 'palette9' ? 'selected' : ''"
-              >{{$t('home.palette')}} 9</div>
-            </div>
-          </div>
+        <div v-show="showCustomInterval" class="customIntervalPanel">
+          <datepicker
+            class="datepicker"
+            :class="lightTheme ? '' : 'inverted'"
+            :placeholder="$t('home.start_date')"
+            v-model="customStartDate"
+            :disabled-dates="disabledDates"
+            id="customStartDate"
+          ></datepicker>
+          <span class="mg-left-5">{{$t('home.to')}}</span>
+          <datepicker
+            class="datepicker"
+            :class="lightTheme ? '' : 'inverted'"
+            :placeholder="$t('home.end_date')"
+            v-model="customEndDate"
+            :disabled-dates="disabledDates"
+            id="customEndDate"
+          ></datepicker>
         </div>
       </div>
       <div class="right menu">
@@ -150,12 +94,67 @@ http://www.nethesis.it - info@nethesis.it
           </div>
         </div>
         <div class="item">
-          <div
-            id="toggleTheme"
-            @click="setTheme()"
-            class="ui button"
-            :class="lightTheme ? 'black' : 'inverted'"
-          >{{lightTheme ? $t('home.dark_theme') : $t('home.light_theme')}}</div>
+          <div class="ui buttons">
+            <div
+              id="toggleTheme"
+              @click="setTheme()"
+              class="ui button"
+              :class="lightTheme ? 'black' : 'inverted'"
+            >{{lightTheme ? $t('home.dark_theme') : $t('home.light_theme')}}</div>
+          </div>
+          <div class="ui compact menu mg-left-10" :class="lightTheme ? '' : 'inverted'">
+            <div class="ui simple dropdown item">
+              {{$t('home.colors')}}
+              <i class="dropdown icon"></i>
+              <div class="menu">
+                <div
+                  @click="setPalette(1)"
+                  class="item"
+                  :class="colorPalette == 'palette1' ? 'selected' : ''"
+                >{{$t('home.palette')}} 1</div>
+                <div
+                  @click="setPalette(2)"
+                  class="item"
+                  :class="colorPalette == 'palette2' ? 'selected' : ''"
+                >{{$t('home.palette')}} 2</div>
+                <div
+                  @click="setPalette(3)"
+                  class="item"
+                  :class="colorPalette == 'palette3' ? 'selected' : ''"
+                >{{$t('home.palette')}} 3</div>
+                <div
+                  @click="setPalette(4)"
+                  class="item"
+                  :class="colorPalette == 'palette4' ? 'selected' : ''"
+                >{{$t('home.palette')}} 4</div>
+                <div
+                  @click="setPalette(5)"
+                  class="item"
+                  :class="colorPalette == 'palette5' ? 'selected' : ''"
+                >{{$t('home.palette')}} 5</div>
+                <div
+                  @click="setPalette(6)"
+                  class="item"
+                  :class="colorPalette == 'palette6' ? 'selected' : ''"
+                >{{$t('home.palette')}} 6</div>
+                <div
+                  @click="setPalette(7)"
+                  class="item"
+                  :class="colorPalette == 'palette7' ? 'selected' : ''"
+                >{{$t('home.palette')}} 7</div>
+                <div
+                  @click="setPalette(8)"
+                  class="item"
+                  :class="colorPalette == 'palette8' ? 'selected' : ''"
+                >{{$t('home.palette')}} 8</div>
+                <div
+                  @click="setPalette(9)"
+                  class="item"
+                  :class="colorPalette == 'palette9' ? 'selected' : ''"
+                >{{$t('home.palette')}} 9</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -193,8 +192,8 @@ export default {
         navigator.userAgent
       ),
       maxDays: 0,
-      customStartDate: moment().subtract(7, "days").startOf("day").toDate(),
-      customEndDate: moment().subtract(1, "days").startOf("day").toDate(),
+      customStartDate: null,
+      customEndDate: moment().startOf("day").toDate(),
       disabledDates: {
         from: moment().toDate(),
         to: moment().subtract(181, "days").toDate()
@@ -204,6 +203,14 @@ export default {
   },
   components: {
   	Datepicker
+  },
+  watch: {
+    customStartDate: function() {
+      this.setCustomInterval();
+    },
+    customEndDate: function() {
+      this.setCustomInterval();
+    }
   },
   methods: {
     setTheme() {
@@ -216,24 +223,31 @@ export default {
     },
     setFilterDate(last) {
       this.filterDate = last;
+      this.showCustomInterval = false;
+      document.title =
+        this.$i18n.t("home.title") +
+        ": " +
+        this.$i18n.t("caronte.last_" + last);
+      this.updateQuery();
+    },
+    setCustomInterval() {
+      this.showCustomInterval = true;
 
-      if (last != "custom") {
-        this.showCustomInterval = false;
+      if (this.customStartDate != null && this.customEndDate != null) {
+        this.filterDate = "custom";
         document.title =
           this.$i18n.t("home.title") +
           ": " +
-          this.$i18n.t("caronte.last_" + last);
-        this.updateQuery();
-      } else {
-        // custom interval dates
-        this.showCustomInterval = true;
-        document.title =
-          this.$i18n.t("home.title") +
-          ": " +
-          this.customStartDate +
+          moment(this.customStartDate).format("DD MMM YYYY") +
           " - " +
-          this.customEndDate +
+          moment(this.customEndDate).format("DD MMM YYYY");
         this.updateQuery(true);
+      } else {
+        $('#customStartDate').trigger('click')
+
+        setTimeout(function () {
+          $('#customStartDate').focus()
+        }, 50);
       }
     },
     updateQuery(customInterval) {
@@ -292,18 +306,20 @@ body {
 .ui.primary.inverted.segment {
   background: #1d1e1e !important;
 }
+
 .datepicker {
   font-size: 1rem;
 }
+
 .datepicker input {
   text-align: center;
   border-color: transparent;
   border-radius: 0.28571429rem;
   background-color: #f1f1f1;
-  width: 120px;
+  width: 115px;
   padding-left: 10px;
   padding-right: 10px;
-  margin-left: 10px;
+  margin-left: 5px;
 }
 .datepicker.inverted input {
   background-color: #1d1e1e;
@@ -311,9 +327,24 @@ body {
   border-color: #5d5e5e;
   border-style: solid;
 }
+
 .customIntervalPanel {
   display: flex;
+  align-items: center;
 }
+
+.mg-left-5 {
+  margin-left: 5px !important;
+}
+
+.mg-left-10 {
+  margin-left: 10px !important;
+}
+
+.mg-left-15 {
+  margin-left: 15px !important;
+}
+
 .datepicker.inverted .vdp-datepicker__calendar {
   background-color: #1d1e1e;
   color: white;
@@ -332,5 +363,10 @@ body {
 }
 .datepicker.inverted .month__year_btn.up:hover {
   color: #1d1e1e;
+}
+
+#customStartDate:focus, #customEndDate:focus, .customDateFocus {
+  outline-width: 0;
+  border: 1px solid #5d5e5e !important;
 }
 </style>

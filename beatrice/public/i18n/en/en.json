@@ -16,7 +16,8 @@
     "search": "Search",
     "start_date": "Start date",
     "end_date": "End date",
-    "ok": "Ok"
+    "ok": "Ok",
+    "to": "To"
   },
   "dashboard": {
     "cancel": "Cancel",

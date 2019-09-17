@@ -16,7 +16,8 @@
     "search": "Cerca",
     "start_date": "Data inizio",
     "end_date": "Data fine",
-    "ok": "Ok"
+    "ok": "Ok",
+    "to": "A"
   },
   "dashboard": {
     "cancel": "Cancella",
