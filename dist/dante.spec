@@ -4,7 +4,7 @@
 %define __strip /bin/true
 
 Name:		dante
-Version: 0.1.3
+Version: 0.1.4
 Release: 1%{?dist}
 Summary:	Single stack reports made simple
 
@@ -82,6 +82,9 @@ cp %{SOURCE7} %{buildroot}/etc/httpd/conf.d/
 
 
 %changelog
+* Wed Sep 18 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 0.1.4-1
+- Statistics on OpenVPN connections - NethServer/dev#5827
+
 * Tue Aug 27 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 0.1.3-1
 - Fix mail counters
 
