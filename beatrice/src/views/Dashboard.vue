@@ -534,6 +534,12 @@ export default {
     },
     "$parent.filterDate": function() {
       this.getLayout();
+    },
+    "$parent.customStartDate": function() {
+      this.getLayout();
+    },
+    "$parent.customEndDate": function() {
+      this.getLayout();
     }
   },
   mounted() {
@@ -623,6 +629,15 @@ export default {
               " - " +
               moment()
                 .subtract(1, "days")
+                .format("DD MMM YYYY");
+            break;
+
+          case "custom":
+            dateRange =
+              moment(this.$parent.customStartDate)
+                .format("DD MMM YYYY") +
+              " - " +
+              moment(this.$parent.customEndDate)
                 .format("DD MMM YYYY");
             break;
         }
@@ -781,6 +796,7 @@ export default {
         success => {
           var layouts = success.body.layout;
           this.$parent.maxDays = success.body.availableDays || 0;
+          this.$parent.disabledDates.to = moment().subtract(success.body.availableDays + 1, "days").toDate()
 
           if (layouts && layouts.length > 0) {
             for (var l in layouts) {
@@ -858,6 +874,11 @@ export default {
           startDate = moment()
             .subtract(6, "months")
             .startOf("day");
+          break;
+
+        case "custom":
+          startDate = moment(this.$parent.customStartDate);
+          endDate = moment(this.$parent.customEndDate);
           break;
       }
 
