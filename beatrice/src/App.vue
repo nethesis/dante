@@ -65,8 +65,7 @@ http://www.nethesis.it - info@nethesis.it
         </div>
         <div v-show="showCustomInterval" class="customIntervalPanel">
           <datepicker
-            class="datepicker"
-            :class="lightTheme ? '' : 'inverted'"
+            :class="['datepicker', lightTheme ? '' : 'inverted', customIntervalError ? 'customIntervalError' : '']"
             :placeholder="$t('home.start_date')"
             v-model="customStartDate"
             :disabled-dates="disabledDates"
@@ -74,8 +73,7 @@ http://www.nethesis.it - info@nethesis.it
           ></datepicker>
           <span class="mg-left-5">{{$t('home.to')}}</span>
           <datepicker
-            class="datepicker"
-            :class="lightTheme ? '' : 'inverted'"
+            :class="['datepicker', lightTheme ? '' : 'inverted', customIntervalError ? 'customIntervalError' : '']"
             :placeholder="$t('home.end_date')"
             v-model="customEndDate"
             :disabled-dates="disabledDates"
@@ -174,7 +172,7 @@ export default {
     document.title =
       this.$t("home.title") +
       ": " +
-      this.$t("caronte.last_" + this.$route.query.last);
+      this.$t("caronte.last_" + (this.$route.query.last || "week"));
   },
   data() {
     // set locale
@@ -192,13 +190,14 @@ export default {
         navigator.userAgent
       ),
       maxDays: 0,
-      customStartDate: null,
-      customEndDate: moment().startOf("day").toDate(),
+      customStartDate: this.getDate(this.$route.query.customStartDate),
+      customEndDate: this.initCustomEndDate(),
       disabledDates: {
-        from: moment().toDate(),
-        to: moment().subtract(181, "days").toDate()
+        from: moment().startOf("day").toDate(),
+        to: moment().startOf("day").subtract(181, "days").toDate()
       },
-      showCustomInterval: false
+      showCustomInterval: this.$route.query.last === 'custom',
+      customIntervalError: false
     };
   },
   components: {
@@ -213,6 +212,25 @@ export default {
     }
   },
   methods: {
+    getDate(dateString) {
+      var momentDate = moment(dateString, 'YYYY-MM-DD');
+
+      if (momentDate && momentDate.toDate() != 'Invalid Date') {
+        return momentDate.toDate();
+      } else {
+        return null;
+      }
+    },
+    initCustomEndDate() {
+      var date = this.getDate(this.$route.query.customEndDate);
+
+      if (date === null) {
+        // return today as default value
+        return moment().startOf("day").toDate();
+      } else {
+        return date;
+      }
+    },
     setTheme() {
       this.lightTheme = !this.lightTheme;
       this.updateQuery();
@@ -232,8 +250,13 @@ export default {
     },
     setCustomInterval() {
       this.showCustomInterval = true;
+      this.customIntervalError = false;
 
-      if (this.customStartDate != null && this.customEndDate != null) {
+      if (this.customStartDate != null && this.customEndDate != null &&
+          moment(this.customStartDate).startOf("day").toDate() > this.customEndDate) {
+        // start date is after end date
+        this.customIntervalError = true;
+      } else if (this.customStartDate != null && this.customEndDate != null) {
         this.filterDate = "custom";
         document.title =
           this.$i18n.t("home.title") +
@@ -241,8 +264,9 @@ export default {
           moment(this.customStartDate).format("DD MMM YYYY") +
           " - " +
           moment(this.customEndDate).format("DD MMM YYYY");
-        this.updateQuery(true);
+        this.updateQuery();
       } else {
+        // user has to choose start date
         $('#customStartDate').trigger('click')
 
         setTimeout(function () {
@@ -250,17 +274,17 @@ export default {
         }, 50);
       }
     },
-    updateQuery(customInterval) {
+    updateQuery() {
       var query;
 
-      if (customInterval) {
+      if (this.customStartDate !== null && this.filterDate === 'custom') {
         query = {
           theme: this.lightTheme ? "light" : "dark",
           palette: this.colorPalette,
           last: this.filterDate,
           lang: this.language,
-          customStartDate: this.customStartDate,
-          customEndDate: this.customEndDate
+          customStartDate: moment(this.customStartDate).format("YYYY-MM-DD"),
+          customEndDate: moment(this.customEndDate).format("YYYY-MM-DD")
         }
       } else {
         query = {
@@ -270,7 +294,7 @@ export default {
           lang: this.language
         }
       }
-      this.$router.push(query);
+      this.$router.push({ query: query });
     },
     getCurrentPath(route, offset) {
       if (offset) {
@@ -365,8 +389,13 @@ body {
   color: #1d1e1e;
 }
 
+.datepicker.customIntervalError input {
+  background-color: #ca1010 !important;
+  color: white;
+}
+
 #customStartDate:focus, #customEndDate:focus, .customDateFocus {
   outline-width: 0;
-  border: 1px solid #5d5e5e !important;
+  border: 1px solid #5d5e5e;
 }
 </style>
