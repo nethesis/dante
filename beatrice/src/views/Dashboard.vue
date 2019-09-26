@@ -536,10 +536,16 @@ export default {
       this.getLayout();
     },
     "$parent.customStartDate": function() {
-      this.getLayout();
+      if (this.$parent.customStartDate != null && this.$parent.customEndDate != null &&
+          this.$parent.customStartDate <= this.$parent.customEndDate) {
+        this.getLayout();
+      }
     },
     "$parent.customEndDate": function() {
-      this.getLayout();
+      if (this.$parent.customStartDate != null && this.$parent.customEndDate != null &&
+          this.$parent.customStartDate <= this.$parent.customEndDate) {
+        this.getLayout();
+      }
     }
   },
   mounted() {
