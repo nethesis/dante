@@ -4,7 +4,7 @@
 %define __strip /bin/true
 
 Name:		dante
-Version: 0.1.4
+Version: 0.2.0
 Release: 1%{?dist}
 Summary:	Single stack reports made simple
 
@@ -82,6 +82,9 @@ cp %{SOURCE7} %{buildroot}/etc/httpd/conf.d/
 
 
 %changelog
+* Fri Sep 27 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 0.2.0-1
+- Weekly reports: allow the user to enter a custom time interval - nethesis/dev#5698
+
 * Wed Sep 18 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 0.1.4-1
 - Statistics on OpenVPN connections - NethServer/dev#5827
 
