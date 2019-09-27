@@ -193,7 +193,7 @@ export default {
       customStartDate: this.getDate(this.$route.query.customStartDate),
       customEndDate: this.initCustomEndDate(),
       disabledDates: {
-        from: moment().startOf("day").toDate(),
+        from: moment().toDate(),
         to: moment().startOf("day").subtract(181, "days").toDate()
       },
       showCustomInterval: this.$route.query.last === 'custom',
