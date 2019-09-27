@@ -205,7 +205,6 @@ http://www.nethesis.it - info@nethesis.it
                 :height="item.height"
                 :theme="$parent.lightTheme"
                 :palette="$parent.colorPalette"
-                :title="item.data.title"
                 :labels="item.data.labels"
                 :sparkline="true"
                 :unit="item.data.unit"
