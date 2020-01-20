@@ -47,7 +47,6 @@ my $i = 0;
 open(my $fh, "du -b --max-depth=1 -c /var/lib/nethserver/nextcloud/ 2>/dev/null| sort -n -r |");
 while (readline($fh)) {
     $i++;
-    next if ($i <= 3); # skip total lines
     my ($bytes, $dir) = split(/\s+/, $_);
     my $name = basename($dir);
     if ($users->{$name}) {
