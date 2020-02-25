@@ -2,22 +2,22 @@
 
 #
 # Copyright (C) 2020 Nethesis S.r.l.
-# http://www.nethesis.it - nethserver@nethesis.it
+# http://www.nethesis.it - info@nethesis.it
 #
-# This script is part of NethServer.
+# This script is part of Dante.
 #
-# NethServer is free software: you can redistribute it and/or modify
+# Dante is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License,
 # or any later version.
 #
-# NethServer is distributed in the hope that it will be useful,
+# Dante is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with NethServer.  If not, see COPYING.
+# along with Dante.  If not, see COPYING.
 #
 
 #
@@ -81,11 +81,14 @@ sub get_category {
     return $category_cache{$ip}
 }
 
+
+my $log = "/var/log/firewall.log";
 my $date = strftime "%b %d", localtime;
+my $yesterday = strftime "%Y%m%d", localtime(time() - (24 * 60 * 60));
+my $previous_log = $log."-$yesterday";
+my $previous_log_gz = $previous_log.".gz";
 
-my $filename = "/var/log/firewall.log";
-
-if (! -f $filename) {
+if (! -f $log) {
     exit 1;
 }
 
@@ -134,57 +137,33 @@ my %categories;
 foreach (keys %sets) {
     $categories{$_} = 0;
 }
-open(my $fh, '<:encoding(UTF-8)', $filename) or die "Could not open file '$filename' $!";
 
-while (my $row = <$fh>) {
-    # skip lines not from today
-    next if ($row !~ /^$date/);
-    chomp $row;
+open(PIPE, "zgrep '$date' $log $previous_log $previous_log_gz 2>/dev/null | grep blacklst | grep -Eo 'SRC=([0-9]{1,3}[\.]){3}[0-9]{1,3} DST=([0-9]{1,3}[\.]){3}[0-9]{1,3}'| tr '=' ' '|");
+while (my $row = <PIPE>) {
 
-    next if($row !~ /Shorewall\:blacklst/);
+    my ($src_s, $src, $dst_s, $dst) = split(/\s/, $row);
     
-    my $src_is_local = 0;
-    my $dst_is_local = 0;
-    my ($month, $day, $time, $host, $prog, $chain, $out, $mac, $src, $dst, $len) = split(/\s/,$row, 11);
-    my ($h, $m, $s) = split(/:/,$time);
+    my $src_is_local = is_local($src);
+    my $dst_is_local = is_local($dst);
 
-    # sometimes mac is empty
-    if ($mac =~ /SRC/) {
-        $src = $mac;
-    }
-    if ($mac =~ /DST/) {
-        $dst = $mac;
+    # find category
+    if (!$src_is_local) {
+        my $category = get_category(\%sets, $src);
+        $categories{$category}++ if ($category);
     }
 
-    # hits by source
-    if ($src =~ /^SRC/) {
-        $src = (split(/=/,$src))[1];
-        $src_is_local = is_local($src);
 
-        # find category
-        if (!$src_is_local) {
-            my $category = get_category(\%sets, $src);
-            $categories{$category}++ if ($category);
-        }
-    }
-
-    # hits by destination
-    if ($dst =~ /^DST/) {
-        $dst = (split(/=/,$dst))[1];
-        $dst_is_local = is_local($dst);
-
-        # find category
-        if (!$dst_is_local) {
-            my $category = get_category(\%sets, $dst);
-            $categories{$category}++ if ($category);
-        }
+    # find category
+    if (!$dst_is_local) {
+        my $category = get_category(\%sets, $dst);
+        $categories{$category}++ if ($category);
     }
 
     if ($src_is_local && $dst_is_local) {
         $categories{'bogons'}++;
     }
 }
-close($fh);
+close(PIPE);
 
 print encode_json({
         minerId => basename($0),
