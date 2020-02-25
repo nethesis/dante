@@ -1,0 +1,84 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2020 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+#
+# Return blacklists statistics in JSON format
+#
+
+use strict;
+use warnings;
+use POSIX qw(strftime);
+use JSON;
+use esmith::NetworksDB;
+use File::Basename;
+
+my $date = strftime "%b %d", localtime;
+
+my $filename = "/var/log/firewall.log";
+
+if (! -f $filename) {
+    exit 1;
+}
+
+open(my $fh, '<:encoding(UTF-8)', $filename) or die "Could not open file '$filename' $!";
+
+my %destinations;
+
+while (my $row = <$fh>) {
+    # skip lines not from today
+    next if ($row !~ /^$date/);
+    chomp $row;
+
+    next if($row !~ /Shorewall\:blacklst/);
+    
+    my ($month, $day, $time, $host, $prog, $chain, $out, $mac, $src, $dst, $len) = split(/\s/,$row, 11);
+
+    # sometimes mac is empty
+    if ($mac =~ /DST/) {
+        $dst = $mac;
+    }
+
+    # hits by destination
+    if ($dst =~ /^DST/) {
+        $dst = (split(/=/,$dst))[1];
+        if (!defined($destinations{$dst})) {
+            $destinations{$dst} = 0;
+        }
+        $destinations{$dst}++;
+    }
+}
+
+close($fh);
+
+my @data;
+foreach (sort { $destinations{$b} <=> $destinations{$a} } keys %destinations) {
+    push(@data, {'name' => $_, 'count' => $destinations{$_}});
+}
+
+print encode_json({
+        minerId => basename($0),
+        type => "list",
+        data => \@data,
+        unit => "number",
+        anonymizable => JSON::true,
+        aggregationType => "sum"
+    });

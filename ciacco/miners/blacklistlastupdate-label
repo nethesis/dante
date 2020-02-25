@@ -1,0 +1,36 @@
+#!/bin/bash
+
+#
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - info@nethesis.it
+#
+# This script is part of Dante.
+#
+# Dante is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# Dante is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Dante.  If not, see COPYING.
+#
+
+# Return last blacklist update
+
+DIR=/usr/share/blacklists/ipsets/
+if [ ! -d $DIR ]; then
+    exit 1
+fi
+
+value=$(git --git-dir=$DIR/.git/ --work-tree=$DIR log -n1 --format="%ci")
+value=$(stat -c %y /var/squidGuard/blacklists/ | cut -d . -f 1)
+
+id=$(basename $0)
+type=$(basename $0 | cut -d'-' -f2)
+
+echo -n "{\"value\":\"$value\",\"type\":\"$type\",\"minerId\":\"$id\"}"

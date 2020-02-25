@@ -1,0 +1,79 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2020 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+#
+# Return blacklists statistics in JSON format
+#
+
+use strict;
+use warnings;
+use POSIX qw(strftime);
+use JSON;
+use File::Basename;
+
+my $date = strftime "%b %d", localtime;
+
+my $filename = "/var/log/firewall.log";
+
+if (! -f $filename) {
+    exit 1;
+}
+
+my %hours;
+for (my $i=0; $i<=23; $i++) {
+    $hours{sprintf("%02d",$i)} = 0;
+}
+
+open(my $fh, '<:encoding(UTF-8)', $filename) or die "Could not open file '$filename' $!";
+while (my $row = <$fh>) {
+    # skip lines not from today
+    next if ($row !~ /^$date/);
+    chomp $row;
+
+    next if($row !~ /Shorewall\:blacklst/);
+    
+    my ($month, $day, $time, $extra) = split(/\s/,$row, 4);
+    my ($h, $m, $s) = split(/:/,$time);
+
+    $hours{$h}++;
+}
+
+close($fh);
+
+my @categories;
+my @data;
+
+foreach (sort keys %hours) {
+    push(@categories, $_);
+    push(@data, $hours{$_});
+}
+
+print encode_json({
+        minerId => basename($0),
+        type => "chart",
+        chartType => "area",
+        aggregationType => "number",
+        categories => \@categories,
+        anonymizable => JSON::false,
+	    unit => "number",
+        series => [ { name => "hours", data => \@data } ]
+    });
