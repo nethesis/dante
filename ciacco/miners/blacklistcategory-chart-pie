@@ -37,7 +37,7 @@ my %category_cache;
 my %local_cache;
 
 sub is_local {
-    my @local_networks = ('10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16');
+    my @local_networks = (NetAddr::IP->new('10.0.0.0/8'), NetAddr::IP->new('172.16.0.0/12'), NetAddr::IP->new('192.168.0.0/16'));
     my $ip = shift;
 
     if (!defined($local_cache{$ip})) {
@@ -47,8 +47,7 @@ sub is_local {
     }
     my $needle = NetAddr::IP->new($ip);
     foreach (@local_networks) {
-        my $haystack = NetAddr::IP->new($_);
-        if ($needle->within($haystack)) {
+        if ($needle->within($_)) {
             $local_cache{$ip} = 1;
             last;
         }
@@ -70,8 +69,7 @@ sub get_category {
     my $needle = NetAddr::IP->new($ip);
     foreach my $c (keys %{$sets}) {
         foreach (@{$sets->{$c}}) {
-            my $haystack = NetAddr::IP->new($_);
-            if ($needle->within($haystack)) {
+            if ($needle->within($_)) {
                 $category_cache{$ip} = $c;
                 last;
             }
@@ -126,7 +124,7 @@ foreach my $set (keys %sets) {
     open(PIPE, "/sbin/ipset -L bl-$set|");
     while (<PIPE>) {
         chomp;
-        push(@ips, $_) if ($_ =~ /^\d/);
+        push(@ips, NetAddr::IP->new($_)) if ($_ =~ /^\d/);
     }
     close(PIPE);
     $sets{$set} = \@ips;
@@ -142,7 +140,6 @@ open(PIPE, "zgrep '$date' $log $previous_log $previous_log_gz 2>/dev/null | grep
 while (my $row = <PIPE>) {
 
     my ($src_s, $src, $dst_s, $dst) = split(/\s/, $row);
-    
     my $src_is_local = is_local($src);
     my $dst_is_local = is_local($dst);
 
@@ -151,7 +148,6 @@ while (my $row = <PIPE>) {
         my $category = get_category(\%sets, $src);
         $categories{$category}++ if ($category);
     }
-
 
     # find category
     if (!$dst_is_local) {
