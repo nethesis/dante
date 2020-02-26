@@ -111,7 +111,7 @@ foreach (NethServer::TrustedNetworks::list_cidr()) {
 my %sets;
 
 # list blacklist sets
-open(PIPE, "ipset -L -name|");
+open(PIPE, "/sbin/ipset -L -name|");
 while (<PIPE>) {
     chomp;
     if ($_ =~ /^bl\-/) {
@@ -123,7 +123,7 @@ close(PIPE);
 # load ipset ip addresses
 foreach my $set (keys %sets) {
     my @ips;
-    open(PIPE, "ipset -L bl-$set|");
+    open(PIPE, "/sbin/ipset -L bl-$set|");
     while (<PIPE>) {
         chomp;
         push(@ips, $_) if ($_ =~ /^\d/);
