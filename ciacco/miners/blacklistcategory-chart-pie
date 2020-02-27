@@ -35,9 +35,9 @@ use File::Basename;
 
 my %category_cache;
 my %local_cache;
+my @private_networks = (NetAddr::IP->new('10.0.0.0/8'), NetAddr::IP->new('172.16.0.0/12'), NetAddr::IP->new('192.168.0.0/16'));
 
 sub is_local {
-    my @local_networks = (NetAddr::IP->new('10.0.0.0/8'), NetAddr::IP->new('172.16.0.0/12'), NetAddr::IP->new('192.168.0.0/16'));
     my $ip = shift;
 
     if (!defined($local_cache{$ip})) {
@@ -46,7 +46,7 @@ sub is_local {
         return $local_cache{$ip};
     }
     my $needle = NetAddr::IP->new($ip);
-    foreach (@local_networks) {
+    foreach (@private_networks) {
         if ($needle->within($_)) {
             $local_cache{$ip} = 1;
             last;
@@ -143,6 +143,8 @@ while (my $row = <PIPE>) {
     my $src_is_local = is_local($src);
     my $dst_is_local = is_local($dst);
 
+    next if ($src_is_local && $dst_is_local);
+
     # find category
     if (!$src_is_local) {
         my $category = get_category(\%sets, $src);
@@ -153,10 +155,6 @@ while (my $row = <PIPE>) {
     if (!$dst_is_local) {
         my $category = get_category(\%sets, $dst);
         $categories{$category}++ if ($category);
-    }
-
-    if ($src_is_local && $dst_is_local) {
-        $categories{'bogons'}++;
     }
 }
 close(PIPE);
