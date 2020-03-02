@@ -25,7 +25,7 @@
 id=$(basename $0)
 type=$(basename $0 | cut -d'-' -f2)
 
-value=$(grep "$(date +"%b %d")" /var/log/firewall.log | grep blacklst | wc -l)
+value=$(grep "$(date +"%b %e")" /var/log/firewall.log | grep blacklst | wc -l)
 trend="percentage"
 aggregation='sum'
 unit="number"

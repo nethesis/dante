@@ -81,7 +81,7 @@ sub get_category {
 
 
 my $log = "/var/log/firewall.log";
-my $date = strftime "%b %d", localtime;
+my $date = strftime "%b %w", localtime;
 my $yesterday = strftime "%Y%m%d", localtime(time() - (24 * 60 * 60));
 my $previous_log = $log."-$yesterday";
 my $previous_log_gz = $previous_log.".gz";

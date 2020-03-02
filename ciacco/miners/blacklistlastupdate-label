@@ -22,13 +22,12 @@
 
 # Return last blacklist update
 
-DIR=/usr/share/blacklists/ipsets/
+DIR=/usr/share/nethserver-blacklist/ipsets/
 if [ ! -d $DIR ]; then
     exit 1
 fi
 
 value=$(git --git-dir=$DIR/.git/ --work-tree=$DIR log -n1 --format="%ci")
-value=$(stat -c %y /var/squidGuard/blacklists/ | cut -d . -f 1)
 
 id=$(basename $0)
 type=$(basename $0 | cut -d'-' -f2)
