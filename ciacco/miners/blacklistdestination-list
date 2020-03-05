@@ -28,7 +28,7 @@ use strict;
 use warnings;
 use POSIX qw(strftime);
 use JSON;
-use esmith::NetworksDB;
+use esmith::ConfigDB;
 use File::Basename;
 
 my $log = "/var/log/firewall.log";
@@ -36,8 +36,10 @@ my $date = strftime "%b %e", localtime;
 my $yesterday = strftime "%Y%m%d", localtime(time() - (24 * 60 * 60));
 my $previous_log = $log."-$yesterday";
 my $previous_log_gz = $previous_log.".gz";
+my $db = esmith::ConfigDB->open_ro();
+my $status = $db->get_prop('blacklist', 'status') || 'disabled';
 
-if (! -f $log) {
+if (! -f $log || $status ne 'enabled') {
     exit 1;
 }
 

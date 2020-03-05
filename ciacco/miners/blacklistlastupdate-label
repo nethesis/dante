@@ -23,7 +23,9 @@
 # Return last blacklist update
 
 DIR=/usr/share/nethserver-blacklist/ipsets/
-if [ ! -d $DIR ]; then
+status=$(/sbin/e-smith/config getprop blacklist status)
+
+if [ ! -d $DIR ] || [ "$status" != "enabled" ] ; then
     exit 1
 fi
 
