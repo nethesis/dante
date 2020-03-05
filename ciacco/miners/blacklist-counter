@@ -25,9 +25,31 @@
 id=$(basename $0)
 type=$(basename $0 | cut -d'-' -f2)
 
-value=$(grep "$(date +"%b %e")" /var/log/firewall.log | grep blacklst | wc -l)
+TMP_FILE=$(mktemp)
+LOG="/var/log/firewall.log"
+DAY=$(date +"%b %e")
+status=$(/sbin/e-smith/config getprop blacklist status)
+
+# Exit if blacklist is not installed or log is empty
+if [ ! -f $LOG ] || [ ! -f /etc/e-smith/db/configuration/defaults/blacklist/type ] || [ "$status" != "enabled" ]; then
+    exit 1
+fi
+
+PREVIOUS_LOG=$(find $(dirname $LOG) -name firewall.log-\* -type f -printf '%T@ %p\n' 2> /dev/null | sort -n | tail -1 | cut -f2- -d" ")
+
+if [ -f "$PREVIOUS_LOG" ] || [ -f "$PREVIOUS_LOG.gz" ]; then
+    zgrep "$DAY" $PREVIOUS_LOG*  > $TMP_FILE
+fi
+
+grep "$DAY" $LOG >> $TMP_FILE
+
+value=$(grep "blacklst" $TMP_FILE | grep blacklst | wc -l)
 trend="percentage"
 aggregation='sum'
 unit="number"
 
-echo -n "{\"value\":$value,\"type\":\"$type\",\"minerId\":\"$id\",\"aggregationType\":\"$aggregation\",\"trendType\":\"$trend\",\"unit\":\"$unit\"}"
+if [ "$status" == "enabled" ]; then
+    echo -n "{\"value\":$value,\"type\":\"$type\",\"minerId\":\"$id\",\"aggregationType\":\"$aggregation\",\"trendType\":\"$trend\",\"unit\":\"$unit\"}"
+fi
+
+rm -f $TMP_FILE 2>/dev/null
