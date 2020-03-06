@@ -115,6 +115,7 @@ my %sets;
 open(PIPE, "/sbin/ipset -L -name|");
 while (<PIPE>) {
     chomp;
+    next if ($_ eq 'bl-whitelist'); # skip global whitelist
     if ($_ =~ /^bl\-/) {
         $sets{substr($_, 3)} = ();
     }
