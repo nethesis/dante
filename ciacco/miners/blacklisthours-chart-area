@@ -49,7 +49,7 @@ for (my $i=0; $i<=23; $i++) {
     $hours{sprintf("%02d",$i)} = 0;
 }
 
-open(PIPE, "zgrep '$date' $log $previous_log $previous_log_gz 2>/dev/null | grep blacklst|  cut -d ' ' -f3 | cut -d ':' -f1 | sort | uniq -c|");
+open(PIPE, "zgrep '$date' $log $previous_log $previous_log_gz 2>/dev/null | grep blacklst | awk '{print \$3}' | cut -d ':' -f1 | sort | uniq -c|");
 while (my $row = <PIPE>) {
     $row =~ /^\s+(\d+)\s+(.*)$/;
     $hours{$2} = int($1);
