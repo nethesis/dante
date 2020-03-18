@@ -42,7 +42,7 @@ grep -E "$DAY" /var/log/maillog >> $TMP_FILE
 
 value=0
 
-value=$(grep 'rspamd_task_write_log' /var/log/maillog | grep -e "YOMI_WAIT" -e "YOMI_CLEAN" -e "YOMI_SUSPICIOUS" -e "YOMI_VIRUS" $TMP_FILE | wc -l)
+value=$(grep 'rspamd_task_write_log' /var/log/maillog | grep -e "YOMI_WAIT" -e "YOMI_UNKNOWN" -e "YOMI_CLEAN" -e "YOMI_SUSPICIOUS" -e "YOMI_VIRUS" $TMP_FILE | wc -l)
 
 id=$(basename $0)
 type=$(basename $0 | cut -d'-' -f2)
@@ -54,4 +54,3 @@ trend="percentage"
 echo -n "{\"value\":$value,\"type\":\"$type\",\"minerId\":\"$id\",\"aggregationType\":\"$aggregation\",\"unit\":\"$unit\",\"trendType\":\"$trend\"}"
 
 rm -f $TMP_FILE 2>/dev/null
-
