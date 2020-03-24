@@ -4,7 +4,7 @@
 %define __strip /bin/true
 
 Name:		dante
-Version: 0.2.1
+Version: 0.3.0
 Release: 1%{?dist}
 Summary:	Single stack reports made simple
 
@@ -82,6 +82,9 @@ cp %{SOURCE7} %{buildroot}/etc/httpd/conf.d/
 
 
 %changelog
+* Tue Mar 24 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 0.3.0-1
+- Blacklist support (threat shield) - NethServer/dev#6072
+
 * Wed Jan 22 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 0.2.1-1
 - Missing users in Nextcloud report  - Bug NethServer/dev#6034
 
