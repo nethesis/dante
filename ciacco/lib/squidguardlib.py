@@ -35,6 +35,9 @@ def find_most_recent(directory, partial_file_name):
     # remove all file names that don't match partial_file_name string
     files = filter(lambda x: x.find(partial_file_name) > -1, files)
 
+    if not files:
+        return None
+
     # create a dict that contains list of files and their modification timestamps
     name_n_timestamp = dict([(x, os.stat(directory+x).st_mtime) for x in files])
 
@@ -65,17 +68,19 @@ def grep_blocked_lines():
         today_lines = grep_pattern(r"{0}".format(today), log_file_fd)
 
     previous_log_file = find_most_recent(log_directory, "ufdbguardd.log-")
-    previous_log_file = log_directory + previous_log_file
 
-    # scan previous log file for today logs
-    if previous_log_file.endswith(".gz"):
-        with gzip.open(previous_log_file, 'rb') as previous_log_file_fd:
-            today_lines_previous_log = grep_pattern(r"{0}".format(today), previous_log_file_fd)
-            today_lines = today_lines + today_lines_previous_log
-    else:
-        with open(previous_log_file) as previous_log_file_fd:
-            today_lines_previous_log = grep_pattern(r"{0}".format(today), previous_log_file_fd)
-            today_lines = today_lines + today_lines_previous_log
+    if previous_log_file:
+        previous_log_file = log_directory + previous_log_file
+
+        # scan previous log file for today logs
+        if previous_log_file.endswith(".gz"):
+            with gzip.open(previous_log_file, 'rb') as previous_log_file_fd:
+                today_lines_previous_log = grep_pattern(r"{0}".format(today), previous_log_file_fd)
+                today_lines = today_lines + today_lines_previous_log
+        else:
+            with open(previous_log_file) as previous_log_file_fd:
+                today_lines_previous_log = grep_pattern(r"{0}".format(today), previous_log_file_fd)
+                today_lines = today_lines + today_lines_previous_log
 
     blocked_lines = grep_pattern(r' BLOCK ', today_lines)
     return blocked_lines
