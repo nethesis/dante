@@ -4,7 +4,7 @@
 %define __strip /bin/true
 
 Name:		dante
-Version: 0.4.0
+Version: 0.4.1
 Release: 1%{?dist}
 Summary:	Single stack reports made simple
 
@@ -82,6 +82,9 @@ cp %{SOURCE7} %{buildroot}/etc/httpd/conf.d/
 
 
 %changelog
+* Thu Jul 09 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 0.4.1-1
+- Weekly reports: nextcloud miner error - Bug nethesis/dev#5842
+
 * Tue May 12 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 0.4.0-1
 - Weekly reports: content filter miner error - Bug nethesis/dev#5794
 - Integrate Yomi sandbox into rspamd - nethesis/dev#5752
