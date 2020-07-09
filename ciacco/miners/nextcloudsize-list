@@ -37,7 +37,7 @@ if (! -d '/var/lib/nethserver/nextcloud') {
     exit 1;
 }
 
-my $users = decode_json(`su - apache -s /bin/bash -c "source /opt/rh/rh-php72/enable; cd /usr/share/nextcloud/; php occ --output=json user:list" 2>/dev/null`);
+my $users = decode_json(`/usr/local/sbin/occ --output=json user:list 2>/dev/null`);
 
 if (!$users) {
     exit 1;
