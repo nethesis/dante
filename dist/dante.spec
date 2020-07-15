@@ -4,7 +4,7 @@
 %define __strip /bin/true
 
 Name:		dante
-Version: 0.4.1
+Version: 0.4.2
 Release: 1%{?dist}
 Summary:	Single stack reports made simple
 
@@ -82,6 +82,9 @@ cp %{SOURCE7} %{buildroot}/etc/httpd/conf.d/
 
 
 %changelog
+* Wed Jul 15 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 0.4.2-1
+- Report: malformed JSON string on nextcloud miner - Bug nethesis/dev#5847
+
 * Thu Jul 09 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 0.4.1-1
 - Weekly reports: nextcloud miner error - Bug nethesis/dev#5842
 
