@@ -33,7 +33,7 @@ use File::Basename;
 my $date = strftime "%Y%m%d", localtime;
 my @data;
 
-if (! -d '/var/lib/nethserver/nextcloud') {
+if (! -d '/var/lib/nethserver/nextcloud' || ! -x '/usr/local/sbin/occ') {
     exit 1;
 }
 
