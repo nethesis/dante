@@ -37,7 +37,7 @@ if (! -d '/var/lib/nethserver/nextcloud' || ! -x '/usr/local/sbin/occ') {
     exit 1;
 }
 
-my $users = decode_json(`/usr/local/sbin/occ --output=json user:list 2>/dev/null`);
+my $users = decode_json(`PATH=/sbin:/bin:/usr/sbin:/usr/bin /usr/local/sbin/occ --output=json user:list 2>/dev/null`);
 
 if (!$users) {
     exit 1;
