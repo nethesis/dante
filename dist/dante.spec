@@ -23,6 +23,8 @@ Source7:    dante.conf
 BuildRequires: systemd
 BuildRequires: python
 
+Requires: parallel
+
 %description
 Single stack reports made simple
 
@@ -44,6 +46,7 @@ python -m compileall ciacco/lib/squidguard.py
 %install
 mkdir -p %{buildroot}/usr/share/dante/beatrice
 mkdir -p %{buildroot}/usr/share/dante/virgilio
+mkdir -p %{buildroot}/usr/share/dante/ciacco
 mkdir -p %{buildroot}/usr/bin
 mkdir -p %{buildroot}/etc/sysconfig/
 mkdir -p %{buildroot}/etc/cron.d/
@@ -53,6 +56,7 @@ mkdir -p %{buildroot}/%{python_sitelib}
 mv ciacco/lib/squidguardlib.py* %{buildroot}%{python_sitelib}
 rm -rf ciacco/lib/
 cp ciacco/ciacco %{buildroot}/%{_bindir}
+cp ciacco/miner_exec %{buildroot}/usr/share/dante/ciacco
 cp %{SOURCE1} %{buildroot}/%{_bindir}
 cp %{SOURCE4} %{buildroot}/%{_bindir}
 mv ciacco/miners %{buildroot}/usr/share/dante/
@@ -79,6 +83,7 @@ cp %{SOURCE7} %{buildroot}/etc/httpd/conf.d/
 %{python_sitelib}/squidguardlib.py*
 /usr/share/dante/miners/
 /usr/share/dante/beatrice
+/usr/share/dante/ciacco/miner_exec
 
 
 %changelog
