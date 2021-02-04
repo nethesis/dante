@@ -32,6 +32,6 @@ fi
 TODAY_DIR="$CIACCO_OUTPUT_DIR/""$(date +"%Y/%m/%d")/"
 mkdir -p $TODAY_DIR
 
-/usr/bin/find /usr/share/dante/miners -type f -executable | /usr/bin/parallel /usr/share/dante/ciacco/miner_exec $TODAY_DIR {}
+/usr/bin/find /usr/share/dante/miners -type f -executable | /usr/bin/parallel --will-cite /usr/share/dante/ciacco/miner_exec $TODAY_DIR {}
 
 exit 0
