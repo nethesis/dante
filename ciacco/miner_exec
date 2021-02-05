@@ -31,7 +31,7 @@ MINER=$2
 NAME=$(basename $MINER)
 OUT="$DIR/$NAME".json
 
-$2 > $OUT
+$MINER > $OUT
 if [ $? -gt 0 ]; then
     rm -f $OUT
 fi
