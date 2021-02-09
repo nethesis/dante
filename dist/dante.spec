@@ -4,7 +4,7 @@
 %define __strip /bin/true
 
 Name:		dante
-Version: 0.4.3
+Version: 0.4.4
 Release: 1%{?dist}
 Summary:	Single stack reports made simple
 
@@ -87,6 +87,9 @@ cp %{SOURCE7} %{buildroot}/etc/httpd/conf.d/
 
 
 %changelog
+* Tue Feb 09 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 0.4.4-1
+- Dante report collects wrong data - Bug NethServer/dev#6419
+
 * Fri Jul 17 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 0.4.3-1
 - Report: malformed JSON string on nextcloud miner - Bug Nethesis/dev#5847 (again)
 
