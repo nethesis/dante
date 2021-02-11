@@ -33,14 +33,14 @@ my @sent;
 my @received;
 my $i = 0;
 
-system("/usr/bin/curl -s '$api' | grep '^{' > /tmp/result_ntopng");
+system("/usr/bin/curl -s '$api' | grep '^{' > /tmp/result_ntopng_chart_bar");
 
 my $json;
 {
-  open my $fh, "<", "/tmp/result_ntopng";
+  open my $fh, "<", "/tmp/result_ntopng_chart_bar";
   $json = <$fh>;
   close $fh;
-  system("/bin/rm -f /tmp/result_ntopng");
+  system("/bin/rm -f /tmp/result_ntopng_chart_bar");
 }
 
 if ($json) {
