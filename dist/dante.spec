@@ -4,7 +4,7 @@
 %define __strip /bin/true
 
 Name:		dante
-Version: 0.4.4
+Version: 0.4.5
 Release: 1%{?dist}
 Summary:	Single stack reports made simple
 
@@ -87,6 +87,9 @@ cp %{SOURCE7} %{buildroot}/etc/httpd/conf.d/
 
 
 %changelog
+* Fri Feb 12 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 0.4.5-1
+- Ntopng miners can't be executed in parallel - Bug NethServer/dev#6424
+
 * Tue Feb 09 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 0.4.4-1
 - Dante report collects wrong data - Bug NethServer/dev#6419
 
