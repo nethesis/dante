@@ -25,40 +25,32 @@ use warnings;
 use JSON;
 use File::Basename;
 
-my $api = 'http://127.0.0.1:3000/lua/hosts_traffic.lua';
+my $api = 'http://127.0.0.1:3000/lua/rest/v1/get/host/custom_data.lua?ifid=view:all&field_alias=ip,names,local_network_id,bytes.sent,bytes.rcvd';
 my $limit = 10;
-my $content = {};
+my @hosts;
 my @categories;
 my @sent;
 my @received;
 my $i = 0;
 
-system("/usr/bin/curl -s '$api' | grep '^{' > /tmp/result_ntopng_chart_bar");
-
-my $json;
-{
-  open my $fh, "<", "/tmp/result_ntopng_chart_bar";
-  $json = <$fh>;
-  close $fh;
-  system("/bin/rm -f /tmp/result_ntopng_chart_bar");
-}
-
-if ($json) {
-   $content = decode_json($json);
-} else {
-    exit 1;
-}
+my $content = decode_json(`/usr/bin/curl -s -H 'Content-Type: application/json' '$api'`);
 
 if (!$content) {
     exit 1;
 }
 
-foreach my $key (sort { int($a) <=> int($b) } keys %{$content->{'rank'}}) {
-    my $ip = $content->{'rank'}{$key};
+foreach my $host (@{$content->{'rsp'}}) {
+    next if not exists $host->{'local_network_id'};
+    push(@hosts, {"host" => $host->{'ip'}, "sent" => int($host->{'bytes.sent'}), "rcvd" => int($host->{'bytes.rcvd'}), "tot" => int($host->{'bytes.sent'}) + int($host->{'bytes.rcvd'})});
+}
+
+@hosts = sort { $a->{"tot"} <=> $b->{"tot"}; } @hosts;
+
+foreach (reverse @hosts) {
     last if ($i >= $limit);
-    push(@categories, $ip);
-    push(@sent,  $content->{'hosts'}{$ip}{'total'}{'sent'});
-    push(@received,  $content->{'hosts'}{$ip}{'total'}{'received'});
+    push(@categories, $_->{"host"});
+    push(@sent, $_->{'sent'});
+    push(@received, $_->{'rcvd'});
     $i++;
 }
 
