@@ -4,7 +4,7 @@
 %define __strip /bin/true
 
 Name:		dante
-Version: 0.4.5
+Version: 0.5.0
 Release: 1%{?dist}
 Summary:	Single stack reports made simple
 
@@ -87,6 +87,9 @@ cp %{SOURCE7} %{buildroot}/etc/httpd/conf.d/
 
 
 %changelog
+* Thu Jun 10 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 0.5.0-1
+- Dante Widgets based on "Traffic by host" empty - Bug nethesis/dev#6024
+
 * Fri Feb 12 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 0.4.5-1
 - Ntopng miners can't be executed in parallel - Bug NethServer/dev#6424
 
