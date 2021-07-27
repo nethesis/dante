@@ -4,7 +4,7 @@
 %define __strip /bin/true
 
 Name:		dante
-Version: 0.5.0
+Version: 0.5.1
 Release: 1%{?dist}
 Summary:	Single stack reports made simple
 
@@ -87,6 +87,9 @@ cp %{SOURCE7} %{buildroot}/etc/httpd/conf.d/
 
 
 %changelog
+* Tue Jul 27 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 0.5.1-1
+- Dante report: CVE-2020-28483 - NethServer/dev#6553 
+
 * Thu Jun 10 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 0.5.0-1
 - Dante Widgets based on "Traffic by host" empty - Bug nethesis/dev#6024
 
