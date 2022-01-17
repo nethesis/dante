@@ -4,7 +4,7 @@
 %define __strip /bin/true
 
 Name:		dante
-Version: 0.5.1
+Version: 0.6.0
 Release: 1%{?dist}
 Summary:	Single stack reports made simple
 
@@ -87,6 +87,9 @@ cp %{SOURCE7} %{buildroot}/etc/httpd/conf.d/
 
 
 %changelog
+* Mon Jan 17 2022 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 0.6.0-1
+- Email report: list of users by quota usage - NethServer/dev#6622
+
 * Tue Jul 27 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 0.5.1-1
 - Dante report: CVE-2020-28483 - NethServer/dev#6553 
 
