@@ -21,7 +21,7 @@
     "vuejs-datepicker": "^1.6.2"
   },
   "devDependencies": {
-    "@vue/cli-service": "^3.0.5",
+    "@vue/cli-service": "^5.0.8",
     "vue-template-compiler": "^2.6.10"
   },
   "postcss": {
